@@ -8,19 +8,9 @@ axios.interceptors.response.use(function (response) {
   if (error.response.data.error.status === 401) {
     localStorage.removeItem('token');
 
-    const authToken = window.btoa('420e781f275641c39c09ee6ca9f94275:e8b5abd005a44331a049e3473d12f4ef')
-    const params = new URLSearchParams();
-    params.append('grant_type', 'client_credentials');
 
-    const auth = {headers: { Authorization: 'Basic ' + authToken }};
+    window.location = 'https://accounts.spotify.com/authorize?client_id=420e781f275641c39c09ee6ca9f94275&response_type=code&redirect_uri=' + encodeURIComponent('http://localhost:8080/auth') + '&scope=user-modify-playback-state'
 
-    const proxy = 'https://cors-anywhere.herokuapp.com/';
-
-    axios
-    .post( proxy + 'https://accounts.spotify.com/api/token', params, auth)
-    .then(function (response) {
-        localStorage.setItem('token', response.data.access_token)
-    })
 }
   return Promise.reject(error)
 })

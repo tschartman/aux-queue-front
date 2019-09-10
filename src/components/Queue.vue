@@ -1,6 +1,6 @@
 <template>
-  <div class="q-pa-md">
-    <div class="q-gutter-md row">
+  <div>
+    <div>
       <q-select
         filled
         v-model="model"
@@ -10,13 +10,13 @@
         input-debounce="0"
         :options="options"
         @filter="filterFn"
-        hint="Basic autocomplete"
         style="width: 250px; padding-bottom: 32px"
       >
         <template v-slot:option="scope">
           <q-item
             v-bind="scope.itemProps"
             v-on="scope.itemEvents"
+            v-on:click="addToQueue(scope.opt)"
           >
             <q-item-section avatar>
               <q-img :src="scope.opt.album.images[0].url" />
@@ -35,12 +35,27 @@
           </q-item>
         </template>
       </q-select>
+
+    <q-list bordered>
+      <q-item 
+      v-for="song in queue"
+      :key="song.name"
+      clickable
+      v-ripple>
+        <q-item-section avatar>
+            <q-img :src="song.album.images[0].url" />
+        </q-item-section>
+
+        <q-item-section>{{song.name}}</q-item-section>
+      </q-item>
+    </q-list>
+    <q-btn @click="skipTrack" color="deep-orange" glossy label="Skip" />
     </div>
   </div>
 </template>
 <script>
 import Vue from "vue";
-import { QSelect, QItem, QImg } from 'quasar';
+import { QSelect, QBtn, QItem, QImg, QList, QItemSection, QItemLabel } from 'quasar';
 
 Vue.component('Queue')
 
@@ -50,29 +65,41 @@ export default {
     components: {
     QSelect,
     QItem,  
-    QImg
+    QImg,
+    QList,
+    QItemSection,
+    QItemLabel,
+    QBtn
   },
   data () {
     return {
       model: null,
-      options: []
+      options: [],
+      queue: []
     }
   },
 
   methods: {
+
+    skipTrack(){
+        this.$axios
+            .post('https://api.spotify.com/v1/me/player/next')
+            .then(res => console.log(res))
+    },
+    addToQueue(song){
+        this.queue.push(song)
+    },
+
     filterFn (val, update, abort) {
       if (val.length < 2) {
         abort()
         return
       }
-
-      update(() => {
-        this.$axios
-            .get('https://api.spotify.com/v1/search?q=' + val + '&type=track')
-            .then(res =>{
-                console.log(res.data.tracks.items[0].album.images[0].url)
-                this.options = res.data.tracks.items})
-      })
+        update(() => {
+            this.$axios
+                .get('https://api.spotify.com/v1/search?q=' + val + '&type=track')
+                .then(res =>this.options = res.data.tracks.items)
+        })
     }
   }
 }
