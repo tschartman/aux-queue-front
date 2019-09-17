@@ -9,7 +9,7 @@ axios.interceptors.response.use(function (response) {
     localStorage.removeItem('token');
 
 
-    window.location = 'https://accounts.spotify.com/authorize?client_id=420e781f275641c39c09ee6ca9f94275&response_type=code&redirect_uri=' + encodeURIComponent('http://localhost:8080/auth') + '&scope=user-modify-playback-state'
+    window.location = 'https://accounts.spotify.com/authorize?client_id=420e781f275641c39c09ee6ca9f94275&response_type=code&redirect_uri=' + encodeURIComponent('http://localhost:8080/auth') + '&scope=playlist-modify-public'
 
 }
   return Promise.reject(error)
