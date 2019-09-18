@@ -7,7 +7,7 @@ axios.interceptors.response.use(function (response) {
 }, function (error) {
   if (error.response.data.error.status === 401) {
     localStorage.removeItem('token');
-    window.location = 'https://accounts.spotify.com/authorize?client_id=420e781f275641c39c09ee6ca9f94275&response_type=code&redirect_uri=' + encodeURIComponent('https://spa.tschartman.now.sh') + '&scope=playlist-modify-public'
+    window.location = 'https://accounts.spotify.com/authorize?client_id=420e781f275641c39c09ee6ca9f94275&response_type=code&redirect_uri=' + encodeURIComponent('https://spa.tschartman.now.sh/auth') + '&scope=playlist-modify-public'
 }
   return Promise.reject(error)
 })
