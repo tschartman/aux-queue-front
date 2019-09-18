@@ -24,7 +24,7 @@ export default {
   mounted(){
       if (this.$route.query.code !== undefined){
         this.$axios
-            .post('http://localhost:3000/auth', 
+            .post('https://rocky-mesa-97178.herokuapp.com/auth', 
                 {
                  'code': this.$route.query.code,
                  })
