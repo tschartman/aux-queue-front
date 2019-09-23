@@ -1,5 +1,5 @@
 <template>
-    <Queue></Queue>
+    <Queue :key="$store.state.playlistId"/>
 </template>
 
 <style></style>

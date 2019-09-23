@@ -7,7 +7,23 @@ axios.interceptors.response.use(function (response) {
 }, function (error) {
   if (error.response.data.error.status === 401) {
     localStorage.removeItem('token');
-    window.location = 'https://accounts.spotify.com/authorize?client_id=420e781f275641c39c09ee6ca9f94275&response_type=code&redirect_uri=' + encodeURIComponent('https://spa.tschartman.now.sh/auth') + '&scope=playlist-modify-public'
+    if (localStorage.getItem('refresh') != null){
+          axios
+            .post('https://rocky-mesa-97178.herokuapp.com/auth', 
+                {
+                 'code': localStorage.getItem('refresh'),
+                 })
+            .then(res =>{
+                localStorage.setItem('token', res.data) 
+            })   
+    } else {
+    axios
+      .get('https://rocky-mesa-97178.herokuapp.com/auth', )
+      .then(res =>{
+              localStorage.setItem('token', res.data.token)
+              localStorage.setItem('refresh', res.data.refresh) 
+      }) 
+    }
 }
   return Promise.reject(error)
 })

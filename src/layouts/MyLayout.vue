@@ -13,9 +13,22 @@
         </q-btn>
 
         <q-toolbar-title>
-          Quasar App
+          AuxQueue
         </q-toolbar-title>
 
+      <q-btn-dropdown stretch flat :label="model.name || 'Playlists'">
+        <q-list>
+          <q-item v-for="plist in playlists" :key="plist.id" @click="updatePlaylist(plist)" clickable v-close-popup tabindex="0">
+            <q-item-section avatar>
+              <q-img :src="plist.images[0].url" />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label>{{plist.name}}</q-item-label>
+              <q-item-label caption>{{plist.owner.display_name}}</q-item-label>
+            </q-item-section>
+          </q-item>
+        </q-list>
+      </q-btn-dropdown>
         <div>Quasar v{{ $q.version }}</div>
       </q-toolbar>
     </q-header>
@@ -117,17 +130,42 @@
 </template>
 
 <script>
-import { openURL } from "quasar";
+import { openURL, QBtnDropdown, QItemLabel, QItem, QItemSection, QImg } from "quasar";
+import { mapMutations } from "vuex";
 
 export default {
   name: "MyLayout",
+  components: {
+    QBtnDropdown,
+    QItemLabel,
+    QItem,
+    QItemSection,
+    QImg
+  },
   data() {
     return {
-      leftDrawerOpen: false
+      leftDrawerOpen: false,
+      playlists: [],
+      model: null
     };
   },
+
   methods: {
-    openURL
+    openURL,
+    ...mapMutations(["CHANGE_PLAYLIST"]),
+    updatePlaylist(plist) {
+      this.model = plist;
+      this.CHANGE_PLAYLIST(this.model.id)
+    },
+  },
+  mounted() {
+     this.$axios
+            .get("https://api.spotify.com/v1/users/tschartman2/playlists")
+            .then(res => {
+              this.playlists = res.data.items
+              this.model = res.data.items[0]
+              this.CHANGE_PLAYLIST(res.data.items[0].id)
+              })
   }
 };
 </script>

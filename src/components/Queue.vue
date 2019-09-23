@@ -5,6 +5,7 @@
             <q-select
                 filled
                 v-model="model"
+                hint="Search Songs!"
                 use-input
                 hide-selected
                 fill-input
@@ -75,7 +76,6 @@
         <q-item-section>{{song.track.name}}</q-item-section>
       </q-item>
     </q-list>
-    <q-btn @click="skipTrack" color="deep-orange" glossy label="Skip" />
     </div>
   </div>
 </template>
@@ -107,13 +107,13 @@ export default {
     }
   },
 
+  computed: {
+      currentPlaylist: function() {
+          return this.$store.state.playlistId
+      }
+  },
   methods: {
 
-    skipTrack(){
-        this.$axios
-            .post('https://api.spotify.com/v1/me/player/next')
-    
-    },
     addToQueue(song){
         this.queue.push(song)
     },
@@ -127,21 +127,24 @@ export default {
             uris.push(track.uri)
         })
 
+        if (this.queue.length > 0) {
         this.$axios
-            .post('https://api.spotify.com/v1/playlists/3eS4UAXLQYZ5QCX8kQrIcu/tracks', {"uris": uris})
+            .post('https://api.spotify.com/v1/playlists/' + this.currentPlaylist + '/tracks', {"uris": uris})
             .then(res => {
-                console.log(res)
+                if(res.status == 201){
                 this.queue = [];
-                this.init()
+                this.init();
+                }
             })
+        }
     },
     init(){
         this.$axios
-            .get('https://api.spotify.com/v1/playlists/3eS4UAXLQYZ5QCX8kQrIcu/tracks')
+            .get('https://api.spotify.com/v1/playlists/' + this.currentPlaylist + '/tracks')
             .then(res => this.playlist = res.data.items)
     },
     filterFn (val, update, abort) {
-      if (val.length < 2) {
+      if (val.length < 1) {
         abort()
         return
       }
@@ -153,7 +156,7 @@ export default {
     }
   },
 
-  mounted() {
+  mounted(){
       this.init()
   }
 }
