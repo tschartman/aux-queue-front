@@ -18,6 +18,7 @@
                     v-bind="scope.itemProps"
                     v-on="scope.itemEvents"
                     v-on:click="addToQueue(scope.opt)"
+                    clickable v-close-popup
                 >
                     <q-item-section avatar>
                     <q-img :src="scope.opt.album.images[0].url" />
@@ -114,12 +115,16 @@ export default {
   },
   methods: {
 
-    addToQueue(song){
-        this.queue.push(song)
+    addToQueue(newSong){
+        if (this.queue.some(song => song.id === newSong.id )){
+            return
+        } else {
+            this.queue.push(newSong)
+        }
     },
     remove(song){
         let index = this.queue.indexOf(song)
-        this.queue.splice(index)
+        this.queue.splice(index, 1)
     },
     addSongs(){
         let uris = []
