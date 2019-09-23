@@ -29,7 +29,6 @@
           </q-item>
         </q-list>
       </q-btn-dropdown>
-        <div>Quasar v{{ $q.version }}</div>
       </q-toolbar>
     </q-header>
 
