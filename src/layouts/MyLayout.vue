@@ -16,7 +16,7 @@
           AuxQueue
         </q-toolbar-title>
 
-      <q-btn-dropdown stretch flat :label="model.name || 'Playlists'">
+      <q-btn-dropdown stretch flat :label="model === null ? 'Playlists' : model.name">
         <q-list>
           <q-item v-for="plist in playlists" :key="plist.id" @click="updatePlaylist(plist)" clickable v-close-popup tabindex="0">
             <q-item-section avatar>
@@ -157,7 +157,7 @@ export default {
       this.CHANGE_PLAYLIST(this.model.id)
     },
   },
-  mounted() {
+  created() {
      this.$axios
             .get("https://api.spotify.com/v1/users/tschartman2/playlists")
             .then(res => {

@@ -1,11 +1,13 @@
 <template>
   <div>
     <div>
-        <div>
+        <div class="row">
+          <div class="col-xs-8 q-pa-md">
             <q-select
-                filled
+                rounded
+                outlined
                 v-model="model"
-                hint="Search Songs!"
+                label="Search Songs"
                 use-input
                 hide-selected
                 fill-input
@@ -37,17 +39,14 @@
                 </q-item>
                 </template>
             </q-select>
+          </div>
+          <div class="col-xs-4 q-pa-lg">
+              <q-btn color="primary" label="Add Songs" @click="addSongs" />
+          </div>
         </div>
     <hr>
     <q-list>
-    <div class="row">
-        <div class="col-md-8">
-        <q-item-label header>Songs to add</q-item-label>
-        </div>
-        <div class="col-md-2">
-        <q-btn color="primary" label="Add Songs" @click="addSongs" />
-        </div>
-    </div>
+      <q-item-label header>Add</q-item-label>
       <q-item 
       v-for="song in queue"
       :key="song.name"
@@ -104,7 +103,13 @@ export default {
       model: null,
       options: [],
       queue: [], 
-      playlist: []
+      playlist: [],
+      category: null,
+      categories: [
+        'artist',
+        'track',
+        'album'
+      ]
     }
   },
 
@@ -161,7 +166,7 @@ export default {
     }
   },
 
-  mounted(){
+  created(){
       this.init()
   }
 }

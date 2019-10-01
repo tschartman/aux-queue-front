@@ -7,7 +7,7 @@ axios.interceptors.response.use(function (response) {
 }, function (error) {
   if (error.response.data.error.status === 401) {
     localStorage.removeItem('token');
-    if (localStorage.getItem('refresh') != null){
+    if (localStorage.getItem('refresh')){
           axios
             .post('https://rocky-mesa-97178.herokuapp.com/auth', 
                 {
@@ -15,6 +15,7 @@ axios.interceptors.response.use(function (response) {
                  })
             .then(res =>{
                 localStorage.setItem('token', res.data) 
+                location.reload()
             })   
     } else {
     axios
@@ -22,6 +23,7 @@ axios.interceptors.response.use(function (response) {
       .then(res =>{
               localStorage.setItem('token', res.data.token)
               localStorage.setItem('refresh', res.data.refresh) 
+              location.reload()
       }) 
     }
 }
