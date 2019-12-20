@@ -1,88 +1,92 @@
 <template>
-  <v-content>
-    <v-container fluid fill-height>
-      <v-layout align-center justify-center>
-        <v-flex xs12 sm8 md4>
-          <v-card class="elevation-12">
-            <v-toolbar color="primary" dark flat>
-              <v-toolbar-title>Register</v-toolbar-title>
-              <v-spacer></v-spacer>
-            </v-toolbar>
-            <v-card-text>
-              <form>
-                <h3>User Info</h3>
-                <v-text-field
-                  @keyup.enter="submit"
-                  v-model="firstName"
-                  :error-messages="firstNameErrors"
-                  label="First Name"
-                  required
-                  @input="$v.firstName.$touch()"
-                  @blur="$v.firstName.$touch()"
-                ></v-text-field>
-                <v-text-field
-                  @keyup.enter="submit"
-                  v-model="lastName"
-                  :error-messages="lastNameErrors"
-                  label="Last Name"
-                  required
-                  @input="$v.lastName.$touch()"
-                  @blur="$v.lastName.$touch()"
-                ></v-text-field>
-                <v-text-field
-                  @keyup.enter="submit"
-                  v-model="email"
-                  :error-messages="emailErrors"
-                  label="E-mail"
-                  required
-                  @input="$v.email.$touch()"
-                  @blur="$v.email.$touch()"
-                ></v-text-field>
-                <h3>Password</h3>
-                <v-text-field
-                  @keyup.enter="submit"
-                  v-model="password"
-                  :error-messages="passwordErrors"
-                  type="password"
-                  label="Password"
-                  required
-                  @input="$v.password.$touch()"
-                  @blur="$v.password.$touch()"
-                ></v-text-field>
-                <v-text-field
-                  @keyup.enter="submit"
-                  v-model="repeatPassword"
-                  :error-messages="repeatPasswordErrors"
-                  type="password"
-                  label="Confirm Password"
-                  required
-                  @input="$v.repeatPassword.$touch()"
-                  @blur="$v.repeatPassword.$touch()"
-                ></v-text-field>
-                <v-checkbox
-                  v-model="checkbox"
-                  :error-messages="checkboxErrors"
-                  label="Do you agree?"
-                  required
-                  @change="$v.checkbox.$touch()"
-                  @blur="$v.checkbox.$touch()"
-                ></v-checkbox>
-              </form>
-            </v-card-text>
-            <v-card-actions>
-              <v-btn @click="cancel" color="error">cancel</v-btn>
-              <v-spacer></v-spacer>
-              <v-btn class="mr-4" @click="submit" color="success">submit</v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-flex>
-      </v-layout>
-    </v-container>
-  </v-content>
+  <div class="window-height window-width row justify-center items-center">
+    <div class="col-xs-12 col-sm-8 col-md-6 col-lg-4 col-xl-2">
+      <q-card class="elevation-12">
+        <q-toolbar class="bg-primary text-white">
+          <q-toolbar-title>Login</q-toolbar-title>
+        </q-toolbar>
+        <q-card-section>
+          <form>
+            <h5>User Info</h5>
+            <q-input
+              @keyup.enter="submit"
+              v-model="firstName"
+              :error-messages="firstNameErrors"
+              label="First Name"
+              required
+              @input="$v.firstName.$touch()"
+              @blur="$v.firstName.$touch()"
+            ></q-input>
+            <q-input
+              @keyup.enter="submit"
+              v-model="lastName"
+              :error-messages="lastNameErrors"
+              label="Last Name"
+              required
+              @input="$v.lastName.$touch()"
+              @blur="$v.lastName.$touch()"
+            ></q-input>
+            <q-input
+              @keyup.enter="submit"
+              v-model="email"
+              :error-messages="emailErrors"
+              label="E-mail"
+              required
+              @input="$v.email.$touch()"
+              @blur="$v.email.$touch()"
+            ></q-input>
+            <div class="sep"></div>
+            <h5>Password</h5>
+            <q-input
+              @keyup.enter="submit"
+              v-model="password"
+              :error-messages="passwordErrors"
+              type="password"
+              label="Password"
+              required
+              @input="$v.password.$touch()"
+              @blur="$v.password.$touch()"
+            ></q-input>
+            <q-input
+              @keyup.enter="submit"
+              v-model="repeatPassword"
+              :error-messages="repeatPasswordErrors"
+              type="password"
+              label="Confirm Password"
+              required
+              @input="$v.repeatPassword.$touch()"
+              @blur="$v.repeatPassword.$touch()"
+            ></q-input>
+            <q-checkbox
+              v-model="checkbox"
+              :error-messages="checkboxErrors"
+              label="Do you agree?"
+              required
+              @change="$v.checkbox.$touch()"
+              @blur="$v.checkbox.$touch()"
+            ></q-checkbox>
+          </form>
+        </q-card-section>
+        <q-card-actions align="around">
+          <q-btn @click="cancel" color="primary">cancel</q-btn>
+          <q-btn class="mr-4" @click="submit" color="secondary">submit</q-btn>
+        </q-card-actions>
+      </q-card>
+    </div>
+  </div>
 </template>
 <script>
 import { validationMixin } from "vuelidate";
 import { required, sameAs, minLength, email } from "vuelidate/lib/validators";
+import {
+  QBtn,
+  QCard,
+  QCardActions,
+  QInput,
+  QToolbar,
+  QCardSection,
+  QCheckbox
+} from "quasar";
 export default {
   mixins: [validationMixin],
   validations: {
@@ -101,6 +105,15 @@ export default {
         return val;
       }
     }
+  },
+  components: {
+    QBtn,
+    QCard,
+    QCardActions,
+    QCardSection,
+    QInput,
+    QToolbar,
+    QCheckbox
   },
   data() {
     return {
@@ -166,7 +179,7 @@ export default {
         this.$http
           .post("http://localhost:8000/users/", data)
           .then(res => {
-            this.$router.push("/login");
+            this.$router.push("/login"), console.log(res);
           })
           .catch(err => {
             console.log(err);
@@ -179,3 +192,12 @@ export default {
   }
 };
 </script>
+<style>
+h5 {
+  margin: 0;
+}
+
+.sep {
+  margin: 1em;
+}
+</style>
