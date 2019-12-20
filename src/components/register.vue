@@ -11,7 +11,8 @@
             <q-input
               @keyup.enter="submit"
               v-model="firstName"
-              :error-messages="firstNameErrors"
+              :error-message="firstNameErrors[0]"
+              :error="firstNameErrors.length > 0"
               label="First Name"
               required
               @input="$v.firstName.$touch()"
@@ -20,7 +21,8 @@
             <q-input
               @keyup.enter="submit"
               v-model="lastName"
-              :error-messages="lastNameErrors"
+              :error-message="lastNameErrors[0]"
+              :error="lastNameErrors.length > 0"
               label="Last Name"
               required
               @input="$v.lastName.$touch()"
@@ -29,7 +31,8 @@
             <q-input
               @keyup.enter="submit"
               v-model="email"
-              :error-messages="emailErrors"
+              :error-message="emailErrors[0]"
+              :error="emailErrors.length > 0"
               label="E-mail"
               required
               @input="$v.email.$touch()"
@@ -40,7 +43,8 @@
             <q-input
               @keyup.enter="submit"
               v-model="password"
-              :error-messages="passwordErrors"
+              :error-message="passwordErrors[0]"
+              :error="passwordErrors.length > 0"
               type="password"
               label="Password"
               required
@@ -50,7 +54,8 @@
             <q-input
               @keyup.enter="submit"
               v-model="repeatPassword"
-              :error-messages="repeatPasswordErrors"
+              :error-message="repeatPasswordErrors[0]"
+              :error="repeatPasswordErrors.length > 0"
               type="password"
               label="Confirm Password"
               required
@@ -59,7 +64,8 @@
             ></q-input>
             <q-checkbox
               v-model="checkbox"
-              :error-messages="checkboxErrors"
+              :error-message="checkboxErrors[0]"
+              :error="checkboxErrors.length > 0"
               label="Do you agree?"
               required
               @change="$v.checkbox.$touch()"
@@ -163,6 +169,8 @@ export default {
       if (!this.$v.repeatPassword.$dirty) return errors;
       !this.$v.repeatPassword.sameAsPassword &&
         errors.push("Passwords must match");
+      !this.$v.password.required &&
+        errors.push("Confirmed password is required");
       return errors;
     }
   },
