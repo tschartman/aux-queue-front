@@ -1,15 +1,15 @@
 <template>
-    <Queue :key="$store.state.playlistId"/>
+  <Queue :key="$store.state.playlistId" />
 </template>
 
 <style></style>
 
 <script>
-import Queue from "../components/Queue.vue"
+import Queue from "../components/Queue.vue";
 export default {
   name: "PageIndex",
   components: {
-   Queue: Queue
- },
+    Queue: Queue
+  }
 };
 </script>

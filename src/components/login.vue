@@ -49,7 +49,14 @@
 <script>
 import { validationMixin } from "vuelidate";
 import { required } from "vuelidate/lib/validators";
-import {QBtn, QCard, QCardActions, QInput, QToolbar, QCardSection} from 'quasar';
+import {
+  QBtn,
+  QCard,
+  QCardActions,
+  QInput,
+  QToolbar,
+  QCardSection
+} from "quasar";
 export default {
   mixins: [validationMixin],
   validations: {
@@ -94,10 +101,11 @@ export default {
         this.$store
           .dispatch("login", { username, password })
           .then(() => this.$router.push("/"))
-          .catch(err => (
-              this.authError = "Username or password incorrect",
+          .catch(
+            err => (
+              (this.authError = "Username or password incorrect"),
               console.log(err)
-          )
+            )
           );
       }
     }
