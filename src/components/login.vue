@@ -1,59 +1,55 @@
 <template>
-  <div>
-    <div fluid fill-height>
-      <div align-center justify-center>
-        <div class="col-xs-12 col-sm-8 col-md-4">
-          <q-card class="elevation-12">
-            <q-toolbar color="primary" dark flat>
-              <q-toolbar-title>Login</q-toolbar-title>
-              <q-separator></q-separator>
-            </q-toolbar>
-            <q-card-section>
-              <form>
-                <q-input
-                  @keyup.enter="login"
-                  v-model="username"
-                  :error-messages="usernameErrors"
-                  label="Email"
-                  name="login"
-                  prepend-icon="person"
-                  type="text"
-                  required
-                  @input="$v.username.$touch()"
-                  @blur="$v.username.$touch()"
-                ></q-input>
+  <div class="window-height window-width row justify-center items-center">
+    <div class="col-xs-12 col-sm-8 col-md-6 col-lg-4 col-xl-2">
+      <q-card class="elevation-12">
+        <q-toolbar class="bg-primary text-white">
+          <q-toolbar-title>Login</q-toolbar-title>
+        </q-toolbar>
+        <q-card-section>
+          <form>
+            <q-input
+              @keyup.enter="login"
+              v-model="username"
+              :error-message="usernameErrors[0]"
+              :error="usernameErrors.length !== 0"
+              label="Email"
+              name="login"
+              prepend-icon="person"
+              type="text"
+              required
+              @input="$v.username.$touch()"
+              @blur="$v.username.$touch()"
+            ></q-input>
 
-                <q-input
-                  @keyup.enter="login"
-                  v-model="password"
-                  :error-messages="passwordErrors"
-                  id="password"
-                  label="Password"
-                  name="password"
-                  prepend-icon="lock"
-                  type="password"
-                  required
-                  @input="$v.password.$touch()"
-                  @blur="$v.password.$touch()"
-                ></q-input>
-              </form>
-              <p class="authError" v-if="authError">{{ authError }}</p>
-            </q-card-section>
-            <q-card-actions>
-              <q-btn to="/register" color="primary">Sign up</q-btn>
-              <q-separator></q-separator>
-              <q-btn @click="login" color="secondary">Login</q-btn>
-            </q-card-actions>
-          </q-card>
-        </div>
-      </div>
+            <q-input
+              @keyup.enter="login"
+              v-model="password"
+              :error-message="passwordErrors[0]"
+              :error="passwordErrors.length !== 0"
+              id="password"
+              label="Password"
+              name="password"
+              prepend-icon="lock"
+              type="password"
+              required
+              @input="$v.password.$touch()"
+              @blur="$v.password.$touch()"
+            ></q-input>
+          </form>
+          <p class="authError" v-if="authError">{{ authError }}</p>
+        </q-card-section>
+        <q-card-actions align="around">
+          <q-btn to="/register" color="primary">Sign up</q-btn>
+          <q-btn @click="login" color="secondary">Login</q-btn>
+        </q-card-actions>
+      </q-card>
     </div>
   </div>
 </template>
 <script>
 import { validationMixin } from "vuelidate";
 import { required } from "vuelidate/lib/validators";
-import {QBtn, QCard, QCardActions, QInput, QToolbar, QSeparator, QCardSection} from 'quasar';
+import {QBtn, QCard, QCardActions, QInput, QToolbar, QCardSection} from 'quasar';
 export default {
   mixins: [validationMixin],
   validations: {
@@ -66,7 +62,6 @@ export default {
     QCardActions,
     QCardSection,
     QInput,
-    QSeparator,
     QToolbar
   },
   data() {
