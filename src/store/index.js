@@ -5,12 +5,16 @@ import router from "../router/routes";
 
 Vue.use(Vuex);
 
+axios.defaults.xsrfCookieName = "csrftoken";
+axios.defaults.xsrfHeaderName = "X-CSRFToken";
+
 const Store = new Vuex.Store({
   state: {
     playlistId: "",
     status: "",
     expires_in: null,
-    token: localStorage.getItem("token") || ""
+    token: localStorage.getItem("token") || "",
+    auth: localStorage.getItem("token") || false
   },
   mutations: {
     CHANGE_PLAYLIST: (state, playlistId) => {
@@ -23,6 +27,7 @@ const Store = new Vuex.Store({
       state.status = "success";
       state.token = token;
       state.expires_in = exp;
+      state.auth = true;
       localStorage.setItem("token", token);
     },
     auth_error(state) {
@@ -31,6 +36,7 @@ const Store = new Vuex.Store({
     logout(state) {
       state.status = "";
       state.token = "";
+      state.auth = false;
       localStorage.removeItem("token");
     }
   },
@@ -49,11 +55,12 @@ const Store = new Vuex.Store({
             const exp = resp.data.expires_in;
             localStorage.setItem("refresh", refresh);
             commit("auth_success", token, exp);
-            resolve(resp);
+            resolve();
           })
-          .catch(err => {
+          .catch(error => {
             commit("auth_error");
-            reject(err);
+            console.error(error);
+            reject(error);
           });
       });
     },
@@ -104,7 +111,7 @@ const Store = new Vuex.Store({
   },
   getters: {
     playlistId: state => state.playlistId,
-    isLoggedIn: state => !!state.token,
+    isLoggedIn: state => state.auth,
     authStatus: state => state.status,
     token: state => state.token
   },
