@@ -1,27 +1,116 @@
 import Vue from "vue";
 import Vuex from "vuex";
+import axios from "axios";
+import router from "../router/routes";
 
 Vue.use(Vuex);
 
-export default function(/* { ssrContext } */) {
-  const Store = new Vuex.Store({
-    state: {
-      playlistId: ""
+const Store = new Vuex.Store({
+  state: {
+    playlistId: "",
+    status: "",
+    expires_in: null,
+    token: localStorage.getItem("token") || ""
+  },
+  mutations: {
+    CHANGE_PLAYLIST: (state, playlistId) => {
+      state.playlistId = playlistId;
     },
-    mutations: {
-      CHANGE_PLAYLIST: (state, playlistId) => {
-        state.playlistId = playlistId;
+    auth_request(state) {
+      state.status = "loading";
+    },
+    auth_success(state, token) {
+      state.status = "success";
+      state.token = token;
+      localStorage.setItem("token", token);
+    },
+    auth_error(state) {
+      state.status = "error";
+    },
+    logout(state) {
+      state.status = "";
+      state.token = "";
+      localStorage.removeItem("token");
+    }
+  },
+  actions: {
+    login({ commit }, user) {
+      return new Promise((resolve, reject) => {
+        commit("auth_request");
+        axios({
+          url: "http://localhost:8000/api/token/",
+          data: user,
+          method: "POST"
+        })
+          .then(resp => {
+            const token = resp.data.access_token;
+            const refresh = resp.data.refresh_token;
+            this.state.expires_in = resp.data.expires_in;
+            localStorage.setItem("refresh", refresh);
+            commit("auth_success", token);
+            resolve(resp);
+          })
+          .catch(err => {
+            commit("auth_error");
+            reject(err);
+          });
+      });
+    },
+    inspect() {
+      const token = this.state.token;
+      if (token) {
+        const exp = this.expires_in;
+        // if token expires in 30 minutes and is not reaching lifespan
+        if (exp - Date.now() / 1000 < 1800) {
+          //token expires soon refresh
+          this.dispatch("refresh", localStorage.getItem("refresh"));
+          console.log("refreshed");
+          // } else if (exp - Date.now() / 1000 < 1800) {
+          //   // token refresh expires soon so logout
+          //   this.dispatch("logout");
+        } else {
+          //token is good, do nothing
+        }
       }
     },
-    actions: {},
-    getters: {
-      playlistId: state => state.playlistId
+    refresh({ commit }, refresh) {
+      return new Promise((resolve, reject) => {
+        commit("auth_request");
+        axios({
+          url: "http://localhost:8000/api/token/refresh/",
+          data: { refresh: refresh },
+          method: "POST"
+        })
+          .then(resp => {
+            const token = resp.data.access;
+            commit("auth_success", token);
+            resolve(resp);
+          })
+          .catch(err => {
+            commit("auth_error");
+            console.log(err);
+            reject(err);
+          });
+      });
     },
+    logout({ commit }) {
+      return new Promise(resolve => {
+        commit("logout");
+        router.push({ path: "login" });
+        resolve();
+      });
+    }
+  },
+  getters: {
+    playlistId: state => state.playlistId,
+    isLoggedIn: state => !!state.token,
+    authStatus: state => state.status,
+    token: state => state.token
+  },
 
-    // enable strict mode (adds overhead!)
-    // for dev mode only
-    strict: process.env.DEV
-  });
+  // enable strict mode (adds overhead!)
+  // for dev mode only
+  strict: process.env.DEV
+});
 
-  return Store;
-}
+export default Store;
