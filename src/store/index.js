@@ -19,9 +19,10 @@ const Store = new Vuex.Store({
     auth_request(state) {
       state.status = "loading";
     },
-    auth_success(state, token) {
+    auth_success(state, token, exp) {
       state.status = "success";
       state.token = token;
+      state.expires_in = exp;
       localStorage.setItem("token", token);
     },
     auth_error(state) {
@@ -38,16 +39,16 @@ const Store = new Vuex.Store({
       return new Promise((resolve, reject) => {
         commit("auth_request");
         axios({
-          url: "http://localhost:8000/api/token/",
+          url: "http://localhost:8000/login/",
           data: user,
           method: "POST"
         })
           .then(resp => {
             const token = resp.data.access_token;
             const refresh = resp.data.refresh_token;
-            this.state.expires_in = resp.data.expires_in;
+            const exp = resp.data.expires_in;
             localStorage.setItem("refresh", refresh);
-            commit("auth_success", token);
+            commit("auth_success", token, exp);
             resolve(resp);
           })
           .catch(err => {

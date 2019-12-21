@@ -100,13 +100,8 @@ export default {
         let password = this.password;
         this.$store
           .dispatch("login", { username, password })
-          .then(() => this.$router.push("/"))
-          .catch(
-            err => (
-              (this.authError = "Username or password incorrect"),
-              console.log(err)
-            )
-          );
+          .then(this.$router.push("/"))
+          .catch((this.authError = "Username or password incorrect"));
       }
     }
   }
