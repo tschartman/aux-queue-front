@@ -33,6 +33,8 @@ spotify_api.interceptors.response.use(
             console.log("renewed your spotify session!");
           });
         });
+    } else {
+      return Promise.reject(error);
     }
   }
 );

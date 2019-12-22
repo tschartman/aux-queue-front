@@ -35,7 +35,6 @@ const Store = new Vuex.Store({
       state.token = token;
       state.expires_in = exp;
       state.auth = true;
-      localStorage.setItem("token", token);
     },
     auth_error(state) {
       state.status = "error";
@@ -47,6 +46,8 @@ const Store = new Vuex.Store({
       state.auth = false;
       localStorage.removeItem("token");
       localStorage.removeItem("stoken");
+      localStorage.removeItem("refresh");
+      localStorage.removeItem("srefresh");
     }
   },
   actions: {
@@ -59,8 +60,9 @@ const Store = new Vuex.Store({
             const token = resp.data.access_token;
             const refresh = resp.data.refresh_token;
             const exp = resp.data.expires_in;
-            localStorage.setItem("refresh", refresh);
             commit("auth_success", token, exp);
+            localStorage.setItem("refresh", refresh);
+            localStorage.setItem("token", token);
             resolve();
           })
           .catch(error => {
