@@ -14,7 +14,8 @@ const Store = new Vuex.Store({
     status: "",
     expires_in: null,
     token: localStorage.getItem("token") || "",
-    auth: localStorage.getItem("token") || false
+    auth: localStorage.getItem("token") || false,
+    spotify_token: localStorage.getItem("stoken") || ""
   },
   mutations: {
     CHANGE_PLAYLIST: (state, playlistId) => {
@@ -113,7 +114,8 @@ const Store = new Vuex.Store({
     playlistId: state => state.playlistId,
     isLoggedIn: state => state.auth,
     authStatus: state => state.status,
-    token: state => state.token
+    token: state => state.token,
+    stoken: state => state.spotify_token
   },
 
   // enable strict mode (adds overhead!)
