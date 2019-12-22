@@ -14,6 +14,7 @@ const Store = new Vuex.Store({
     expires_in: null,
     token: localStorage.getItem("token") || "",
     auth: localStorage.getItem("token") == undefined ? false : true,
+    sauth: localStorage.getItem("stoken") == undefined ? false : true,
     spotify_token: localStorage.getItem("stoken") || "",
     spotify_refresh: localStorage.getItem("srefresh") || ""
   },
@@ -135,6 +136,7 @@ const Store = new Vuex.Store({
   getters: {
     playlistId: state => state.playlistId,
     isLoggedIn: state => state.auth,
+    isLinked: state => state.sauth,
     authStatus: state => state.status,
     token: state => state.token,
     spotifyToken: state => state.spotify_token,

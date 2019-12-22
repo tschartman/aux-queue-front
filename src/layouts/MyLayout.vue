@@ -15,7 +15,11 @@
         <q-toolbar-title>
           AuxQueue
         </q-toolbar-title>
-        <a href="https://78caead9.ngrok.io/spotify/">link spotify</a>
+        <a
+          v-if="!this.$store.getters.isLinked"
+          href="https://78caead9.ngrok.io/spotify/"
+          >link spotify</a
+        >
         <q-btn-dropdown
           stretch
           flat
