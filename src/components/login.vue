@@ -100,7 +100,11 @@ export default {
         let password = this.password;
         this.$store
           .dispatch("login", { username, password })
-          .then(() => this.$router.push("/"))
+          .then(() => {
+            this.$store.dispatch("linkSpotify").then(() => {
+              this.$router.push("/");
+            });
+          })
           .catch(() => (this.authError = "Username or password incorrect"));
       }
     }

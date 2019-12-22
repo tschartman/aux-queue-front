@@ -1,7 +1,6 @@
 import Vue from "vue";
 import Vuex from "vuex";
 import { app_api } from "../utils/app-api";
-import router from "../router/routes";
 
 Vue.use(Vuex);
 
@@ -14,8 +13,9 @@ const Store = new Vuex.Store({
     status: "",
     expires_in: null,
     token: localStorage.getItem("token") || "",
-    auth: localStorage.getItem("token") || false,
-    spotify_token: localStorage.getItem("stoken") || ""
+    auth: localStorage.getItem("token") == undefined ? false : true,
+    spotify_token: localStorage.getItem("stoken") || "",
+    spotify_refresh: localStorage.getItem("srefresh") || ""
   },
   mutations: {
     CHANGE_PLAYLIST: (state, playlistId) => {
@@ -24,9 +24,11 @@ const Store = new Vuex.Store({
     auth_request(state) {
       state.status = "loading";
     },
-    link_spotify(state, token) {
-      localStorage.setItem("stoken", token);
-      state.spotify_token = token;
+    link_spotify(state, tokens) {
+      localStorage.setItem("stoken", tokens.token);
+      localStorage.setItem("srefresh", tokens.refresh);
+      state.spotify_token = tokens.token;
+      state.spotify_refresh = tokens.refresh;
     },
     auth_success(state, token, exp) {
       state.status = "success";
@@ -41,8 +43,10 @@ const Store = new Vuex.Store({
     logout(state) {
       state.status = "";
       state.token = "";
+      state.spotify_token = "";
       state.auth = false;
       localStorage.removeItem("token");
+      localStorage.removeItem("stoken");
     }
   },
   actions: {
@@ -71,8 +75,9 @@ const Store = new Vuex.Store({
         app_api
           .get("/users/1/spotify/")
           .then(res => {
-            console.log(res);
-            commit("link_spotify", res.data.access_token);
+            let token = res.data.access_token;
+            let refresh = res.data.refresh_token;
+            commit("link_spotify", { token: token, refresh: refresh });
             resolve();
           })
           .catch(error => {
@@ -121,7 +126,6 @@ const Store = new Vuex.Store({
     logout({ commit }) {
       return new Promise(resolve => {
         commit("logout");
-        router.push({ path: "login" });
         resolve();
       });
     }
@@ -131,7 +135,8 @@ const Store = new Vuex.Store({
     isLoggedIn: state => state.auth,
     authStatus: state => state.status,
     token: state => state.token,
-    spotifyToken: state => state.spotify_token
+    spotifyToken: state => state.spotify_token,
+    spotifyRefresh: state => state.spotify_refresh
   },
 
   // enable strict mode (adds overhead!)

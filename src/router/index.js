@@ -1,7 +1,7 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
 import routes from "./routes";
-import store from "../store/index";
+import Store from "../store";
 
 Vue.use(VueRouter);
 
@@ -24,7 +24,7 @@ export default function(/* { store, ssrContext } */) {
 
   Router.beforeEach((to, from, next) => {
     if (to.matched.some(record => record.meta.requiresAuth)) {
-      if (store.getters.isLoggedIn) {
+      if (Store.getters.isLoggedIn) {
         next();
         return;
       }
