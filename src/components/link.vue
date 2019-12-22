@@ -5,7 +5,7 @@
 </template>
 <script>
 import Vue from "vue";
-import axios from "axios";
+import { app_api } from "../utils/app-api";
 
 Vue.component("Link");
 
@@ -25,20 +25,19 @@ export default {
         access_token: this.$route.query.token,
         refresh_token: this.$route.query.refresh
       };
-
-      const config = {
-        headers: {
-          Authorization: "Bearer " + this.$store.getters.token
-        }
-      };
-
-      console.log(this.$store.getters.token);
-
-      axios
-        .put("http://localhost:8000/users/1/spotify/", data, config)
+      app_api
+        .put("/users/1/spotify/", data)
         .then(res => {
           console.log(res);
-          this.$router.push("/");
+          this.$store
+            .dispatch("linkSpotify")
+            .then(res => {
+              console.log(res);
+              this.$router.push("/");
+            })
+            .catch(error => {
+              console.log(error);
+            });
         })
         .catch(error => {
           console.log(error);

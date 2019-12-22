@@ -76,6 +76,7 @@
 </template>
 <script>
 import Vue from "vue";
+import { spotify_api } from "../utils/spotify-api";
 import {
   QSelect,
   QBtn,
@@ -136,13 +137,10 @@ export default {
       });
 
       if (this.queue.length > 0) {
-        this.$axios
-          .post(
-            "https://api.spotify.com/v1/playlists/" +
-              this.currentPlaylist +
-              "/tracks",
-            { uris: uris }
-          )
+        spotify_api
+          .post("/playlists/" + this.currentPlaylist + "/tracks", {
+            uris: uris
+          })
           .then(res => {
             if (res.status == 201) {
               this.queue = [];
@@ -152,12 +150,8 @@ export default {
       }
     },
     init() {
-      this.$axios
-        .get(
-          "https://api.spotify.com/v1/playlists/" +
-            this.currentPlaylist +
-            "/tracks"
-        )
+      spotify_api
+        .get("/playlists/" + this.currentPlaylist + "/tracks")
         .then(res => (this.playlist = res.data.items));
     },
     filterFn(val, update, abort) {
@@ -166,8 +160,8 @@ export default {
         return;
       }
       update(() => {
-        this.$axios
-          .get("https://api.spotify.com/v1/search?q=" + val + "&type=track")
+        spotify_api
+          .get("/search?q=" + val + "&type=track")
           .then(res => (this.options = res.data.tracks.items));
       });
     }

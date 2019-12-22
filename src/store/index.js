@@ -1,12 +1,12 @@
 import Vue from "vue";
 import Vuex from "vuex";
-import axios from "axios";
+import { app_api } from "../utils/app-api";
 import router from "../router/routes";
 
 Vue.use(Vuex);
 
-axios.defaults.xsrfCookieName = "csrftoken";
-axios.defaults.xsrfHeaderName = "X-CSRFToken";
+app_api.defaults.xsrfCookieName = "csrftoken";
+app_api.defaults.xsrfHeaderName = "X-CSRFToken";
 
 const Store = new Vuex.Store({
   state: {
@@ -23,6 +23,10 @@ const Store = new Vuex.Store({
     },
     auth_request(state) {
       state.status = "loading";
+    },
+    link_spotify(state, token) {
+      localStorage.setItem("stoken", token);
+      state.spotify_token = token;
     },
     auth_success(state, token, exp) {
       state.status = "success";
@@ -45,11 +49,8 @@ const Store = new Vuex.Store({
     login({ commit }, user) {
       return new Promise((resolve, reject) => {
         commit("auth_request");
-        axios({
-          url: "http://localhost:8000/login/",
-          data: user,
-          method: "POST"
-        })
+        app_api
+          .post("/login/", user)
           .then(resp => {
             const token = resp.data.access_token;
             const refresh = resp.data.refresh_token;
@@ -61,6 +62,21 @@ const Store = new Vuex.Store({
           .catch(error => {
             commit("auth_error");
             console.error(error);
+            reject(error);
+          });
+      });
+    },
+    linkSpotify({ commit }) {
+      return new Promise((resolve, reject) => {
+        app_api
+          .get("/users/1/spotify/")
+          .then(res => {
+            console.log(res);
+            commit("link_spotify", res.data.access_token);
+            resolve();
+          })
+          .catch(error => {
+            console.log(error);
             reject(error);
           });
       });
@@ -85,8 +101,8 @@ const Store = new Vuex.Store({
     refresh({ commit }, refresh) {
       return new Promise((resolve, reject) => {
         commit("auth_request");
-        axios({
-          url: "http://localhost:8000/api/token/refresh/",
+        app_api({
+          url: "/api/token/refresh/",
           data: { refresh: refresh },
           method: "POST"
         })
@@ -115,7 +131,7 @@ const Store = new Vuex.Store({
     isLoggedIn: state => state.auth,
     authStatus: state => state.status,
     token: state => state.token,
-    stoken: state => state.spotify_token
+    spotifyToken: state => state.spotify_token
   },
 
   // enable strict mode (adds overhead!)

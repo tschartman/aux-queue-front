@@ -151,6 +151,7 @@ import {
   QImg
 } from "quasar";
 import { mapMutations } from "vuex";
+import { spotify_api } from "../utils/spotify-api";
 
 export default {
   name: "MyLayout",
@@ -178,7 +179,7 @@ export default {
     }
   },
   created() {
-    this.$axios
+    spotify_api
       .get("https://api.spotify.com/v1/users/tschartman2/playlists")
       .then(res => {
         this.playlists = res.data.items;
