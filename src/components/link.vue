@@ -25,6 +25,7 @@ export default {
         access_token: this.$route.query.token,
         refresh_token: this.$route.query.refresh
       };
+      console.log(data);
       app_api
         .put("/users/1/spotify/", data)
         .then(res => {
