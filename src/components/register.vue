@@ -93,6 +93,7 @@ import {
   QCardSection,
   QCheckbox
 } from "quasar";
+import { app_api } from "../utils/app-api";
 export default {
   mixins: [validationMixin],
   validations: {
@@ -181,11 +182,11 @@ export default {
         let data = {
           first_name: this.firstName,
           last_name: this.lastName,
-          username: this.email,
+          email: this.email,
           password: this.password
         };
-        this.$http
-          .post("http://localhost:8000/users/", data)
+        app_api
+          .post("/users/", data)
           .then(res => {
             this.$router.push("/login"), console.log(res);
           })

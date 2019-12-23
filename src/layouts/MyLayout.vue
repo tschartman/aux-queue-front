@@ -17,7 +17,7 @@
         </q-toolbar-title>
         <a
           v-if="!this.$store.getters.isLinked"
-          href="https://78caead9.ngrok.io/spotify/"
+          href="https://auxstack.herokuapp.com/spotify/"
           >link spotify</a
         >
         <q-btn-dropdown
