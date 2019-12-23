@@ -128,10 +128,12 @@ export default {
     }
   },
   created() {
-    spotify_api.get("/users/tschartman2/playlists").then(res => {
-      this.playlists = res.data.items;
-      this.model = res.data.items[0];
-      this.CHANGE_PLAYLIST(res.data.items[0].id);
+    spotify_api.get("/me").then(re => {
+      spotify_api.get("/users/" + re.data.id + "/playlists").then(res => {
+        this.playlists = res.data.items;
+        this.model = res.data.items[0];
+        this.CHANGE_PLAYLIST(res.data.items[0].id);
+      });
     });
   }
 };
