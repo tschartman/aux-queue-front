@@ -7,6 +7,7 @@
   "author": "Tim Schartman <tschartman@yahoo.com>",
   "private": true,
   "scripts": {
+    "deploy": "quasar build && now ./dist/spa --prod",
     "lint": "eslint --ext .js,.vue src",
     "test": "echo \"No test specified\" && exit 0",
     "start": "node server.js",
