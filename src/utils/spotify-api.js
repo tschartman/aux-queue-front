@@ -27,10 +27,10 @@ spotify_api.interceptors.response.use(
             refresh_token: Store.getters.refresh_token
           };
 
-          localStorage.setItem("stoken", res.data.access_token);
           app_api.put("/users/1/spotify/", data).then(resp => {
             console.log(resp);
             console.log("renewed your spotify session!");
+            Store.dispatch("linkSpotify");
           });
         });
     } else {
