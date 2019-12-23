@@ -90,7 +90,6 @@ const Store = new Vuex.Store({
             resolve(res);
           })
           .catch(error => {
-            console.log(error);
             reject(error);
           });
       });

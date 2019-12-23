@@ -101,11 +101,20 @@ export default {
         this.$store
           .dispatch("login", { username, password })
           .then(() => {
-            this.$store.dispatch("linkSpotify").then(() => {
-              this.$router.push("/");
-            });
+            this.$store
+              .dispatch("linkSpotify")
+              .then(() => {
+                this.$router.push("/");
+              })
+              .catch(() => {
+                this.$router.push("/");
+              });
           })
-          .catch(() => (this.authError = "Username or password incorrect"));
+          .catch(error => {
+            if (error.response.status == 401) {
+              this.authError = "Username or password incorrect";
+            }
+          });
       }
     }
   }
