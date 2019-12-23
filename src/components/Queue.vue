@@ -153,7 +153,10 @@ export default {
     init() {
       spotify_api
         .get("/playlists/" + this.currentPlaylist + "/tracks")
-        .then(res => (this.playlist = res.data.items));
+        .then(res => (this.playlist = res.data.items))
+        .catch(error => {
+          console.log(error);
+        });
     },
     filterFn(val, update, abort) {
       if (val.length < 1) {

@@ -31,6 +31,12 @@ const Store = new Vuex.Store({
       state.spotify_token = tokens.token;
       state.spotify_refresh = tokens.refresh;
     },
+    clear_spotify(state) {
+      state.spotifyToken = undefined;
+      state.spotifyRefresh = undefined;
+      localStorage.removeItem("refresh");
+      localStorage.removeItem("srefresh");
+    },
     auth_success(state, token, exp) {
       state.status = "success";
       state.token = token;
@@ -75,19 +81,22 @@ const Store = new Vuex.Store({
     },
     linkSpotify({ commit }) {
       return new Promise((resolve, reject) => {
-        app_api
+        return app_api
           .get("/users/1/spotify/")
           .then(res => {
             let token = res.data.access_token;
             let refresh = res.data.refresh_token;
             commit("link_spotify", { token: token, refresh: refresh });
-            resolve();
+            resolve(res);
           })
           .catch(error => {
             console.log(error);
             reject(error);
           });
       });
+    },
+    clearSpotify({ commit }) {
+      commit("clear_spotify");
     },
     inspect() {
       const token = this.state.token;
