@@ -50,8 +50,12 @@ spotify_api.interceptors.response.use(
               refresh_token: Store.getters.refresh_token
             };
 
-            app_api.put("/users/1/spotify/", data).then(() => {
-              Store.dispatch("linkSpotify").then(() => {});
+            app_api.get("/users/").then(res => {
+              app_api
+                .put("/users/" + res.data[0].id + "/spotify/", data)
+                .then(() => {
+                  Store.dispatch("linkSpotify").then(() => {});
+                });
             });
           });
       }
