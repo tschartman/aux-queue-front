@@ -182,7 +182,7 @@ export default {
         let data = {
           first_name: this.firstName,
           last_name: this.lastName,
-          email: this.email,
+          email: this.email.toLowerCase(),
           password: this.password
         };
         app_api

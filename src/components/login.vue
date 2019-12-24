@@ -96,7 +96,7 @@ export default {
     login() {
       this.$v.$touch();
       if (!this.$v.$invalid) {
-        let username = this.username;
+        let username = this.username.toLowerCase();
         let password = this.password;
         this.$store
           .dispatch("login", { username, password })
