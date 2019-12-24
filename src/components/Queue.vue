@@ -44,12 +44,12 @@
           </q-select>
         </div>
         <div class="col-xs-4 q-pa-lg">
-          <q-btn color="primary" label="Add Songs" @click="addSongs" />
+          <q-btn color="black" label="Submit" @click="addSongs" />
         </div>
       </div>
       <hr />
       <q-list>
-        <q-item-label header>Add</q-item-label>
+        <q-item-label header>Queue</q-item-label>
         <q-item v-for="song in queue" :key="song.name" clickable v-ripple>
           <q-item-section avatar>
             <q-img :src="song.album.images[0].url" />
