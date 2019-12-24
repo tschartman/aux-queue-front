@@ -1,8 +1,8 @@
 <template>
   <div>
     <div class="page row justify-center items-center">
-      <img src="/statics/AuxQueue-logo.png" />
       <div class="col-xs-12 col-sm-8 col-md-6 col-lg-4 col-xl-2">
+        <img src="/statics/AuxQueue-logo.png" />
         <q-card class="elevation-12 screen">
           <q-toolbar class="bg-primary text-white">
             <q-toolbar-title>Login</q-toolbar-title>
