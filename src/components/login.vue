@@ -1,50 +1,52 @@
 <template>
   <div>
-    <div class="page row justify-center items-center">
-      <div class="col-xs-12 col-sm-8 col-md-6 col-lg-4 col-xl-2">
-        <img src="/statics/AuxQueue-logo.png" />
-        <q-card class="elevation-12 screen">
-          <q-toolbar class="bg-primary text-white">
-            <q-toolbar-title>Login</q-toolbar-title>
-          </q-toolbar>
-          <q-card-section>
-            <form>
-              <q-input
-                @keyup.enter="login"
-                v-model="username"
-                :error-message="usernameErrors[0]"
-                :error="usernameErrors.length > 0"
-                label="Email"
-                name="login"
-                prepend-icon="person"
-                type="text"
-                required
-                @input="$v.username.$touch()"
-                @blur="$v.username.$touch()"
-              ></q-input>
+    <div class="page justify-center items-center">
+      <img height="75px" width="300px" src="/statics/AuxQueue-logo.png" />
+      <div class="row">
+        <div class="col-xs-12 ">
+          <q-card class="elevation-12 screen">
+            <q-toolbar class="bg-primary text-white">
+              <q-toolbar-title>Login</q-toolbar-title>
+            </q-toolbar>
+            <q-card-section>
+              <form>
+                <q-input
+                  @keyup.enter="login"
+                  v-model="username"
+                  :error-message="usernameErrors[0]"
+                  :error="usernameErrors.length > 0"
+                  label="Email"
+                  name="login"
+                  prepend-icon="person"
+                  type="text"
+                  required
+                  @input="$v.username.$touch()"
+                  @blur="$v.username.$touch()"
+                ></q-input>
 
-              <q-input
-                @keyup.enter="login"
-                v-model="password"
-                :error-message="passwordErrors[0]"
-                :error="passwordErrors.length > 0"
-                id="password"
-                label="Password"
-                name="password"
-                prepend-icon="lock"
-                type="password"
-                required
-                @input="$v.password.$touch()"
-                @blur="$v.password.$touch()"
-              ></q-input>
-            </form>
-            <p class="authError" v-if="authError">{{ authError }}</p>
-          </q-card-section>
-          <q-card-actions align="around">
-            <q-btn to="/register" color="primary">Sign up</q-btn>
-            <q-btn @click="login" color="secondary">Login</q-btn>
-          </q-card-actions>
-        </q-card>
+                <q-input
+                  @keyup.enter="login"
+                  v-model="password"
+                  :error-message="passwordErrors[0]"
+                  :error="passwordErrors.length > 0"
+                  id="password"
+                  label="Password"
+                  name="password"
+                  prepend-icon="lock"
+                  type="password"
+                  required
+                  @input="$v.password.$touch()"
+                  @blur="$v.password.$touch()"
+                ></q-input>
+              </form>
+              <p class="authError" v-if="authError">{{ authError }}</p>
+            </q-card-section>
+            <q-card-actions align="around">
+              <q-btn to="/register" color="primary">Sign up</q-btn>
+              <q-btn @click="login" color="secondary">Login</q-btn>
+            </q-card-actions>
+          </q-card>
+        </div>
       </div>
     </div>
   </div>
@@ -128,9 +130,10 @@ export default {
   color: red;
 }
 .screen {
-  margin-top: 5em;
+  margin-top: 3em;
 }
 .page {
   margin-top: 1em;
+  display: grid;
 }
 </style>
