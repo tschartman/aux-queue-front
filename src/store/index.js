@@ -13,7 +13,7 @@ const Store = new Vuex.Store({
     status: "",
     expires_in: null,
     token: localStorage.getItem("token") || "",
-    auth: localStorage.getItem("token") == undefined ? false : true,
+    auth: localStorage.getItem("auth") ? true : false,
     sauth: localStorage.getItem("stoken") == undefined ? false : true,
     spotify_token: localStorage.getItem("stoken") || "",
     spotify_refresh: localStorage.getItem("srefresh") || ""
@@ -37,11 +37,14 @@ const Store = new Vuex.Store({
       localStorage.removeItem("refresh");
       localStorage.removeItem("srefresh");
     },
-    auth_success(state, token, exp) {
+    auth_success(state, token, exp, refresh) {
       state.status = "success";
       state.token = token;
       state.expires_in = exp;
       state.auth = true;
+      localStorage.setItem("refresh", refresh);
+      localStorage.setItem("token", token);
+      localStorage.setItem("auth", true);
     },
     auth_error(state) {
       state.status = "error";
@@ -55,6 +58,7 @@ const Store = new Vuex.Store({
       localStorage.removeItem("stoken");
       localStorage.removeItem("refresh");
       localStorage.removeItem("srefresh");
+      localStorage.removeItem("auth");
     }
   },
   actions: {
@@ -67,9 +71,7 @@ const Store = new Vuex.Store({
             const token = resp.data.access_token;
             const refresh = resp.data.refresh_token;
             const exp = resp.data.expires_in;
-            commit("auth_success", token, exp);
-            localStorage.setItem("refresh", refresh);
-            localStorage.setItem("token", token);
+            commit("auth_success", token, exp, refresh);
             resolve();
           })
           .catch(error => {
@@ -96,8 +98,12 @@ const Store = new Vuex.Store({
         });
       });
     },
+    tempAuth({ commit }) {
+      commit("auth_success", null, null, null);
+    },
     setSpotify({ commit }, token) {
       commit("link_spotify", { token: token, refresh: null });
+      commit("auth_success", null, null, null);
     },
     clearSpotify({ commit }) {
       commit("clear_spotify");
