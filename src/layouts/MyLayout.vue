@@ -57,7 +57,7 @@
     >
       <q-list>
         <q-item-label header>Options</q-item-label>
-        <q-item clickable tag="a" target="_blank" href="https://quasar.dev">
+        <q-item clickable v-on:click="share = true">
           <q-item-section avatar>
             <q-icon name="share" />
           </q-item-section>
@@ -75,7 +75,11 @@
         </q-item>
       </q-list>
     </q-drawer>
-
+    <div class="q-pa-md q-gutter-sm">
+      <q-dialog v-model="share">
+        <shareQueue />
+      </q-dialog>
+    </div>
     <q-page-container>
       <router-view />
     </q-page-container>
@@ -93,7 +97,7 @@ import {
 } from "quasar";
 import { mapMutations } from "vuex";
 import { spotify_api } from "../utils/spotify-api";
-
+import shareQueue from "../modals/shareQueue";
 export default {
   name: "MyLayout",
   components: {
@@ -101,13 +105,15 @@ export default {
     QItemLabel,
     QItem,
     QItemSection,
-    QImg
+    QImg,
+    shareQueue
   },
   data() {
     return {
       leftDrawerOpen: false,
       playlists: [],
-      model: null
+      model: null,
+      share: false
     };
   },
 

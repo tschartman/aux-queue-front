@@ -2,8 +2,10 @@ import Vue from "vue";
 import VueRouter from "vue-router";
 import routes from "./routes";
 import Store from "../store";
+import Clipboard from "v-clipboard";
 
 Vue.use(VueRouter);
+Vue.use(Clipboard);
 
 /*
  * If not building with SSR mode, you can
