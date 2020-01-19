@@ -56,24 +56,21 @@
       content-class="bg-grey-2"
     >
       <q-list>
-        <q-item-label header>User</q-item-label>
+        <q-item-label header>Options</q-item-label>
         <q-item clickable tag="a" target="_blank" href="https://quasar.dev">
           <q-item-section avatar>
-            <q-icon name="school" />
+            <q-icon name="share" />
           </q-item-section>
           <q-item-section>
-            <q-item-label>Docs</q-item-label>
-            <q-item-label caption>quasar.dev</q-item-label>
+            <q-item-label>Share Queue</q-item-label>
           </q-item-section>
         </q-item>
-        <q-item-label header>Log Out</q-item-label>
         <q-item clickable v-on:click="logout">
           <q-item-section avatar>
-            <q-icon name="warning" />
+            <q-icon name="exit_to_app" />
           </q-item-section>
           <q-item-section>
-            <q-item-label>Docs</q-item-label>
-            <q-item-label caption>quasar.dev</q-item-label>
+            <q-item-label>Log Out</q-item-label>
           </q-item-section>
         </q-item>
       </q-list>
