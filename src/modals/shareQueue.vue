@@ -20,7 +20,8 @@ export default {
   },
   methods: {
     copy() {
-      this.$clipboard("Test");
+      let code = this.$store.getters.spotifyToken;
+      this.$clipboard("auxqueue.com/share?code=" + code);
     }
   }
 };

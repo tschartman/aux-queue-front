@@ -19,6 +19,11 @@ const routes = [
     path: "/link",
     name: "link",
     component: () => import("components/link.vue")
+  },
+  {
+    path: "/share",
+    name: "share",
+    component: () => import("components/share.vue")
   }
 ];
 

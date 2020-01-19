@@ -1,7 +1,6 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
 import routes from "./routes";
-import Store from "../store";
 import Clipboard from "v-clipboard";
 
 Vue.use(VueRouter);
@@ -22,18 +21,6 @@ export default function(/* { store, ssrContext } */) {
     // quasar.conf.js -> build -> publicPath
     mode: "history",
     base: process.env.VUE_ROUTER_BASE
-  });
-
-  Router.beforeEach((to, from, next) => {
-    if (to.matched.some(record => record.meta.requiresAuth)) {
-      if (Store.getters.isLoggedIn) {
-        next();
-        return;
-      }
-      next("/login");
-    } else {
-      next();
-    }
   });
 
   return Router;

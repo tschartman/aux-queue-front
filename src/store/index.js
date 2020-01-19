@@ -96,6 +96,9 @@ const Store = new Vuex.Store({
         });
       });
     },
+    setSpotify({ commit }, token) {
+      commit("link_spotify", { token: token, refresh: null });
+    },
     clearSpotify({ commit }) {
       commit("clear_spotify");
     },
