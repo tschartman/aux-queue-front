@@ -23,7 +23,9 @@ const routes = [
   {
     path: "/share",
     name: "share",
-    component: () => import("components/share.vue")
+    component: () => import("layouts/MyLayout.vue"),
+    meta: { requiresAuth: true },
+    children: [{ path: "", component: () => import("components/share.vue") }]
   }
 ];
 
