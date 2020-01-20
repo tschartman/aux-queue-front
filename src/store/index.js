@@ -19,7 +19,8 @@ const Store = new Vuex.Store({
     auth: false,
     sauth: false,
     spotify_token: null,
-    spotify_refresh: null
+    spotify_refresh: null,
+    user: {}
   },
   plugins: [
     createPersistedState({
@@ -59,6 +60,9 @@ const Store = new Vuex.Store({
       state.expires_in = exp;
       state.auth = true;
     },
+    set_user(state, user) {
+      state.user = user;
+    },
     auth_error(state) {
       state.status = "error";
     },
@@ -79,7 +83,14 @@ const Store = new Vuex.Store({
             const refresh = resp.data.refresh_token;
             const exp = resp.data.expires_in;
             commit("auth_success", token, exp, refresh);
-            resolve();
+            app_api
+              .get("/users/")
+              .then(res => {
+                commit("set_user", res.data[0]);
+              })
+              .then(() => {
+                resolve();
+              });
           })
           .catch(error => {
             commit("auth_error");
@@ -167,7 +178,8 @@ const Store = new Vuex.Store({
     authStatus: state => state.status,
     token: state => state.token,
     spotifyToken: state => state.spotify_token,
-    spotifyRefresh: state => state.spotify_refresh
+    spotifyRefresh: state => state.spotify_refresh,
+    user: state => state.user
   }
 
   // enable strict mode (adds overhead!)

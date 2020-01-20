@@ -1,7 +1,7 @@
 const routes = [
   {
     path: "/",
-    component: () => import("layouts/MyLayout.vue"),
+    component: () => import("layouts/AppBar.vue"),
     meta: { requiresAuth: true },
     children: [{ path: "", component: () => import("pages/Index.vue") }]
   },
@@ -23,7 +23,7 @@ const routes = [
   {
     path: "/share",
     name: "share",
-    component: () => import("layouts/MyLayout.vue"),
+    component: () => import("layouts/AppBar.vue"),
     meta: { requiresAuth: true },
     children: [{ path: "", component: () => import("components/share.vue") }]
   }

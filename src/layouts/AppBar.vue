@@ -57,6 +57,16 @@
     >
       <q-list>
         <q-item-label header>Options</q-item-label>
+        <q-item clickable>
+          <q-item-section avatar>
+            <q-avatar>
+              <q-img :src="imageURL" />
+            </q-avatar>
+          </q-item-section>
+          <q-item-section>
+            <q-item-label>User Profile</q-item-label>
+          </q-item-section>
+        </q-item>
         <q-item clickable v-on:click="share = true">
           <q-item-section avatar>
             <q-icon name="share" />
@@ -93,19 +103,22 @@ import {
   QItemLabel,
   QItem,
   QItemSection,
+  QAvatar,
   QImg
 } from "quasar";
 import { mapMutations } from "vuex";
 import { spotify_api } from "../utils/spotify-api";
 import shareQueue from "../modals/shareQueue";
+import md5 from "md5";
 export default {
-  name: "MyLayout",
+  name: "AppBar",
   components: {
     QBtnDropdown,
     QItemLabel,
     QItem,
     QItemSection,
     QImg,
+    QAvatar,
     shareQueue
   },
   data() {
@@ -113,7 +126,8 @@ export default {
       leftDrawerOpen: false,
       playlists: [],
       model: null,
-      share: false
+      share: false,
+      imageURL: ""
     };
   },
 
@@ -131,6 +145,8 @@ export default {
     }
   },
   created() {
+    this.imageURL =
+      "https://www.gravatar.com/avatar/" + md5(this.$store.getters.user.email);
     spotify_api.get("/me").then(re => {
       spotify_api.get("/users/" + re.data.id + "/playlists").then(res => {
         this.playlists = res.data.items;
