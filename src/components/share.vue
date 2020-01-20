@@ -195,6 +195,8 @@ export default {
         }
       };
       this.init();
+    } else {
+      this.$router.push("/login");
     }
   }
 };
