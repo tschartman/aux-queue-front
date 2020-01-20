@@ -25,24 +25,22 @@ export default {
         access_token: this.$route.query.token,
         refresh_token: this.$route.query.refresh
       };
-      app_api.get("/users/").then(res => {
-        app_api
-          .put("/users/" + res.data[0].id + "/spotify/", data)
-          .then(() => {
-            this.$store
-              .dispatch("linkSpotify")
-              .then(res => {
-                console.log(res);
-                this.$router.push("/");
-              })
-              .catch(error => {
-                console.log(error);
-              });
-          })
-          .catch(error => {
-            console.log(error);
-          });
-      });
+      app_api
+        .put("/users/" + this.$store.getters.user.id + "/spotify/", data)
+        .then(() => {
+          this.$store
+            .dispatch("linkSpotify")
+            .then(res => {
+              console.log(res);
+              this.$router.push("/");
+            })
+            .catch(error => {
+              console.log(error);
+            });
+        })
+        .catch(error => {
+          console.log(error);
+        });
     }
   }
 };
