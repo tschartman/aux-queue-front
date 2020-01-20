@@ -1,6 +1,8 @@
 import Vue from "vue";
 import Vuex from "vuex";
 import { app_api } from "../utils/app-api";
+import createPersistedState from "vuex-persistedstate";
+import * as Cookies from "js-cookie";
 
 Vue.use(Vuex);
 
@@ -12,12 +14,23 @@ const Store = new Vuex.Store({
     playlistId: "",
     status: "",
     expires_in: null,
-    token: localStorage.getItem("token") || "",
-    auth: localStorage.getItem("auth") ? true : false,
-    sauth: localStorage.getItem("stoken") == undefined ? false : true,
-    spotify_token: localStorage.getItem("stoken") || "",
-    spotify_refresh: localStorage.getItem("srefresh") || ""
+    token: null,
+    refresh: null,
+    auth: false,
+    sauth: false,
+    spotify_token: null,
+    spotify_refresh: null
   },
+  plugins: [
+    createPersistedState({
+      storage: {
+        getItem: key => Cookies.get(key),
+        setItem: (key, value) =>
+          Cookies.set(key, value, { expires: 3, secure: false }),
+        removeItem: key => Cookies.remove(key)
+      }
+    })
+  ],
   mutations: {
     CHANGE_PLAYLIST: (state, playlistId) => {
       state.playlistId = playlistId;
@@ -26,25 +39,19 @@ const Store = new Vuex.Store({
       state.status = "loading";
     },
     link_spotify(state, tokens) {
-      localStorage.setItem("stoken", tokens.token);
-      localStorage.setItem("srefresh", tokens.refresh);
       state.spotify_token = tokens.token;
       state.spotify_refresh = tokens.refresh;
     },
     clear_spotify(state) {
       state.spotifyToken = undefined;
       state.spotifyRefresh = undefined;
-      localStorage.removeItem("refresh");
-      localStorage.removeItem("srefresh");
     },
     auth_success(state, token, exp, refresh) {
       state.status = "success";
       state.token = token;
+      state.refresh = refresh;
       state.expires_in = exp;
       state.auth = true;
-      localStorage.setItem("refresh", refresh);
-      localStorage.setItem("token", token);
-      localStorage.setItem("auth", true);
     },
     auth_error(state) {
       state.status = "error";
@@ -54,11 +61,6 @@ const Store = new Vuex.Store({
       state.token = "";
       state.spotify_token = "";
       state.auth = false;
-      localStorage.removeItem("token");
-      localStorage.removeItem("stoken");
-      localStorage.removeItem("refresh");
-      localStorage.removeItem("srefresh");
-      localStorage.removeItem("auth");
     }
   },
   actions: {
@@ -115,7 +117,7 @@ const Store = new Vuex.Store({
         // if token expires in 30 minutes and is not reaching lifespan
         if (exp - Date.now() / 1000 < 1800) {
           //token expires soon refresh
-          this.dispatch("refresh", localStorage.getItem("refresh"));
+          this.dispatch("refresh", this.state.refresh);
           console.log("refreshed");
           // } else if (exp - Date.now() / 1000 < 1800) {
           //   // token refresh expires soon so logout
@@ -160,11 +162,11 @@ const Store = new Vuex.Store({
     token: state => state.token,
     spotifyToken: state => state.spotify_token,
     spotifyRefresh: state => state.spotify_refresh
-  },
+  }
 
   // enable strict mode (adds overhead!)
   // for dev mode only
-  strict: process.env.DEV
+  //strict: process.env.DEV
 });
 
 export default Store;

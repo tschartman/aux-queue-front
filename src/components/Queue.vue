@@ -1,6 +1,7 @@
 <template>
   <div>
     <div>
+      <h4 class="title">My Queue</h4>
       <div class="row">
         <div class="col-xs-8 q-pa-md">
           <q-select
@@ -176,3 +177,10 @@ export default {
   }
 };
 </script>
+<style scoped>
+.title {
+  display: block;
+  margin: auto;
+  text-align: center;
+}
+</style>

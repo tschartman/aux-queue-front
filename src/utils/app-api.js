@@ -1,6 +1,6 @@
 import axios from "axios";
 import Store from "../store/index";
-
+import router from "../router/index";
 export const app_api = axios.create({
   baseURL: "https://auxstack.herokuapp.com",
   timeout: 100000,
@@ -25,16 +25,10 @@ app_api.interceptors.response.use(
   },
 
   function(error) {
-    if (error.response.status == 4000) {
-      app_api
-        .post("/login/refresh/", { token: localStorage.getItem("refresh") })
-        .then(res => {
-          if (res.data.access_token && res.data.refresh_token) {
-            localStorage.setItem("token", res.data.access_token);
-            localStorage.setItem("refresh", res.data.refresh_token);
-            return res;
-          }
-        });
+    console.log(error);
+    if (error.response.status == 401) {
+      Store.dispatch("logout");
+      router.push("/login");
     } else {
       return Promise.reject(error);
     }
