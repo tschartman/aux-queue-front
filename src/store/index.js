@@ -26,6 +26,7 @@ const Store = new Vuex.Store({
       storage: {
         getItem: key => Cookies.get(key),
         setItem: (key, value) =>
+          // Set secure to true in prod!!!
           Cookies.set(key, value, { expires: 3, secure: false }),
         removeItem: key => Cookies.remove(key)
       }
@@ -41,10 +42,12 @@ const Store = new Vuex.Store({
     link_spotify(state, tokens) {
       state.spotify_token = tokens.token;
       state.spotify_refresh = tokens.refresh;
+      state.sauth = true;
     },
     clear_spotify(state) {
-      state.spotifyToken = undefined;
-      state.spotifyRefresh = undefined;
+      state.spotify_token = null;
+      state.spotify_refresh = null;
+      state.sauth = false;
     },
     auth_success(state, token, exp, refresh) {
       state.status = "success";
@@ -59,7 +62,6 @@ const Store = new Vuex.Store({
     logout(state) {
       state.status = "";
       state.token = "";
-      state.spotify_token = "";
       state.auth = false;
     }
   },
@@ -150,6 +152,7 @@ const Store = new Vuex.Store({
     logout({ commit }) {
       return new Promise(resolve => {
         commit("logout");
+        commit("clear_spotify");
         resolve();
       });
     }
