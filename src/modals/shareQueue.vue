@@ -21,7 +21,9 @@ export default {
   methods: {
     copy() {
       let code = this.$store.getters.spotifyToken;
-      let base = window.webpackHotUpdate ? "localhost:8080" : "auxqueue.com";
+      let base = window.webpackHotUpdate
+        ? "http://localhost:8080"
+        : "https://auxqueue.com";
       this.$clipboard(base + "/share?code=" + code);
     }
   }
