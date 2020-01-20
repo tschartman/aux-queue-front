@@ -1,7 +1,7 @@
 <template>
   <div>
     <div>
-      <h4 class="title">My Queue</h4>
+      <h4 class="title">{{ user }}'s Queue</h4>
       <div class="row">
         <div class="col-xs-8 q-pa-md">
           <q-select
@@ -105,6 +105,7 @@ export default {
   data() {
     return {
       model: null,
+      user: null,
       options: [],
       queue: [],
       playlist: [],
@@ -158,13 +159,19 @@ export default {
     },
     init() {
       axios
-        .get(
-          this.baseURL + "/playlists/" + this.currentPlaylist + "/tracks",
-          this.config
-        )
-        .then(res => (this.playlist = res.data.items))
+        .get(this.baseURL + "/me", this.config)
+        .then(res => {
+          this.user = res.data.display_name;
+          axios
+            .get(
+              this.baseURL + "/playlists/" + this.currentPlaylist + "/tracks",
+              this.config
+            )
+            .then(res => (this.playlist = res.data.items));
+        })
         .catch(error => {
-          console.log(error);
+          if (error.status === 401) console.log(error);
+          this.$router.push("/login");
         });
     },
     filterFn(val, update, abort) {
