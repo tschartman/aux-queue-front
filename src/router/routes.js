@@ -24,7 +24,6 @@ const routes = [
     path: "/share",
     name: "share",
     component: () => import("layouts/AppBar.vue"),
-    meta: { requiresAuth: true },
     children: [{ path: "", component: () => import("components/share.vue") }]
   }
 ];
