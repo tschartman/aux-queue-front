@@ -27,7 +27,10 @@ const Store = new Vuex.Store({
         getItem: key => Cookies.get(key),
         setItem: (key, value) =>
           // Set secure to true in prod!!!
-          Cookies.set(key, value, { expires: 3, secure: false }),
+          Cookies.set(key, value, {
+            expires: 3,
+            secure: window.webpackHotUpdate ? false : true
+          }),
         removeItem: key => Cookies.remove(key)
       }
     })
