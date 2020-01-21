@@ -112,15 +112,11 @@ export default {
       category: null,
       categories: ["artist", "track", "album"],
       config: {},
-      baseURL: "https://api.spotify.com/v1"
+      baseURL: "https://api.spotify.com/v1",
+      currentPlaylist: null
     };
   },
 
-  computed: {
-    currentPlaylist: function() {
-      return this.$store.state.playlistId;
-    }
-  },
   methods: {
     addToQueue(newSong) {
       if (this.queue.some(song => song.id === newSong.id)) {
@@ -194,6 +190,9 @@ export default {
           Authorization: "Bearer " + this.$route.query.code
         }
       };
+
+      console.log(this.$route.query);
+      this.currentPlaylist = this.$route.query.playlist;
       this.init();
     } else {
       this.$router.push("/login");

@@ -21,6 +21,7 @@
           >link spotify</a
         >
         <q-btn-dropdown
+          v-if="this.$store.getters.isLoggedIn"
           stretch
           flat
           :label="model === null ? 'Playlists' : model.name"
