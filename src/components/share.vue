@@ -136,7 +136,6 @@ export default {
       });
 
       if (this.queue.length > 0) {
-        console.log(this.currentPlaylist);
         axios
           .post(
             this.baseURL + "/playlists/" + this.currentPlaylist + "/tracks",
@@ -191,7 +190,6 @@ export default {
         }
       };
 
-      console.log(this.$route.query);
       this.currentPlaylist = this.$route.query.playlist;
       this.init();
     } else {

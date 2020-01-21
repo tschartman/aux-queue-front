@@ -15,10 +15,10 @@
         <q-toolbar-title>
           AuxQueue
         </q-toolbar-title>
-        <a
-          v-if="!this.$store.getters.isLinked"
-          href="https://auxstack.herokuapp.com/spotify/"
-          >link spotify</a
+        <q-btn
+          v-if="!$store.getters.isLinked && $store.getters.isLoggedIn"
+          v-on:click="redirect()"
+          >link spotify</q-btn
         >
         <q-btn-dropdown
           v-if="this.$store.getters.isLoggedIn"
@@ -58,32 +58,44 @@
     >
       <q-list>
         <q-item-label header>Options</q-item-label>
-        <q-item clickable>
-          <q-item-section avatar>
-            <q-avatar>
-              <q-img :src="imageURL" />
-            </q-avatar>
-          </q-item-section>
-          <q-item-section>
-            <q-item-label>User Profile</q-item-label>
-          </q-item-section>
-        </q-item>
-        <q-item clickable v-on:click="share = true">
-          <q-item-section avatar>
-            <q-icon name="share" />
-          </q-item-section>
-          <q-item-section>
-            <q-item-label>Share Queue</q-item-label>
-          </q-item-section>
-        </q-item>
-        <q-item clickable v-on:click="logout">
-          <q-item-section avatar>
-            <q-icon name="exit_to_app" />
-          </q-item-section>
-          <q-item-section>
-            <q-item-label>Log Out</q-item-label>
-          </q-item-section>
-        </q-item>
+        <div v-if="$store.getters.isLoggedIn">
+          <q-item clickable>
+            <q-item-section avatar>
+              <q-avatar>
+                <q-img :src="imageURL" />
+              </q-avatar>
+            </q-item-section>
+            <q-item-section>
+              <q-item-label>User Profile</q-item-label>
+            </q-item-section>
+          </q-item>
+          <q-item clickable v-on:click="share = true">
+            <q-item-section avatar>
+              <q-icon name="share" />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label>Share Queue</q-item-label>
+            </q-item-section>
+          </q-item>
+          <q-item clickable v-on:click="logout">
+            <q-item-section avatar>
+              <q-icon name="exit_to_app" />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label>Log Out</q-item-label>
+            </q-item-section>
+          </q-item>
+        </div>
+        <div v-else>
+          <q-item clickable to="/register">
+            <q-item-section avatar>
+              <q-icon name="person_add" />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label>Create Acccount</q-item-label>
+            </q-item-section>
+          </q-item>
+        </div>
       </q-list>
     </q-drawer>
     <div class="q-pa-md q-gutter-sm">
@@ -143,18 +155,24 @@ export default {
       this.$store.dispatch("logout").then(() => {
         this.$router.push("/login");
       });
+    },
+    redirect() {
+      window.location = "https://auxstack.herokuapp.com/spotify/";
     }
   },
   created() {
-    this.imageURL =
-      "https://www.gravatar.com/avatar/" + md5(this.$store.getters.user.email);
-    spotify_api.get("/me").then(re => {
-      spotify_api.get("/users/" + re.data.id + "/playlists").then(res => {
-        this.playlists = res.data.items;
-        this.model = res.data.items[0];
-        this.CHANGE_PLAYLIST(res.data.items[0].id);
+    if (this.$store.getters.isLoggedIn) {
+      this.imageURL =
+        "https://www.gravatar.com/avatar/" +
+        md5(this.$store.getters.user.email);
+      spotify_api.get("/me").then(re => {
+        spotify_api.get("/users/" + re.data.id + "/playlists").then(res => {
+          this.playlists = res.data.items;
+          this.model = res.data.items[0];
+          this.CHANGE_PLAYLIST(res.data.items[0].id);
+        });
       });
-    });
+    }
   }
 };
 </script>
