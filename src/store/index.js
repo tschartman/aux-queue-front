@@ -172,7 +172,7 @@ const Store = new Vuex.Store({
   getters: {
     playlistId: state => state.playlistId,
     isLoggedIn: state => state.auth,
-    isLinked: state => state.sauth,
+    isLinked: state => state.spotify_refresh,
     authStatus: state => state.status,
     token: state => state.token,
     spotifyToken: state => state.spotify_token,
