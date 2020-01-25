@@ -63,7 +63,15 @@ export default {
       let base = window.webpackHotUpdate
         ? "http://localhost:8080"
         : "https://auxqueue.com";
-      this.$clipboard(base + "/share?code=" + code + "&playlist=" + this.id);
+      this.$clipboard(
+        base +
+          "/share?code=" +
+          code +
+          "&playlist=" +
+          this.id +
+          "&name=" +
+          this.name
+      );
     },
     updatePlaylist(plist) {
       console.log(plist);
@@ -77,6 +85,7 @@ export default {
         this.playlists = res.data.items;
         this.model = res.data.items[0];
         this.id = res.data.items[0].id;
+        this.name = res.data.items[0].name;
       });
     });
   }

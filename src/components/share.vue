@@ -63,7 +63,7 @@
       </q-list>
       <hr />
       <q-list>
-        <q-item-label header>Playlist</q-item-label>
+        <q-item-label header>{{ name }}</q-item-label>
         <q-item v-for="song in playlist" :key="song.name" clickable v-ripple>
           <q-item-section avatar>
             <q-img :src="song.track.album.images[0].url" />
@@ -191,6 +191,7 @@ export default {
       };
 
       this.currentPlaylist = this.$route.query.playlist;
+      this.name = this.$route.query.name;
       this.init();
     } else {
       this.$router.push("/login");
