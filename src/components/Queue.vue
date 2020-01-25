@@ -49,9 +49,14 @@
         </div>
       </div>
       <hr />
-      <q-list>
-        <q-item-label header>Queue</q-item-label>
-        <q-item v-for="song in queue" :key="song.name" clickable v-ripple>
+      <q-item-label header>Queue</q-item-label>
+      <q-intersection
+        v-for="song in queue"
+        :key="song.name"
+        once
+        transition="scale"
+      >
+        <q-item clickable v-ripple>
           <q-item-section avatar>
             <q-img :src="song.album.images[0].url" />
           </q-item-section>
@@ -60,18 +65,23 @@
             <q-icon @click="remove(song)" name="delete" />
           </q-item-section>
         </q-item>
-      </q-list>
+      </q-intersection>
       <hr />
-      <q-list>
-        <q-item-label header>Playlist</q-item-label>
-        <q-item v-for="song in playlist" :key="song.name" clickable v-ripple>
+      <q-item-label header>Playlist</q-item-label>
+      <q-intersection
+        v-for="song in playlist"
+        :key="song.name"
+        once
+        transition="scale"
+      >
+        <q-item clickable v-ripple>
           <q-item-section avatar>
             <q-img :src="song.track.album.images[0].url" />
           </q-item-section>
 
           <q-item-section>{{ song.track.name }}</q-item-section>
         </q-item>
-      </q-list>
+      </q-intersection>
     </div>
   </div>
 </template>
@@ -84,9 +94,9 @@ import {
   QItem,
   QImg,
   QIcon,
-  QList,
   QItemSection,
-  QItemLabel
+  QItemLabel,
+  QIntersection
 } from "quasar";
 
 Vue.component("Queue");
@@ -97,11 +107,11 @@ export default {
     QSelect,
     QItem,
     QImg,
-    QList,
     QItemSection,
     QItemLabel,
     QBtn,
-    QIcon
+    QIcon,
+    QIntersection
   },
   data() {
     return {
