@@ -40,14 +40,15 @@
 </template>
 <script>
 import { spotify_api } from "../utils/spotify-api";
-import { QBtnDropdown, QItemLabel, QItem, QItemSection } from "quasar";
+import { QBtnDropdown, QItemLabel, QItem, QItemSection, QImg } from "quasar";
 
 export default {
   components: {
     QBtnDropdown,
     QItemLabel,
     QItem,
-    QItemSection
+    QItemSection,
+    QImg
   },
   data() {
     return {
