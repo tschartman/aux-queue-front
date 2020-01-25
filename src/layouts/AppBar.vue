@@ -36,7 +36,11 @@
               tabindex="0"
             >
               <q-item-section avatar>
-                <q-img :src="plist.images[0].url" />
+                <q-img
+                  v-if="plist.images.length > 0"
+                  :src="plist.images[0].url"
+                />
+                <q-icon class="q-pl-md q-pt-xs" v-else name="camera_alt" />
               </q-item-section>
               <q-item-section>
                 <q-item-label>{{ plist.name }}</q-item-label>
@@ -126,7 +130,8 @@ import {
   QItem,
   QItemSection,
   QAvatar,
-  QImg
+  QImg,
+  QIcon
 } from "quasar";
 import { mapMutations } from "vuex";
 import { spotify_api } from "../utils/spotify-api";
@@ -142,6 +147,7 @@ export default {
     QItemSection,
     QImg,
     QAvatar,
+    QIcon,
     shareQueue
   },
   data() {

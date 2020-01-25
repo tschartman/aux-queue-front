@@ -3,12 +3,19 @@
     <h4 class="title">Fuse Playlists</h4>
     <div class="form">
       <div class="row justify-center items-center">
-        <div class="col-xs-5 q-pa-lg">
-          <q-input v-model="text" label="Fused Playlist Name" />
+        <div class="col-xs-4 q-pa-lg">
+          <q-input
+            v-model="text"
+            :error-message="playlistsNameErrors[0]"
+            :error="playlistsNameErrors.length > 0"
+            @input="$v.text.$touch()"
+            @blur="$v.text.$touch()"
+            label="Fused Playlist Name"
+          />
         </div>
-        <div class="col-xs-7 q-pa-lg">
+        <div class="col-xs-2 q-pa-lg"></div>
+        <div class="col-xs-6 q-pa-lg">
           <q-btn-dropdown
-            v-if="this.$store.getters.isLoggedIn"
             stretch
             flat
             :label="model1 === null ? 'Playlists' : model1.name"
@@ -23,7 +30,11 @@
                 tabindex="0"
               >
                 <q-item-section avatar>
-                  <q-img :src="plist.images[0].url" />
+                  <q-img
+                    v-if="plist.images.length > 0"
+                    :src="plist.images[0].url"
+                  />
+                  <q-icon class="q-pl-md q-pt-xs" v-else name="camera_alt" />
                 </q-item-section>
                 <q-item-section>
                   <q-item-label>{{ plist.name }}</q-item-label>
@@ -50,7 +61,11 @@
                 tabindex="0"
               >
                 <q-item-section avatar>
-                  <q-img :src="plist.images[0].url" />
+                  <q-img
+                    v-if="plist.images.length > 0"
+                    :src="plist.images[0].url"
+                  />
+                  <q-icon class="q-pl-md q-pt-xs" v-else name="camera_alt" />
                 </q-item-section>
                 <q-item-section>
                   <q-item-label>{{ plist.name }}</q-item-label>
@@ -64,18 +79,18 @@
         </div>
       </div>
       <div class="row justify-center items-center">
-        <div class="col-xs-6 q-pa-lg">
-          <q-checkbox
-            v-model="dPlay"
-            label="Delete fused playlists"
-            color="teal"
-          />
+        <div class="col-xs-2 q-pa-lg">
+          <q-checkbox v-model="priv" label="Private" color="teal" />
         </div>
-        <div class="col-xs-3 q-pa-lg">
+        <div class="col-xs-2 q-pa-lg">
+          <q-checkbox v-model="colab" label="Collaborative" color="teal" />
+        </div>
+        <div class="col-xs-3 q-pa-lg"></div>
+        <div class="col-xs-2 q-pa-lg">
           <q-btn color="primary" v-on:click="fusePlaylists">Fuse</q-btn>
         </div>
-        <div class="col-xs-3 q-pa-lg">
-          <q-btn color="secondary">Submit</q-btn>
+        <div class="col-xs-2 q-pa-lg">
+          <q-btn color="secondary" v-on:click="createPlaylist">Submit</q-btn>
         </div>
       </div>
     </div>
@@ -94,6 +109,8 @@
 <script>
 import Vue from "vue";
 import { spotify_api } from "../utils/spotify-api";
+import { validationMixin } from "vuelidate";
+import { required } from "vuelidate/lib/validators";
 import {
   QBtn,
   QItem,
@@ -107,8 +124,23 @@ import {
 } from "quasar";
 
 Vue.component("Queue");
-
+const alerts = [
+  {
+    color: "negative",
+    message: "Warning: You must fuse playlists before submitting!",
+    icon: "report_problem"
+  },
+  {
+    color: "secondary",
+    message: "Fused Playlist Created! Check your Spotify to listen now",
+    icon: "thumb_up"
+  }
+];
 export default {
+  mixins: [validationMixin],
+  validations: {
+    text: { required }
+  },
   name: "Queue",
   components: {
     QItem,
@@ -123,16 +155,24 @@ export default {
   },
   data() {
     return {
-      playlist: null,
+      playlists: null,
       model1: null,
       model2: null,
       text: "",
-      dPlay: false,
+      priv: false,
+      colab: false,
       fused: []
     };
   },
 
-  computed: {},
+  computed: {
+    playlistsNameErrors() {
+      const errors = [];
+      if (!this.$v.text.$dirty) return errors;
+      !this.$v.text.required && errors.push("Playlist Name is required.");
+      return errors;
+    }
+  },
   methods: {
     fusePlaylists() {
       spotify_api
@@ -156,17 +196,59 @@ export default {
       let max = Math.max(p1.length, p2.length);
       for (let i = 0; i < max; i++) {
         if (p2.length > i && p1.length > i) {
-          uniqList[p1[i].track.id] = p1[i].track;
-          uniqList[p2[i].track.id] = p2[i].track;
+          uniqList[p1[i].track.name] = p1[i].track;
+          uniqList[p2[i].track.name] = p2[i].track;
         } else if (p1.length < i) {
-          uniqList[p2[i].track.id] = p2[i].track;
+          uniqList[p2[i].track.name] = p2[i].track;
         } else if (p2.length < i) {
-          uniqList[p1[i].track.id] = p1[i].track;
+          uniqList[p1[i].track.name] = p1[i].track;
         }
       }
-
       this.fused = Object.values(uniqList);
-      console.log(this.fused);
+    },
+    createPlaylist() {
+      console.log(this.priv + " -- " + this.colab);
+      this.$v.$touch();
+      if (!this.$v.$invalid && this.fused.length > 0) {
+        let uris = [];
+        this.fused.forEach(track => {
+          uris.push(track.uri);
+        });
+
+        spotify_api
+          .post("/users/" + this.$store.getters.sUser.id + "/playlists", {
+            name: this.text,
+            public: !this.priv,
+            collaborative: this.colab
+          })
+          .then(res => {
+            if (res.status === 201) {
+              let id = res.data.id;
+              spotify_api
+                .post("/playlists/" + id + "/tracks", { uris: uris })
+                .then(res => {
+                  if (res.status === 201) {
+                    this.$q.notify(alerts[1]);
+                    this.fused = [];
+                    this.priv = false;
+                    this.colab = false;
+                    this.$nextTick(() => {
+                      this.$v.$reset();
+                    });
+                    this.text = "";
+                  }
+                })
+                .catch(error => {
+                  console.log(error);
+                });
+            }
+          })
+          .catch(error => {
+            console.log(error);
+          });
+      } else if (this.fused.length <= 0) {
+        this.$q.notify(alerts[0]);
+      }
     }
   },
 
