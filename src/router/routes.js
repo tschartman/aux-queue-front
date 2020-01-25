@@ -18,6 +18,7 @@ const routes = [
   {
     path: "/link",
     name: "link",
+    meta: { requiresAuth: true },
     component: () => import("components/link.vue")
   },
   {
@@ -29,8 +30,16 @@ const routes = [
   {
     path: "/fuse",
     name: "fuse",
+    meta: { requiresAuth: true },
     component: () => import("layouts/AppBar.vue"),
     children: [{ path: "", component: () => import("components/fuse.vue") }]
+  },
+  {
+    path: "/user",
+    name: "user",
+    meta: { requiresAuth: true },
+    component: () => import("layouts/AppBar.vue"),
+    children: [{ path: "", component: () => import("components/user.vue") }]
   }
 ];
 

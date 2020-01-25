@@ -63,7 +63,7 @@
       <q-list>
         <q-item-label header>Options</q-item-label>
         <div v-if="$store.getters.isLoggedIn">
-          <q-item clickable>
+          <q-item clickable v-on:click="$router.push('/user')">
             <q-item-section avatar>
               <q-avatar>
                 <q-img :src="imageURL" />
