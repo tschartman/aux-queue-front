@@ -138,7 +138,6 @@ export default {
       });
 
       if (this.queue.length > 0) {
-        console.log(this.currentPlaylist);
         spotify_api
           .post("/playlists/" + this.currentPlaylist + "/tracks", {
             uris: uris

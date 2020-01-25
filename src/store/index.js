@@ -1,6 +1,7 @@
 import Vue from "vue";
 import Vuex from "vuex";
 import { app_api } from "../utils/app-api";
+import { spotify_api } from "../utils/spotify-api";
 import createPersistedState from "vuex-persistedstate";
 import * as Cookies from "js-cookie";
 
@@ -20,7 +21,8 @@ const Store = new Vuex.Store({
     sauth: false,
     spotify_token: null,
     spotify_refresh: null,
-    user: {}
+    user: {},
+    sUser: {}
   },
   plugins: [
     createPersistedState({
@@ -62,6 +64,9 @@ const Store = new Vuex.Store({
     },
     set_user(state, user) {
       state.user = user;
+    },
+    set_spotify(state, user) {
+      state.sUser = user;
     },
     auth_error(state) {
       state.status = "error";
@@ -107,7 +112,11 @@ const Store = new Vuex.Store({
             let token = res.data.access_token;
             let refresh = res.data.refresh_token;
             commit("link_spotify", { token: token, refresh: refresh });
-            resolve(res);
+
+            spotify_api.get("/me").then(re => {
+              commit("set_spotify", re.data);
+              resolve(res);
+            });
           })
           .catch(error => {
             reject(error);
@@ -177,7 +186,8 @@ const Store = new Vuex.Store({
     token: state => state.token,
     spotifyToken: state => state.spotify_token,
     spotifyRefresh: state => state.spotify_refresh,
-    user: state => state.user
+    user: state => state.user,
+    sUser: state => state.sUser
   }
 
   // enable strict mode (adds overhead!)

@@ -12,7 +12,7 @@
           <q-icon name="menu" />
         </q-btn>
 
-        <q-toolbar-title>
+        <q-toolbar-title class="icon" v-on:click="$router.push('/')">
           AuxQueue
         </q-toolbar-title>
         <q-btn
@@ -69,6 +69,14 @@
               <q-item-label>User Profile</q-item-label>
             </q-item-section>
           </q-item>
+          <q-item clickable v-on:click="$router.push('/fuse')">
+            <q-item-section avatar>
+              <q-icon name="compare_arrows" />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label>Fuse Playlists</q-item-label>
+            </q-item-section>
+          </q-item>
           <q-item clickable v-on:click="share = true">
             <q-item-section avatar>
               <q-icon name="share" />
@@ -77,6 +85,7 @@
               <q-item-label>Share Queue</q-item-label>
             </q-item-section>
           </q-item>
+
           <q-item clickable v-on:click="logout">
             <q-item-section avatar>
               <q-icon name="exit_to_app" />
@@ -122,6 +131,7 @@ import {
 import { mapMutations } from "vuex";
 import { spotify_api } from "../utils/spotify-api";
 import shareQueue from "../modals/shareQueue";
+import Store from "../store/index";
 import md5 from "md5";
 export default {
   name: "AppBar",
@@ -165,16 +175,20 @@ export default {
       this.imageURL =
         "https://www.gravatar.com/avatar/" +
         md5(this.$store.getters.user.email);
-      spotify_api.get("/me").then(re => {
-        spotify_api.get("/users/" + re.data.id + "/playlists").then(res => {
+      spotify_api
+        .get("/users/" + Store.getters.sUser.id + "/playlists")
+        .then(res => {
           this.playlists = res.data.items;
           this.model = res.data.items[0];
           this.CHANGE_PLAYLIST(res.data.items[0].id);
         });
-      });
     }
   }
 };
 </script>
 
-<style></style>
+<style>
+.icon {
+  cursor: pointer;
+}
+</style>

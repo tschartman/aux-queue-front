@@ -41,6 +41,7 @@
 <script>
 import { spotify_api } from "../utils/spotify-api";
 import { QBtnDropdown, QItemLabel, QItem, QItemSection, QImg } from "quasar";
+import Store from "../store/index";
 
 export default {
   components: {
@@ -80,14 +81,14 @@ export default {
     }
   },
   created() {
-    spotify_api.get("/me").then(re => {
-      spotify_api.get("/users/" + re.data.id + "/playlists").then(res => {
+    spotify_api
+      .get("/users/" + Store.getters.sUser.id + "/playlists")
+      .then(res => {
         this.playlists = res.data.items;
         this.model = res.data.items[0];
         this.id = res.data.items[0].id;
         this.name = res.data.items[0].name;
       });
-    });
   }
 };
 </script>

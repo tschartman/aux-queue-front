@@ -25,6 +25,12 @@ const routes = [
     name: "share",
     component: () => import("layouts/AppBar.vue"),
     children: [{ path: "", component: () => import("components/share.vue") }]
+  },
+  {
+    path: "/fuse",
+    name: "fuse",
+    component: () => import("layouts/AppBar.vue"),
+    children: [{ path: "", component: () => import("components/fuse.vue") }]
   }
 ];
 
