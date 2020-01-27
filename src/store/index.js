@@ -12,7 +12,6 @@ app_api.defaults.xsrfHeaderName = "X-CSRFToken";
 
 const Store = new Vuex.Store({
   state: {
-    playlistId: "",
     status: "",
     expires_in: null,
     token: null,
@@ -39,9 +38,6 @@ const Store = new Vuex.Store({
     })
   ],
   mutations: {
-    CHANGE_PLAYLIST: (state, playlistId) => {
-      state.playlistId = playlistId;
-    },
     auth_request(state) {
       state.status = "loading";
     },
@@ -133,23 +129,6 @@ const Store = new Vuex.Store({
     clearSpotify({ commit }) {
       commit("clear_spotify");
     },
-    inspect() {
-      const token = this.state.token;
-      if (token) {
-        const exp = this.expires_in;
-        // if token expires in 30 minutes and is not reaching lifespan
-        if (exp - Date.now() / 1000 < 1800) {
-          //token expires soon refresh
-          this.dispatch("refresh", this.state.refresh);
-          console.log("refreshed");
-          // } else if (exp - Date.now() / 1000 < 1800) {
-          //   // token refresh expires soon so logout
-          //   this.dispatch("logout");
-        } else {
-          //token is good, do nothing
-        }
-      }
-    },
     refresh({ commit }, refresh) {
       return new Promise((resolve, reject) => {
         commit("auth_request");
@@ -179,7 +158,6 @@ const Store = new Vuex.Store({
     }
   },
   getters: {
-    playlistId: state => state.playlistId,
     isLoggedIn: state => state.auth,
     isLinked: state => state.spotify_refresh,
     authStatus: state => state.status,

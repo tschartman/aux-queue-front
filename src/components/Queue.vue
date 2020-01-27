@@ -56,7 +56,7 @@
         once
         transition="scale"
       >
-        <q-item clickable v-ripple>
+        <q-item v-if="queue.length > 0" clickable v-ripple>
           <q-item-section avatar>
             <q-img :src="song.album.images[0].url" />
           </q-item-section>
@@ -67,9 +67,41 @@
         </q-item>
       </q-intersection>
       <hr />
-      <q-item-label header>Playlist</q-item-label>
+      <q-item-label header>
+        <q-btn-dropdown
+          stretch
+          flat
+          :label="playlist === null ? 'Playlists' : playlist.name"
+        >
+          <q-list>
+            <q-item
+              v-for="plist in playlists"
+              :key="plist.id"
+              @click="updatePlaylist(plist)"
+              clickable
+              v-close-popup
+              tabindex="0"
+            >
+              <q-item-section avatar>
+                <q-img
+                  v-if="plist.images.length > 0"
+                  :src="plist.images[0].url"
+                />
+                <q-icon class="q-pl-md q-pt-xs" v-else name="camera_alt" />
+              </q-item-section>
+              <q-item-section>
+                <q-item-label>{{ plist.name }}</q-item-label>
+                <q-item-label caption>{{
+                  plist.owner.display_name
+                }}</q-item-label>
+              </q-item-section>
+            </q-item>
+          </q-list>
+        </q-btn-dropdown>
+      </q-item-label>
+
       <q-intersection
-        v-for="song in playlist"
+        v-for="song in songs"
         :key="song.name"
         once
         transition="scale"
@@ -89,6 +121,7 @@
 import Vue from "vue";
 import { spotify_api } from "../utils/spotify-api";
 import {
+  QBtnDropdown,
   QSelect,
   QBtn,
   QItem,
@@ -104,6 +137,7 @@ Vue.component("Queue");
 export default {
   name: "Queue",
   components: {
+    QBtnDropdown,
     QSelect,
     QItem,
     QImg,
@@ -118,17 +152,15 @@ export default {
       model: null,
       options: [],
       queue: [],
-      playlist: [],
+      songs: [],
+      playlist: null,
+      playlists: [],
       category: null,
       categories: ["artist", "track", "album"]
     };
   },
 
-  computed: {
-    currentPlaylist: function() {
-      return this.$store.state.playlistId;
-    }
-  },
+  computed: {},
   methods: {
     addToQueue(newSong) {
       if (this.queue.some(song => song.id === newSong.id)) {
@@ -141,15 +173,20 @@ export default {
       let index = this.queue.indexOf(song);
       this.queue.splice(index, 1);
     },
+    updatePlaylist(plist) {
+      this.playlist = plist;
+      this.init();
+    },
     addSongs() {
       let uris = [];
       this.queue.map(track => {
         uris.push(track.uri);
+        this.songs.push(track);
       });
 
       if (this.queue.length > 0) {
         spotify_api
-          .post("/playlists/" + this.currentPlaylist + "/tracks", {
+          .post("/playlists/" + this.playlist.id + "/tracks", {
             uris: uris
           })
           .then(res => {
@@ -162,8 +199,8 @@ export default {
     },
     init() {
       spotify_api
-        .get("/playlists/" + this.currentPlaylist + "/tracks")
-        .then(res => (this.playlist = res.data.items))
+        .get("/playlists/" + this.playlist.id + "/tracks")
+        .then(res => (this.songs = res.data.items))
         .catch(error => {
           console.log(error);
         });
@@ -182,7 +219,13 @@ export default {
   },
 
   created() {
-    this.init();
+    spotify_api
+      .get("/users/" + this.$store.getters.sUser.id + "/playlists")
+      .then(res => {
+        this.playlists = res.data.items;
+        this.playlist = res.data.items[0];
+        this.init();
+      });
   }
 };
 </script>
