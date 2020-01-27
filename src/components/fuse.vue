@@ -3,7 +3,7 @@
     <h4 class="title">Fuse Playlists</h4>
     <div class="form">
       <div class="row justify-center items-center">
-        <div class="col-xs-4 q-pa-lg">
+        <div class="col-xs-12 q-px-lg">
           <q-input
             v-model="text"
             :error-message="playlistsNameErrors[0]"
@@ -13,11 +13,28 @@
             label="Fused Playlist Name"
           />
         </div>
-        <div class="col-xs-2 q-pa-lg"></div>
-        <div class="col-xs-6 q-pa-lg">
+      </div>
+      <div class="row justify-start">
+        <div class="col-xs-6">
+          <q-checkbox
+            class="q-ml-sm float-left"
+            v-model="priv"
+            label="Private"
+            color="teal"
+          />
+          <q-checkbox
+            class="q-ml-sm float-left"
+            v-model="colab"
+            label="Collaborative"
+            color="teal"
+          />
+        </div>
+      </div>
+      <div class="row justify-center items-center q-py-lg">
+        <div class="col-xs-6">
           <q-btn-dropdown
-            stretch
-            flat
+            class="drop"
+            color="black"
             :label="model1 === null ? 'Playlists' : model1.name"
           >
             <q-list>
@@ -45,10 +62,11 @@
               </q-item>
             </q-list>
           </q-btn-dropdown>
+        </div>
+        <div class="col-xs-6">
           <q-btn-dropdown
-            v-if="this.$store.getters.isLoggedIn"
-            stretch
-            flat
+            class="drop"
+            color="black"
             :label="model2 === null ? 'Playlists' : model2.name"
           >
             <q-list>
@@ -78,18 +96,40 @@
           </q-btn-dropdown>
         </div>
       </div>
+      <div class="row justify-center items-center q-pb-lg">
+        <div class="col-xs-6">
+          <q-img
+            :src="model1.images[0].url"
+            style="width: 150px"
+            :ratio="1"
+            basic
+            spinner-color="white"
+            class="rounded-borders"
+          />
+        </div>
+        <div class="col-xs-6">
+          <q-img
+            :src="model2.images[0].url"
+            style="width: 150px"
+            :ratio="1"
+            basic
+            spinner-color="white"
+            class="rounded-borders"
+          />
+        </div>
+      </div>
+      <div class="row justify-center items-center q-pb-lg">
+        <div class="col-xs-12">
+          <q-btn class="q-ma-lg" color="primary" v-on:click="fusePlaylists"
+            >Fuse</q-btn
+          >
+        </div>
+      </div>
       <div class="row justify-center items-center">
-        <div class="col-xs-2 q-pa-lg">
-          <q-checkbox v-model="priv" label="Private" color="teal" />
+        <div class="col-xs-6">
+          <q-btn color="red" v-on:click="clearForm">Cancel</q-btn>
         </div>
-        <div class="col-xs-2 q-pa-lg">
-          <q-checkbox v-model="colab" label="Collaborative" color="teal" />
-        </div>
-        <div class="col-xs-3 q-pa-lg"></div>
-        <div class="col-xs-2 q-pa-lg">
-          <q-btn color="primary" v-on:click="fusePlaylists">Fuse</q-btn>
-        </div>
-        <div class="col-xs-2 q-pa-lg">
+        <div class="col-xs-6">
           <q-btn color="secondary" v-on:click="createPlaylist">Submit</q-btn>
         </div>
       </div>
@@ -206,8 +246,16 @@ export default {
       }
       this.fused = Object.values(uniqList);
     },
+    clearForm() {
+      this.fused = [];
+      this.priv = false;
+      this.colab = false;
+      this.$nextTick(() => {
+        this.$v.$reset();
+      });
+      this.text = "";
+    },
     createPlaylist() {
-      console.log(this.priv + " -- " + this.colab);
       this.$v.$touch();
       if (!this.$v.$invalid && this.fused.length > 0) {
         let uris = [];
@@ -229,13 +277,7 @@ export default {
                 .then(res => {
                   if (res.status === 201) {
                     this.$q.notify(alerts[1]);
-                    this.fused = [];
-                    this.priv = false;
-                    this.colab = false;
-                    this.$nextTick(() => {
-                      this.$v.$reset();
-                    });
-                    this.text = "";
+                    this.clearForm();
                   }
                 })
                 .catch(error => {
@@ -274,5 +316,9 @@ export default {
   display: block;
   margin: auto;
   text-align: center;
+}
+
+.drop {
+  max-width: 175px;
 }
 </style>
