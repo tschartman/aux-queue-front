@@ -31,25 +31,50 @@
             </q-item>
           </q-list>
         </q-btn-dropdown>
-        <button @click="copy">
+        <q-btn @click="copy">
           Copy to clipboard
-        </button>
+        </q-btn>
+      </q-card-section>
+
+      <q-card-section class="q-pt-none justify-center">
+        <q-img
+          :src="model.images[0].url"
+          style="width: 150px"
+          :ratio="1"
+          basic
+          spinner-color="white"
+          class="rounded-borders"
+        />
       </q-card-section>
     </q-card>
   </div>
 </template>
 <script>
 import { spotify_api } from "../utils/spotify-api";
-import { QBtnDropdown, QItemLabel, QItem, QItemSection, QImg } from "quasar";
+import {
+  QBtnDropdown,
+  QItemLabel,
+  QItem,
+  QItemSection,
+  QImg,
+  QBtn
+} from "quasar";
 import Store from "../store/index";
-
+const alerts = [
+  {
+    color: "secondary",
+    message: "Copied to clipboard!",
+    icon: "thumb_up"
+  }
+];
 export default {
   components: {
     QBtnDropdown,
     QItemLabel,
     QItem,
     QItemSection,
-    QImg
+    QImg,
+    QBtn
   },
   data() {
     return {
@@ -73,6 +98,7 @@ export default {
           "&name=" +
           this.name
       );
+      this.$q.notify(alerts[0]);
     },
     updatePlaylist(plist) {
       console.log(plist);
