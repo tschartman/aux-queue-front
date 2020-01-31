@@ -108,7 +108,18 @@
       >
         <q-item clickable v-ripple>
           <q-item-section avatar>
-            <q-img :src="song.track.album.images[0].url" />
+            <q-img
+              :src="song.track.album.images[0].url"
+              v-on:click="playPreview(song.track.preview_url)"
+            >
+              <q-btn
+                v-if="audio && audio.src === song.track.preview_url"
+                round
+                color="transparent"
+                icon="pause"
+              />
+              <q-btn v-else round color="transparent" icon="play_arrow" />
+            </q-img>
           </q-item-section>
 
           <q-item-section>{{ song.track.name }}</q-item-section>
@@ -149,6 +160,7 @@ export default {
   },
   data() {
     return {
+      audio: null,
       model: null,
       options: [],
       queue: [],
@@ -177,6 +189,19 @@ export default {
       this.playlist = plist;
       this.init();
     },
+    playPreview(url) {
+      if (this.audio) {
+        let current = this.audio;
+        this.audio.pause();
+        this.audio = null;
+        if (current.src !== url) {
+          this.playPreview(url);
+        }
+      } else {
+        this.audio = new Audio(url);
+        this.audio.play();
+      }
+    },
     addSongs() {
       let uris = [];
       this.queue.map(track => {
@@ -190,7 +215,7 @@ export default {
             uris: uris
           })
           .then(res => {
-            if (res.status == 201) {
+            if (res.status === 201) {
               this.queue = [];
               this.init();
             }
