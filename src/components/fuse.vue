@@ -30,11 +30,17 @@
           />
         </div>
       </div>
+      <div class="row justify-center items-center">
+        <div class="col-xs-12">
+          <q-btn flat class="q-ma-lg" color="primary" v-on:click="fusePlaylists"
+            >Fuse</q-btn
+          >
+        </div>
+      </div>
       <div class="row justify-center items-center q-py-lg">
         <div class="col-xs-6">
           <q-btn-dropdown
             class="drop"
-            color="black"
             :label="model1 === null ? 'Playlists' : model1.name"
           >
             <q-list>
@@ -66,7 +72,6 @@
         <div class="col-xs-6">
           <q-btn-dropdown
             class="drop"
-            color="black"
             :label="model2 === null ? 'Playlists' : model2.name"
           >
             <q-list>
@@ -118,19 +123,14 @@
           />
         </div>
       </div>
-      <div class="row justify-center items-center q-pb-lg">
-        <div class="col-xs-12">
-          <q-btn class="q-ma-lg" color="primary" v-on:click="fusePlaylists"
-            >Fuse</q-btn
+      <div class="row justify-center items-center q-pt-lg">
+        <div class="col-xs-6">
+          <q-btn flat color="red" v-on:click="clearForm">Cancel</q-btn>
+        </div>
+        <div class="col-xs-6">
+          <q-btn flat color="secondary" v-on:click="createPlaylist"
+            >Submit</q-btn
           >
-        </div>
-      </div>
-      <div class="row justify-center items-center">
-        <div class="col-xs-6">
-          <q-btn color="red" v-on:click="clearForm">Cancel</q-btn>
-        </div>
-        <div class="col-xs-6">
-          <q-btn color="secondary" v-on:click="createPlaylist">Submit</q-btn>
         </div>
       </div>
     </div>

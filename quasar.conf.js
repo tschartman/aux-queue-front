@@ -61,6 +61,9 @@ module.exports = function(ctx) {
       // gzip: true,
       // analyze: true,
       // extractCSS: false,
+      uglifyOptions: {
+        compress: { drop_console: true }
+      },
       extendWebpack(cfg) {
         cfg.module.rules.push({
           enforce: "pre",

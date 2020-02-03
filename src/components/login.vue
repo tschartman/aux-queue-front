@@ -4,9 +4,10 @@
       <img height="75px" width="300px" src="/statics/AuxQueue-logo.png" />
       <div class="row">
         <div class="col-xs-12 ">
-          <q-card class="elevation-12 screen">
-            <q-toolbar class="bg-primary text-white">
+          <q-card class="screen" flat bordered>
+            <q-toolbar class="bg-black text-white">
               <q-toolbar-title>Login</q-toolbar-title>
+              <q-spinner-radio v-if="loading" color="cyan" class="loading" />
             </q-toolbar>
             <q-card-section>
               <form>
@@ -42,8 +43,8 @@
               <p class="authError" v-if="authError">{{ authError }}</p>
             </q-card-section>
             <q-card-actions align="around">
-              <q-btn to="/register" color="primary">Sign up</q-btn>
-              <q-btn @click="login" color="secondary">Login</q-btn>
+              <q-btn flat to="/register" color="dark">Sign up</q-btn>
+              <q-btn flat @click="login" color="primary">Login</q-btn>
             </q-card-actions>
           </q-card>
         </div>
@@ -60,7 +61,8 @@ import {
   QCardActions,
   QInput,
   QToolbar,
-  QCardSection
+  QCardSection,
+  QSpinnerRadio
 } from "quasar";
 export default {
   mixins: [validationMixin],
@@ -74,13 +76,15 @@ export default {
     QCardActions,
     QCardSection,
     QInput,
-    QToolbar
+    QToolbar,
+    QSpinnerRadio
   },
   data() {
     return {
       username: "",
       password: "",
-      authError: ""
+      authError: "",
+      loading: false
     };
   },
   computed: {
@@ -103,6 +107,7 @@ export default {
       if (!this.$v.$invalid) {
         let username = this.username.toLowerCase();
         let password = this.password;
+        this.loading = true;
         this.$store
           .dispatch("login", { username, password })
           .then(() => {
@@ -110,15 +115,16 @@ export default {
               .dispatch("linkSpotify")
               .then(() => {
                 this.$router.push("/");
+                this.loading = false;
               })
               .catch(() => {
                 this.$router.push("/");
+                this.loading = false;
               });
           })
-          .catch(error => {
-            if (error.response.status == 401) {
-              this.authError = "Username or password incorrect";
-            }
+          .catch(() => {
+            this.loading = false;
+            this.authError = "Username or password incorrect";
           });
       }
     }
@@ -135,5 +141,8 @@ export default {
 .page {
   margin-top: 1em;
   display: grid;
+}
+.loading {
+  font-size: 20px;
 }
 </style>

@@ -2,7 +2,7 @@
   <div class="test">
     <q-layout view="lHh Lpr lFf">
       <q-header elevated>
-        <q-toolbar class="bg-black text-white">
+        <q-toolbar class="bg-grey-3 text-white">
           <q-btn
             flat
             dense
@@ -10,12 +10,16 @@
             @click="leftDrawerOpen = !leftDrawerOpen"
             aria-label="Menu"
           >
-            <q-icon name="menu" />
+            <q-icon name="menu" color="black" />
           </q-btn>
 
           <q-toolbar-title>
             <router-link class="router-link" to="/">
-              AuxQueue
+              <img
+                height="35px"
+                width="140px"
+                src="/statics/AuxQueue-logo.png"
+              />
             </router-link>
           </q-toolbar-title>
           <q-btn

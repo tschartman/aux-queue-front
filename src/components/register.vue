@@ -1,9 +1,10 @@
 <template>
-  <div class="window-height window-width row justify-center items-center">
-    <div class="col-xs-12 col-sm-8 col-md-6 col-lg-4 col-xl-2">
-      <q-card class="elevation-12">
-        <q-toolbar class="bg-primary text-white">
-          <q-toolbar-title>Login</q-toolbar-title>
+  <div class="page justify-center items-center">
+    <img height="75px" width="300px" src="/statics/AuxQueue-logo.png" />
+    <div class="col-xs-12">
+      <q-card class="screen" flat bordered>
+        <q-toolbar class="bg-black text-white">
+          <q-toolbar-title>Sign Up</q-toolbar-title>
         </q-toolbar>
         <q-card-section>
           <form>
@@ -74,8 +75,10 @@
           </form>
         </q-card-section>
         <q-card-actions align="around">
-          <q-btn @click="cancel" color="primary">cancel</q-btn>
-          <q-btn class="mr-4" @click="submit" color="secondary">submit</q-btn>
+          <q-btn flat @click="cancel" color="dark">cancel</q-btn>
+          <q-btn flat class="mr-4" @click="submit" color="primary"
+            >submit</q-btn
+          >
         </q-card-actions>
       </q-card>
     </div>
