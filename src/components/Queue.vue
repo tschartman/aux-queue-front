@@ -75,51 +75,56 @@
         </q-item>
       </q-intersection>
       <hr />
-      <h6 class="title">Now Playing</h6>
-      <div class="row justify-center items-center q-pt-lg">
-        <q-img
-          :src="currentlyPlaying.album.images[0].url"
-          style="width: 150px"
-          :ratio="1"
-          basic
-          spinner-color="white"
-          class="rounded-borders"
-        >
-        </q-img>
-      </div>
+      <div v-if="currentlyPlaying" class="playing">
+        <h6 class="title">Now Playing</h6>
+        <div class="row justify-center items-center q-pt-lg">
+          <q-img
+            :src="currentlyPlaying.album.images[0].url"
+            style="width: 150px"
+            :ratio="1"
+            basic
+            spinner-color="white"
+            class="rounded-borders"
+          >
+          </q-img>
+        </div>
 
-      <div class="row justify-center items-center  q-pt-lg">
-        <div class="text-subtitle1">
-          {{ currentlyPlaying.name }} - {{ currentlyPlaying.artists[0].name }}
+        <div class="row justify-center items-center  q-pt-lg">
+          <div class="text-subtitle1">
+            {{ currentlyPlaying.name }} - {{ currentlyPlaying.artists[0].name }}
+          </div>
         </div>
-      </div>
-      <div class="row justify-center items-center">
-        <q-linear-progress
-          class="progress q-ma-lg"
-          :value="progress / duration"
-          color="black"
-        />
-      </div>
-      <div class="row justify-center text-center">
-        <div class="col-xs-6 q-mb-md">
-          {{ moment(this.progress).format("mm:ss") }}
-        </div>
-        <div class="col-xs-6 q-mb-md">
-          {{ moment(this.duration - this.progress).format("mm:ss") }}
-        </div>
-      </div>
-      <div class="row justify-center items-center">
-        <q-btn v-on:click="skipPrevious()" flat icon="skip_previous" />
-        <div class="q-mx-md">
-          <q-btn
-            v-on:click="playCurrentSong()"
-            v-if="paused"
-            round
-            icon="play_arrow"
+        <div class="row justify-center items-center">
+          <q-linear-progress
+            class="progress q-ma-lg"
+            :value="progress / duration"
+            color="black"
           />
-          <q-btn v-on:click="pauseCurrentSong()" v-else round icon="pause" />
         </div>
-        <q-btn v-on:click="skipNext()" flat icon="skip_next" />
+        <div class="row justify-center text-center">
+          <div class="col-xs-6 q-mb-md">
+            {{ moment(this.progress).format("mm:ss") }}
+          </div>
+          <div class="col-xs-6 q-mb-md">
+            {{ moment(this.duration - this.progress).format("mm:ss") }}
+          </div>
+        </div>
+        <div class="row justify-center items-center">
+          <q-btn v-on:click="skipPrevious()" flat icon="skip_previous" />
+          <div class="q-mx-md">
+            <q-btn
+              v-on:click="playCurrentSong()"
+              v-if="paused"
+              round
+              icon="play_arrow"
+            />
+            <q-btn v-on:click="pauseCurrentSong()" v-else round icon="pause" />
+          </div>
+          <q-btn v-on:click="skipNext()" flat icon="skip_next" />
+        </div>
+      </div>
+      <div v-else>
+        <h6 class="title">No Songs Playing</h6>
       </div>
     </div>
   </div>
@@ -238,23 +243,19 @@ export default {
       });
     },
     init() {
+      clearInterval(this.interval);
       spotify_api.get("/me/player/currently-playing").then(res => {
         this.currentlyPlaying = res.data.item;
         this.duration = res.data.item.duration_ms;
         this.progress = res.data.progress_ms;
         this.interval = setInterval(() => {
           if (this.progress >= this.duration) {
-            console.log("here");
-            this.updatePlayer();
+            this.init();
           } else if (!this.paused) {
             this.progress = this.progress + 10;
           }
         }, 10);
       });
-    },
-    updatePlayer() {
-      clearInterval(this.interval);
-      this.init();
     }
   },
 

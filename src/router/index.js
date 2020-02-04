@@ -1,10 +1,12 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
+import VueWorker from "vue-worker";
 import routes from "./routes";
 import Store from "../store";
 import Clipboard from "v-clipboard";
 import moment from "moment";
 
+Vue.use(VueWorker);
 Vue.use(VueRouter);
 Vue.use(Clipboard);
 Vue.prototype.moment = moment;
