@@ -1,9 +1,9 @@
 <template>
   <div>
     <div>
-      <h4 class="title">My Queue</h4>
+      <h4 class="title">My Playlists</h4>
       <div class="row">
-        <div class="col-xs-12 q-pa-md">
+        <div class="col-xs-8 q-pa-md">
           <q-select
             rounded
             outlined
@@ -44,6 +44,9 @@
             </template>
           </q-select>
         </div>
+        <div class="col-xs-4 q-pa-lg">
+          <q-btn color="black" label="Submit" @click="addSongs" />
+        </div>
       </div>
       <hr />
       <q-item-label header>Queue</q-item-label>
@@ -55,18 +58,7 @@
       >
         <q-item v-if="queue.length > 0" clickable v-ripple>
           <q-item-section avatar>
-            <q-img
-              :src="song.album.images[0].url"
-              v-on:click="playPreview(song.preview_url)"
-            >
-              <q-btn
-                v-if="audio && audio.src === song.preview_url"
-                round
-                color="transparent"
-                icon="pause"
-              />
-              <q-btn v-else round color="transparent" icon="play_arrow" />
-            </q-img>
+            <q-img :src="song.album.images[0].url" />
           </q-item-section>
           <q-item-section>{{ song.name }}</q-item-section>
           <q-item-section avatar>
@@ -75,7 +67,64 @@
         </q-item>
       </q-intersection>
       <hr />
-      <h6 class="title">Now Playing</h6>
+      <q-item-label header>
+        <q-btn-dropdown
+          stretch
+          flat
+          :label="playlist === null ? 'Playlists' : playlist.name"
+        >
+          <q-list>
+            <q-item
+              v-for="plist in playlists"
+              :key="plist.id"
+              @click="updatePlaylist(plist)"
+              clickable
+              v-close-popup
+              tabindex="0"
+            >
+              <q-item-section avatar>
+                <q-img
+                  v-if="plist.images.length > 0"
+                  :src="plist.images[0].url"
+                />
+                <q-icon class="q-pl-md q-pt-xs" v-else name="camera_alt" />
+              </q-item-section>
+              <q-item-section>
+                <q-item-label>{{ plist.name }}</q-item-label>
+                <q-item-label caption>{{
+                  plist.owner.display_name
+                }}</q-item-label>
+              </q-item-section>
+            </q-item>
+          </q-list>
+        </q-btn-dropdown>
+      </q-item-label>
+
+      <q-intersection
+        v-for="song in songs"
+        :key="song.name"
+        once
+        transition="scale"
+      >
+        <q-item clickable v-ripple>
+          <q-item-section avatar>
+            <q-img
+              :src="song.track.album.images[0].url"
+              v-on:click="playPreview(song.track.preview_url)"
+            >
+              <q-btn
+                v-if="audio && audio.src === song.track.preview_url"
+                round
+                color="transparent"
+                icon="pause"
+              />
+              <q-btn v-else round color="transparent" icon="play_arrow" />
+            </q-img>
+          </q-item-section>
+
+          <q-item-section>{{ song.track.name }}</q-item-section>
+        </q-item>
+      </q-intersection>
     </div>
   </div>
 </template>
@@ -83,6 +132,7 @@
 import Vue from "vue";
 import { spotify_api } from "../utils/spotify-api";
 import {
+  QBtnDropdown,
   QSelect,
   QBtn,
   QItem,
@@ -98,6 +148,7 @@ Vue.component("Queue");
 export default {
   name: "Queue",
   components: {
+    QBtnDropdown,
     QSelect,
     QItem,
     QImg,
@@ -113,6 +164,9 @@ export default {
       model: null,
       options: [],
       queue: [],
+      songs: [],
+      playlist: null,
+      playlists: [],
       category: null,
       categories: ["artist", "track", "album"]
     };
@@ -131,6 +185,10 @@ export default {
       let index = this.queue.indexOf(song);
       this.queue.splice(index, 1);
     },
+    updatePlaylist(plist) {
+      this.playlist = plist;
+      this.init();
+    },
     playPreview(url) {
       if (this.audio) {
         let current = this.audio;
@@ -144,7 +202,34 @@ export default {
         this.audio.play();
       }
     },
-    playSong() {},
+    addSongs() {
+      let uris = [];
+      this.queue.map(track => {
+        uris.push(track.uri);
+        this.songs.push(track);
+      });
+
+      if (this.queue.length > 0) {
+        spotify_api
+          .post("/playlists/" + this.playlist.id + "/tracks", {
+            uris: uris
+          })
+          .then(res => {
+            if (res.status === 201) {
+              this.queue = [];
+              this.init();
+            }
+          });
+      }
+    },
+    init() {
+      spotify_api
+        .get("/playlists/" + this.playlist.id + "/tracks")
+        .then(res => (this.songs = res.data.items))
+        .catch(error => {
+          console.log(error);
+        });
+    },
     filterFn(val, update, abort) {
       if (val.length < 1) {
         abort();
@@ -158,7 +243,15 @@ export default {
     }
   },
 
-  created() {}
+  created() {
+    spotify_api
+      .get("/users/" + this.$store.getters.sUser.id + "/playlists")
+      .then(res => {
+        this.playlists = res.data.items;
+        this.playlist = res.data.items[0];
+        this.init();
+      });
+  }
 };
 </script>
 <style scoped>
