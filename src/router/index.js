@@ -3,9 +3,11 @@ import VueRouter from "vue-router";
 import routes from "./routes";
 import Store from "../store";
 import Clipboard from "v-clipboard";
+import moment from "moment";
 
 Vue.use(VueRouter);
 Vue.use(Clipboard);
+Vue.prototype.moment = moment;
 
 /*
  * If not building with SSR mode, you can
