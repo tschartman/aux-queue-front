@@ -76,6 +76,36 @@
       </q-intersection>
       <hr />
       <h6 class="title">Now Playing</h6>
+      <div class="row justify-center items-center q-pt-lg">
+        <q-img
+          :src="currentlyPlaying.album.images[0].url"
+          style="width: 150px"
+          :ratio="1"
+          basic
+          spinner-color="white"
+          class="rounded-borders"
+        >
+        </q-img>
+      </div>
+
+      <div class="row justify-center items-center  q-pa-lg">
+        <div class="text-subtitle1">
+          {{ currentlyPlaying.name }} - {{ currentlyPlaying.artists[0].name }}
+        </div>
+      </div>
+      <div class="row justify-center items-center">
+        <q-btn flat icon="skip_previous" />
+        <div class="q-mx-md">
+          <q-btn
+            v-on:click="playCurrentSong()"
+            v-if="paused"
+            round
+            icon="play_arrow"
+          />
+          <q-btn v-on:click="pauseCurrentSong()" v-else round icon="pause" />
+        </div>
+        <q-btn flat icon="skip_next" />
+      </div>
     </div>
   </div>
 </template>
@@ -111,7 +141,9 @@ export default {
     return {
       audio: null,
       model: null,
+      currentlyPlaying: null,
       options: [],
+      paused: false,
       queue: [],
       category: null,
       categories: ["artist", "track", "album"]
@@ -155,10 +187,30 @@ export default {
           .get("/search?q=" + val + "&type=track")
           .then(res => (this.options = res.data.tracks.items));
       });
+    },
+    pauseCurrentSong() {
+      spotify_api.put("/me/player/pause").then(res => {
+        if (res.status === 204) {
+          this.paused = true;
+        }
+      });
+    },
+
+    playCurrentSong() {
+      spotify_api.put("/me/player/play").then(res => {
+        if (res.status === 204) {
+          this.paused = false;
+        }
+      });
     }
   },
 
-  created() {}
+  created() {
+    spotify_api.get("/me/player/currently-playing").then(res => {
+      this.currentlyPlaying = res.data.item;
+      console.log(this.currentlyPlaying);
+    });
+  }
 };
 </script>
 <style scoped>
