@@ -53,7 +53,7 @@
         once
         transition="scale"
       >
-        <q-item v-if="queue.length > 0" clickable v-ripple>
+        <q-item v-if="queue && queue.length > 0" clickable v-ripple>
           <q-item-section avatar>
             <q-img
               :src="song.album.images[0].url"
@@ -69,6 +69,9 @@
             </q-img>
           </q-item-section>
           <q-item-section>{{ song.name }}</q-item-section>
+          <q-item-section avatar>
+            <q-icon @click="playNow(song)" name="arrow_upward" />
+          </q-item-section>
           <q-item-section avatar>
             <q-icon @click="remove(song)" name="delete" />
           </q-item-section>
@@ -223,38 +226,66 @@ export default {
 
     playCurrentSong() {
       spotify_api.put("/me/player/play").then(res => {
-        if (res.status === 204) {
-          this.paused = false;
-        }
+        //  if (res.status === 204) {
+        console.log(res);
+        this.paused = false;
+        //  }
       });
     },
     skipNext() {
       spotify_api.post("/me/player/next").then(res => {
-        if (res.status == 204) {
-          this.init();
-        }
+        //  if (res.status == 204) {
+        console.log(res);
+        this.init();
+        //  }
       });
     },
     skipPrevious() {
       spotify_api.post("/me/player/previous").then(res => {
-        if (res.status == 204) {
-          this.init();
-        }
+        //  if (res.status == 204) {
+        console.log(res);
+        this.init();
+        // }
       });
+    },
+    playNow(song) {
+      let uris = [song.uri];
+      spotify_api
+        .put("/me/player/play", { uris: uris })
+        .then(res => {
+          //  if (res.status == 204) {
+          console.log(res);
+          this.remove(song);
+          this.resetView();
+          this.init();
+          //  }
+        })
+        .catch(error => {
+          console.log(error);
+        });
+    },
+    resetView() {
+      this.currentlyPlaying = null;
+      this.duration = 0;
+      this.progress = 0;
     },
     init() {
       clearInterval(this.interval);
       spotify_api.get("/me/player/currently-playing").then(res => {
-        this.currentlyPlaying = res.data.item;
-        this.duration = res.data.item.duration_ms;
-        this.progress = res.data.progress_ms;
-        this.interval = setInterval(() => {
-          if (this.progress >= this.duration) {
-            this.init();
-          } else if (!this.paused) {
-            this.progress = this.progress + 10;
-          }
-        }, 10);
+        console.log(res);
+        if (res.data !== "") {
+          this.currentlyPlaying = res.data.item;
+          this.duration = res.data.item.duration_ms;
+          this.progress = res.data.progress_ms;
+          this.interval = setInterval(() => {
+            if (this.progress >= this.duration) {
+              this.resetView();
+              this.init();
+            } else if (!this.paused) {
+              this.progress = this.progress + 10;
+            }
+          }, 10);
+        }
       });
     }
   },
