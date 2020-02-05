@@ -46,7 +46,12 @@
         </div>
       </div>
       <hr />
-      <q-item-label header>Queue</q-item-label>
+      <div class="row">
+        <q-item-label header>Queue</q-item-label>
+        <q-item-section avatar>
+          <q-icon @click="playAll()" name="arrow_upward" />
+        </q-item-section>
+      </div>
       <q-intersection
         v-for="song in queue"
         :key="song.name"
@@ -256,6 +261,25 @@ export default {
           //  if (res.status == 204) {
           console.log(res);
           this.remove(song);
+          this.resetView();
+          this.init();
+          //  }
+        })
+        .catch(error => {
+          console.log(error);
+        });
+    },
+    playAll() {
+      let uris = this.queue.map(song => {
+        return song.uri;
+      });
+
+      spotify_api
+        .put("/me/player/play", { uris: uris })
+        .then(res => {
+          //  if (res.status == 204) {
+          console.log(res);
+          this.queue = [];
           this.resetView();
           this.init();
           //  }
