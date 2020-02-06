@@ -49,6 +49,14 @@
                 <q-item-label>User Profile</q-item-label>
               </q-item-section>
             </q-item>
+            <q-item clickable v-on:click="$router.push('/playlists')">
+              <q-item-section avatar>
+                <q-icon class="q-ml-md" name="lists" />
+              </q-item-section>
+              <q-item-section>
+                <q-item-label>Playlists</q-item-label>
+              </q-item-section>
+            </q-item>
             <q-item clickable v-on:click="$router.push('/fuse')">
               <q-item-section avatar>
                 <q-icon name="compare_arrows" />
