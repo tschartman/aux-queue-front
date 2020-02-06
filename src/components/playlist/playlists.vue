@@ -3,7 +3,7 @@
     <div>
       <h4 class="title">My Playlists</h4>
       <div class="row">
-        <div class="col-xs-8 q-pa-md">
+        <div class="col-xs-12 q-pa-md">
           <q-select
             rounded
             outlined
@@ -44,9 +44,9 @@
             </template>
           </q-select>
         </div>
-        <div class="col-xs-4 q-pa-lg">
-          <q-btn color="black" label="Submit" @click="addSongs" />
-        </div>
+      </div>
+      <div class="row justify-center items-center">
+        <q-btn flat color="black" label="Submit" @click="addSongs" />
       </div>
       <hr />
       <q-item-label header>Queue</q-item-label>

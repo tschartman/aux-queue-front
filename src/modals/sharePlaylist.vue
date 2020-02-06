@@ -2,7 +2,7 @@
   <div>
     <q-card>
       <q-card-section>
-        <div class="text-h6">Share Your Queue!</div>
+        <div class="text-h6">Share a Playlist!</div>
       </q-card-section>
       <q-card-section class="q-pt-none">
         <q-btn-dropdown

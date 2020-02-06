@@ -13,7 +13,7 @@
             <q-icon name="menu" color="black" />
           </q-btn>
 
-          <q-toolbar-title>
+          <q-toolbar-title v-on:click="link = ''">
             <router-link class="router-link" to="/">
               <img
                 height="35px"
@@ -39,25 +39,35 @@
         <q-list>
           <q-item-label header>Options</q-item-label>
           <div v-if="$store.getters.isLoggedIn">
-            <q-item clickable v-on:click="$router.push('/user')">
+            <q-item
+              :active="link === 'user'"
+              clickable
+              v-on:click="$router.push('/user'), (link = 'user')"
+            >
               <q-item-section avatar>
-                <q-avatar>
-                  <q-img :src="imageURL" />
-                </q-avatar>
+                <q-icon name="person" />
               </q-item-section>
               <q-item-section>
                 <q-item-label>User Profile</q-item-label>
               </q-item-section>
             </q-item>
-            <q-item clickable v-on:click="$router.push('/playlists')">
+            <q-item
+              :active="link === 'playlists'"
+              clickable
+              v-on:click="$router.push('/playlists'), (link = 'playlists')"
+            >
               <q-item-section avatar>
-                <q-icon class="q-ml-md" name="lists" />
+                <q-icon class="q-ml-sm q-pl-sm" name="lists" />
               </q-item-section>
               <q-item-section>
                 <q-item-label>Playlists</q-item-label>
               </q-item-section>
             </q-item>
-            <q-item clickable v-on:click="$router.push('/fuse')">
+            <q-item
+              :active="link === 'fuse'"
+              clickable
+              v-on:click="$router.push('/fuse'), (link = 'fuse')"
+            >
               <q-item-section avatar>
                 <q-icon name="compare_arrows" />
               </q-item-section>
@@ -73,7 +83,7 @@
                 <q-item-label>Share Playlist</q-item-label>
               </q-item-section>
             </q-item>
-
+            <q-separator />
             <q-item clickable v-on:click="logout">
               <q-item-section avatar>
                 <q-icon name="exit_to_app" />
@@ -113,30 +123,27 @@ import {
   QItemLabel,
   QItem,
   QItemSection,
-  QAvatar,
-  QImg,
-  QIcon
+  QIcon,
+  QSeparator
 } from "quasar";
 import sharePlaylist from "src/modals/sharePlaylist";
-import md5 from "md5";
 export default {
   name: "AppBar",
   components: {
     QItemLabel,
     QItem,
     QItemSection,
-    QImg,
-    QAvatar,
     QIcon,
+    QSeparator,
     sharePlaylist
   },
   data() {
     return {
+      link: "",
       leftDrawerOpen: false,
       playlists: [],
       model: null,
-      share: false,
-      imageURL: ""
+      share: false
     };
   },
 
@@ -151,13 +158,7 @@ export default {
       window.location = "https://auxstack.herokuapp.com/spotify/";
     }
   },
-  created() {
-    if (this.$store.getters.isLoggedIn) {
-      this.imageURL =
-        "https://www.gravatar.com/avatar/" +
-        md5(this.$store.getters.user.email);
-    }
-  }
+  created() {}
 };
 </script>
 
