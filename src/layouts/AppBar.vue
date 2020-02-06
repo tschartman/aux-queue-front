@@ -13,14 +13,8 @@
             <q-icon name="menu" color="black" />
           </q-btn>
 
-          <q-toolbar-title v-on:click="link = ''">
-            <router-link class="router-link" to="/">
-              <img
-                height="35px"
-                width="140px"
-                src="/statics/AuxQueue-logo.png"
-              />
-            </router-link>
+          <q-toolbar-title>
+            <img height="35px" width="140px" src="/statics/AuxQueue-logo.png" />
           </q-toolbar-title>
           <q-btn
             v-if="!$store.getters.isLinked && $store.getters.isLoggedIn"
@@ -38,6 +32,18 @@
       >
         <q-list>
           <q-item-label header>Options</q-item-label>
+          <q-item
+            :active="link === 'home'"
+            clickable
+            v-on:click="$router.push('/'), (link = 'home')"
+          >
+            <q-item-section avatar>
+              <q-icon name="home" />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label>AuxQueue</q-item-label>
+            </q-item-section>
+          </q-item>
           <div v-if="$store.getters.isLoggedIn">
             <q-item
               :active="link === 'user'"
