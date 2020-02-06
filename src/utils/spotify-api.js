@@ -1,5 +1,5 @@
 import axios from "axios";
-import Store from "../store";
+import Store from "src/store";
 import { app_api } from "./app-api";
 
 export const spotify_api = axios.create({

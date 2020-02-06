@@ -109,7 +109,7 @@ import {
   QImg,
   QIcon
 } from "quasar";
-import sharePlaylist from "../modals/sharePlaylist";
+import sharePlaylist from "src/modals/sharePlaylist";
 import md5 from "md5";
 export default {
   name: "AppBar",

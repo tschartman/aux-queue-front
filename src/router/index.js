@@ -2,7 +2,7 @@ import Vue from "vue";
 import VueRouter from "vue-router";
 import VueWorker from "vue-worker";
 import routes from "./routes";
-import Store from "../store";
+import Store from "src/store";
 import Clipboard from "v-clipboard";
 import moment from "moment";
 

@@ -96,7 +96,7 @@ import {
   QCardSection,
   QCheckbox
 } from "quasar";
-import { app_api } from "../utils/app-api";
+import { app_api } from "src/utils/app-api";
 export default {
   mixins: [validationMixin],
   validations: {

@@ -1,6 +1,6 @@
 import axios from "axios";
-import Store from "../store/index";
-import router from "../router/index";
+import Store from "src/store/index";
+import router from "src/router/index";
 export const app_api = axios.create({
   baseURL: "https://auxstack.herokuapp.com",
   timeout: 100000,

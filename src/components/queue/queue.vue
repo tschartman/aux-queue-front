@@ -145,8 +145,8 @@
 </template>
 <script>
 import Vue from "vue";
-import { spotify_api } from "../utils/spotify-api";
-import shareQueue from "../modals/shareQueue";
+import { spotify_api } from "src/utils/spotify-api";
+import shareQueue from "src/modals/shareQueue";
 import {
   QSelect,
   QBtn,

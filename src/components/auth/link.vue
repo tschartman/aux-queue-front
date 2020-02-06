@@ -5,7 +5,7 @@
 </template>
 <script>
 import Vue from "vue";
-import { app_api } from "../utils/app-api";
+import { app_api } from "src/utils/app-api";
 
 Vue.component("Link");
 

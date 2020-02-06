@@ -130,7 +130,7 @@
 </template>
 <script>
 import Vue from "vue";
-import { spotify_api } from "../utils/spotify-api";
+import { spotify_api } from "src/utils/spotify-api";
 import {
   QBtnDropdown,
   QSelect,

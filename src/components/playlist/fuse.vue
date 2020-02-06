@@ -148,7 +148,7 @@
 </template>
 <script>
 import Vue from "vue";
-import { spotify_api } from "../utils/spotify-api";
+import { spotify_api } from "src/utils/spotify-api";
 import { validationMixin } from "vuelidate";
 import { required } from "vuelidate/lib/validators";
 import {

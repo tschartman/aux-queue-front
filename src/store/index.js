@@ -1,7 +1,7 @@
 import Vue from "vue";
 import Vuex from "vuex";
-import { app_api } from "../utils/app-api";
-import { spotify_api } from "../utils/spotify-api";
+import { app_api } from "src/utils/app-api";
+import { spotify_api } from "src/utils/spotify-api";
 import createPersistedState from "vuex-persistedstate";
 import * as Cookies from "js-cookie";
 

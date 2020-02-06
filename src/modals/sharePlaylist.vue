@@ -50,7 +50,7 @@
   </div>
 </template>
 <script>
-import { spotify_api } from "../utils/spotify-api";
+import { spotify_api } from "src/utils/spotify-api";
 import {
   QBtnDropdown,
   QItemLabel,
@@ -59,7 +59,7 @@ import {
   QImg,
   QBtn
 } from "quasar";
-import Store from "../store/index";
+import Store from "src/store/index";
 const alerts = [
   {
     color: "secondary",
