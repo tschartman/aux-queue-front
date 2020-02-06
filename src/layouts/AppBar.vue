@@ -62,7 +62,7 @@
                 <q-icon name="share" />
               </q-item-section>
               <q-item-section>
-                <q-item-label>Share Queue</q-item-label>
+                <q-item-label>Share Playlist</q-item-label>
               </q-item-section>
             </q-item>
 
@@ -89,7 +89,7 @@
       </q-drawer>
       <div class="q-pa-md q-gutter-sm">
         <q-dialog v-model="share">
-          <shareQueue />
+          <sharePlaylist />
         </q-dialog>
       </div>
       <q-page-container>
@@ -109,7 +109,7 @@ import {
   QImg,
   QIcon
 } from "quasar";
-import shareQueue from "../modals/shareQueue";
+import sharePlaylist from "../modals/sharePlaylist";
 import md5 from "md5";
 export default {
   name: "AppBar",
@@ -120,7 +120,7 @@ export default {
     QImg,
     QAvatar,
     QIcon,
-    shareQueue
+    sharePlaylist
   },
   data() {
     return {

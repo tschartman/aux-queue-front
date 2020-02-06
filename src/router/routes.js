@@ -30,10 +30,20 @@ const routes = [
     ]
   },
   {
-    path: "/share",
-    name: "share",
+    path: "/sharePlaylist",
+    name: "sharePlaylist",
     component: () => import("layouts/AppBar.vue"),
-    children: [{ path: "", component: () => import("components/share.vue") }]
+    children: [
+      { path: "", component: () => import("components/sharePlaylist.vue") }
+    ]
+  },
+  {
+    path: "/shareQueue",
+    name: "shareQueue",
+    component: () => import("layouts/AppBar.vue"),
+    children: [
+      { path: "", component: () => import("components/shareQueue.vue") }
+    ]
   },
   {
     path: "/fuse",

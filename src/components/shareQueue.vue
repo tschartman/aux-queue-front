@@ -1,7 +1,7 @@
 <template>
   <div>
     <div>
-      <h4 class="title">My Queue</h4>
+      <h4 class="title">{{ user }}'s Queue</h4>
       <div class="row">
         <div class="col-xs-12 q-pa-md">
           <q-select
@@ -45,12 +45,6 @@
           </q-select>
         </div>
       </div>
-      <div class="row justify-center items-center">
-        <q-btn v-on:click="share = true" label="Share" flat />
-      </div>
-      <q-dialog v-model="share">
-        <shareQueue />
-      </q-dialog>
       <hr />
       <div class="row">
         <q-item-label header>Queue</q-item-label>
@@ -145,8 +139,7 @@
 </template>
 <script>
 import Vue from "vue";
-import { spotify_api } from "../utils/spotify-api";
-import shareQueue from "../modals/shareQueue";
+import axios from "axios";
 import {
   QSelect,
   QBtn,
@@ -172,11 +165,11 @@ export default {
     QBtn,
     QIcon,
     QIntersection,
-    QLinearProgress,
-    shareQueue
+    QLinearProgress
   },
   data() {
     return {
+      user: "",
       audio: null,
       model: null,
       currentlyPlaying: null,
@@ -185,9 +178,10 @@ export default {
       queue: [],
       progress: 0,
       duration: 0,
-      share: false,
       interval: "",
       category: null,
+      config: {},
+      baseURL: "https://api.spotify.com/v1",
       categories: ["artist", "track", "album"]
     };
   },
@@ -225,21 +219,23 @@ export default {
         return;
       }
       update(() => {
-        spotify_api
-          .get("/search?q=" + val + "&type=track")
+        axios
+          .get(this.baseURL + "/search?q=" + val + "&type=track", this.config)
           .then(res => (this.options = res.data.tracks.items));
       });
     },
     pauseCurrentSong() {
-      spotify_api.put("/me/player/pause").then(res => {
-        if (res.status === 204) {
-          this.paused = true;
-        }
-      });
+      axios
+        .put(this.baseURL + "/me/player/pause", {}, this.config)
+        .then(res => {
+          if (res.status === 204) {
+            this.paused = true;
+          }
+        });
     },
 
     playCurrentSong() {
-      spotify_api.put("/me/player/play").then(res => {
+      axios.put(this.baseURL + "/me/player/play", {}, this.config).then(res => {
         //  if (res.status === 204) {
         console.log(res);
         this.paused = false;
@@ -247,25 +243,29 @@ export default {
       });
     },
     skipNext() {
-      spotify_api.post("/me/player/next").then(res => {
-        //  if (res.status == 204) {
-        console.log(res);
-        this.init();
-        //  }
-      });
+      axios
+        .post(this.baseURL + "/me/player/next", {}, this.config)
+        .then(res => {
+          //  if (res.status == 204) {
+          console.log(res);
+          this.init();
+          //  }
+        });
     },
     skipPrevious() {
-      spotify_api.post("/me/player/previous").then(res => {
-        //  if (res.status == 204) {
-        console.log(res);
-        this.init();
-        // }
-      });
+      axios
+        .post(this.baseURL + "/me/player/previous", {}, this.config)
+        .then(res => {
+          //  if (res.status == 204) {
+          console.log(res);
+          this.init();
+          // }
+        });
     },
     playNow(song) {
       let uris = [song.uri];
-      spotify_api
-        .put("/me/player/play", { uris: uris })
+      axios
+        .put(this.baseURL + "/me/player/play", { uris: uris }, this.config)
         .then(res => {
           //  if (res.status == 204) {
           console.log(res);
@@ -283,8 +283,8 @@ export default {
         return song.uri;
       });
 
-      spotify_api
-        .put("/me/player/play", { uris: uris })
+      axios
+        .put(this.baseURL + "/me/player/play", { uris: uris }, this.config)
         .then(res => {
           //  if (res.status == 204) {
           console.log(res);
@@ -304,27 +304,42 @@ export default {
     },
     init() {
       clearInterval(this.interval);
-      spotify_api.get("/me/player/currently-playing").then(res => {
-        console.log(res);
-        if (res.data !== "" && res.data.is_playing) {
-          this.currentlyPlaying = res.data.item;
-          this.duration = res.data.item.duration_ms;
-          this.progress = res.data.progress_ms;
-          this.interval = setInterval(() => {
-            if (this.progress >= this.duration) {
-              this.resetView();
-              this.init();
-            } else if (!this.paused) {
-              this.progress = this.progress + 10;
-            }
-          }, 10);
-        }
-      });
+      axios
+        .get(this.baseURL + "/me/player/currently-playing", this.config)
+        .then(res => {
+          console.log(res);
+          if (res.data !== "" && res.data.is_playing) {
+            this.currentlyPlaying = res.data.item;
+            this.duration = res.data.item.duration_ms;
+            this.progress = res.data.progress_ms;
+            this.interval = setInterval(() => {
+              if (this.progress >= this.duration) {
+                this.resetView();
+                this.init();
+              } else if (!this.paused) {
+                this.progress = this.progress + 10;
+              }
+            }, 10);
+          }
+        });
     }
   },
 
   created() {
-    this.init();
+    if (this.$route.query.code) {
+      this.config = {
+        headers: {
+          Authorization: "Bearer " + this.$route.query.code
+        }
+      };
+
+      axios.get(this.baseURL + "/me", this.config).then(res => {
+        this.user = res.data.display_name;
+        this.init();
+      });
+    } else {
+      this.$router.push("/login");
+    }
   }
 };
 </script>
