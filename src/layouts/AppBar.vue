@@ -32,32 +32,19 @@
       >
         <q-list>
           <q-item-label header>Options</q-item-label>
-          <q-item
-            :active="link === 'home'"
-            clickable
-            v-on:click="$router.push('/'), (link = 'home')"
-          >
-            <q-item-section avatar>
-              <q-icon name="home" />
-            </q-item-section>
-            <q-item-section>
-              <q-item-label>AuxQueue</q-item-label>
-            </q-item-section>
-          </q-item>
           <div v-if="$store.getters.isLoggedIn">
             <q-item
-              :active="link === 'user'"
+              :active="link === 'home'"
               clickable
-              v-on:click="$router.push('/user'), (link = 'user')"
+              v-on:click="$router.push('/'), (link = 'home')"
             >
               <q-item-section avatar>
-                <q-icon name="person" />
+                <q-icon name="home" />
               </q-item-section>
               <q-item-section>
-                <q-item-label>User Profile</q-item-label>
+                <q-item-label>AuxQueue</q-item-label>
               </q-item-section>
             </q-item>
-
             <q-expansion-item
               :content-inset-level="1"
               expand-separator
@@ -97,7 +84,18 @@
                 </q-item-section>
               </q-item>
             </q-expansion-item>
-
+            <q-item
+              :active="link === 'user'"
+              clickable
+              v-on:click="$router.push('/user'), (link = 'user')"
+            >
+              <q-item-section avatar>
+                <q-icon name="person" />
+              </q-item-section>
+              <q-item-section>
+                <q-item-label>User Profile</q-item-label>
+              </q-item-section>
+            </q-item>
             <q-separator />
             <q-item clickable v-on:click="logout">
               <q-item-section avatar>
@@ -156,7 +154,7 @@ export default {
   },
   data() {
     return {
-      link: "",
+      link: "home",
       leftDrawerOpen: false,
       playlists: [],
       model: null,
