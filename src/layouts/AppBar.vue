@@ -51,38 +51,47 @@
                 <q-item-label>User Profile</q-item-label>
               </q-item-section>
             </q-item>
-            <q-item
-              :active="link === 'playlists'"
-              clickable
-              v-on:click="$router.push('/playlists'), (link = 'playlists')"
+
+            <q-expansion-item
+              :content-inset-level="1"
+              expand-separator
+              icon="view_list"
+              label="Playlists"
             >
-              <q-item-section avatar>
-                <q-icon class="q-ml-sm q-pl-sm" name="lists" />
-              </q-item-section>
-              <q-item-section>
-                <q-item-label>Playlists</q-item-label>
-              </q-item-section>
-            </q-item>
-            <q-item
-              :active="link === 'fuse'"
-              clickable
-              v-on:click="$router.push('/fuse'), (link = 'fuse')"
-            >
-              <q-item-section avatar>
-                <q-icon name="compare_arrows" />
-              </q-item-section>
-              <q-item-section>
-                <q-item-label>Fuse Playlists</q-item-label>
-              </q-item-section>
-            </q-item>
-            <q-item clickable v-on:click="share = true">
-              <q-item-section avatar>
-                <q-icon name="share" />
-              </q-item-section>
-              <q-item-section>
-                <q-item-label>Share Playlist</q-item-label>
-              </q-item-section>
-            </q-item>
+              <q-item
+                :active="link === 'playlists'"
+                clickable
+                v-on:click="$router.push('/playlists'), (link = 'playlists')"
+              >
+                <q-item-section avatar>
+                  <q-icon name="featured_play_list" />
+                </q-item-section>
+                <q-item-section>
+                  <q-item-label>My Playlists</q-item-label>
+                </q-item-section>
+              </q-item>
+              <q-item
+                :active="link === 'fuse'"
+                clickable
+                v-on:click="$router.push('/fuse'), (link = 'fuse')"
+              >
+                <q-item-section avatar>
+                  <q-icon name="compare_arrows" />
+                </q-item-section>
+                <q-item-section>
+                  <q-item-label>Fuse Playlists</q-item-label>
+                </q-item-section>
+              </q-item>
+              <q-item clickable v-on:click="share = true">
+                <q-item-section avatar>
+                  <q-icon name="share" />
+                </q-item-section>
+                <q-item-section>
+                  <q-item-label>Share Playlist</q-item-label>
+                </q-item-section>
+              </q-item>
+            </q-expansion-item>
+
             <q-separator />
             <q-item clickable v-on:click="logout">
               <q-item-section avatar>
@@ -124,7 +133,8 @@ import {
   QItem,
   QItemSection,
   QIcon,
-  QSeparator
+  QSeparator,
+  QExpansionItem
 } from "quasar";
 import sharePlaylist from "src/modals/sharePlaylist";
 export default {
@@ -135,6 +145,7 @@ export default {
     QItemSection,
     QIcon,
     QSeparator,
+    QExpansionItem,
     sharePlaylist
   },
   data() {
