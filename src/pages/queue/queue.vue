@@ -58,36 +58,12 @@
           <q-icon @click="playAll()" name="arrow_upward" />
         </q-item-section>
       </div>
-      <q-intersection
-        v-for="song in queue"
-        :key="song.name"
-        once
-        transition="scale"
-      >
-        <q-item v-if="queue && queue.length > 0" clickable v-ripple>
-          <q-item-section avatar>
-            <q-img
-              :src="song.album.images[0].url"
-              v-on:click="playPreview(song.preview_url)"
-            >
-              <q-btn
-                v-if="audio && audio.src === song.preview_url"
-                round
-                color="transparent"
-                icon="pause"
-              />
-              <q-btn v-else round color="transparent" icon="play_arrow" />
-            </q-img>
-          </q-item-section>
-          <q-item-section>{{ song.name }}</q-item-section>
-          <q-item-section avatar>
-            <q-icon @click="playNow(song)" name="arrow_upward" />
-          </q-item-section>
-          <q-item-section avatar>
-            <q-icon @click="remove(song)" name="delete" />
-          </q-item-section>
-        </q-item>
-      </q-intersection>
+      <songList
+        :action="true"
+        :songs="queue"
+        @deleteAction="remove"
+        @postAction="playNow"
+      />
       <hr />
       <div v-if="currentlyPlaying" class="playing">
         <h6 class="title">Now Playing</h6>
@@ -144,9 +120,9 @@
   </div>
 </template>
 <script>
-import Vue from "vue";
 import { spotify_api } from "src/utils/spotify-api";
 import shareQueue from "src/modals/shareQueue";
+import songList from "components/songList";
 import {
   QSelect,
   QBtn,
@@ -155,11 +131,8 @@ import {
   QIcon,
   QItemSection,
   QItemLabel,
-  QIntersection,
   QLinearProgress
 } from "quasar";
-
-Vue.component("Queue");
 
 export default {
   name: "Queue",
@@ -171,13 +144,12 @@ export default {
     QItemLabel,
     QBtn,
     QIcon,
-    QIntersection,
     QLinearProgress,
-    shareQueue
+    shareQueue,
+    songList
   },
   data() {
     return {
-      audio: null,
       model: null,
       currentlyPlaying: null,
       options: [],
@@ -205,20 +177,6 @@ export default {
       let index = this.queue.indexOf(song);
       this.queue.splice(index, 1);
     },
-    playPreview(url) {
-      if (this.audio) {
-        let current = this.audio;
-        this.audio.pause();
-        this.audio = null;
-        if (current.src !== url) {
-          this.playPreview(url);
-        }
-      } else {
-        this.audio = new Audio(url);
-        this.audio.play();
-      }
-    },
-    playSong() {},
     filterFn(val, update, abort) {
       if (val.length < 1) {
         abort();
@@ -263,6 +221,7 @@ export default {
       });
     },
     playNow(song) {
+      console.log(event);
       let uris = [song.uri];
       spotify_api
         .put("/me/player/play", { uris: uris })

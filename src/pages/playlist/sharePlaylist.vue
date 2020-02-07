@@ -3,7 +3,7 @@
     <div>
       <h4 class="title">{{ user }}'s Queue</h4>
       <div class="row">
-        <div class="col-xs-8 q-pa-md">
+        <div class="col-xs-12 q-pa-md">
           <q-select
             rounded
             outlined
@@ -44,50 +44,29 @@
             </template>
           </q-select>
         </div>
-        <div class="col-xs-4 q-pa-lg">
-          <q-btn color="black" label="Submit" @click="addSongs" />
-        </div>
+      </div>
+      <div class="row justify-center items-center">
+        <q-btn flat color="black" label="Submit" @click="addSongs" />
       </div>
       <hr />
-      <q-list>
-        <q-item-label header>Queue</q-item-label>
-        <q-item v-for="song in queue" :key="song.name" clickable v-ripple>
-          <q-item-section avatar>
-            <q-img :src="song.album.images[0].url" />
-          </q-item-section>
-          <q-item-section>{{ song.name }}</q-item-section>
-          <q-item-section avatar>
-            <q-icon @click="remove(song)" name="delete" />
-          </q-item-section>
-        </q-item>
-      </q-list>
+      <q-item-label header>Queue</q-item-label>
+      <songList
+        :action="true"
+        :songs="queue"
+        @deleteAction="remove"
+        @postAction="addSong"
+      />
       <hr />
-      <q-list>
-        <q-item-label header>{{ name }}</q-item-label>
-        <q-item v-for="song in playlist" :key="song.name" clickable v-ripple>
-          <q-item-section avatar>
-            <q-img :src="song.track.album.images[0].url" />
-          </q-item-section>
-
-          <q-item-section>{{ song.track.name }}</q-item-section>
-        </q-item>
-      </q-list>
+      <q-item-label header>{{ name }}</q-item-label>
+      <songList :action="false" :songs="playlist" />
     </div>
   </div>
 </template>
 <script>
 import Vue from "vue";
 import axios from "axios";
-import {
-  QSelect,
-  QBtn,
-  QItem,
-  QImg,
-  QIcon,
-  QList,
-  QItemSection,
-  QItemLabel
-} from "quasar";
+import songList from "components/songList";
+import { QSelect, QBtn, QItem, QImg, QItemSection, QItemLabel } from "quasar";
 Vue.component("Share");
 
 export default {
@@ -96,11 +75,10 @@ export default {
     QSelect,
     QItem,
     QImg,
-    QList,
     QItemSection,
     QItemLabel,
     QBtn,
-    QIcon
+    songList
   },
   data() {
     return {
@@ -162,7 +140,12 @@ export default {
               this.baseURL + "/playlists/" + this.currentPlaylist + "/tracks",
               this.config
             )
-            .then(res => (this.playlist = res.data.items));
+            .then(
+              res =>
+                (this.playlist = res.data.items.map(item => {
+                  return item.track;
+                }))
+            );
         })
         .catch(error => {
           if (error.status === 401) console.log(error);

@@ -50,22 +50,12 @@
       </div>
       <hr />
       <q-item-label header>Queue</q-item-label>
-      <q-intersection
-        v-for="song in queue"
-        :key="song.name"
-        once
-        transition="scale"
-      >
-        <q-item v-if="queue.length > 0" clickable v-ripple>
-          <q-item-section avatar>
-            <q-img :src="song.album.images[0].url" />
-          </q-item-section>
-          <q-item-section>{{ song.name }}</q-item-section>
-          <q-item-section avatar>
-            <q-icon @click="remove(song)" name="delete" />
-          </q-item-section>
-        </q-item>
-      </q-intersection>
+      <songList
+        :action="true"
+        :songs="queue"
+        @deleteAction="remove"
+        @postAction="addSong"
+      />
       <hr />
       <q-item-label header>
         <q-btn-dropdown
@@ -99,38 +89,14 @@
           </q-list>
         </q-btn-dropdown>
       </q-item-label>
-
-      <q-intersection
-        v-for="song in songs"
-        :key="song.name"
-        once
-        transition="scale"
-      >
-        <q-item clickable v-ripple>
-          <q-item-section avatar>
-            <q-img
-              :src="song.track.album.images[0].url"
-              v-on:click="playPreview(song.track.preview_url)"
-            >
-              <q-btn
-                v-if="audio && audio.src === song.track.preview_url"
-                round
-                color="transparent"
-                icon="pause"
-              />
-              <q-btn v-else round color="transparent" icon="play_arrow" />
-            </q-img>
-          </q-item-section>
-
-          <q-item-section>{{ song.track.name }}</q-item-section>
-        </q-item>
-      </q-intersection>
+      <songList :action="false" :songs="songs" />
     </div>
   </div>
 </template>
 <script>
 import Vue from "vue";
 import { spotify_api } from "src/utils/spotify-api";
+import songList from "components/songList";
 import {
   QBtnDropdown,
   QSelect,
@@ -139,8 +105,7 @@ import {
   QImg,
   QIcon,
   QItemSection,
-  QItemLabel,
-  QIntersection
+  QItemLabel
 } from "quasar";
 
 Vue.component("Queue");
@@ -156,7 +121,7 @@ export default {
     QItemLabel,
     QBtn,
     QIcon,
-    QIntersection
+    songList
   },
   data() {
     return {
@@ -222,10 +187,27 @@ export default {
           });
       }
     },
+    addSong(song) {
+      spotify_api
+        .post("/playlists/" + this.playlist.id + "/tracks", {
+          uris: [song.uri]
+        })
+        .then(res => {
+          if (res.status === 201) {
+            this.remove(song);
+            this.init();
+          }
+        });
+    },
     init() {
       spotify_api
         .get("/playlists/" + this.playlist.id + "/tracks")
-        .then(res => (this.songs = res.data.items))
+        .then(
+          res =>
+            (this.songs = res.data.items.map(item => {
+              return item.track;
+            }))
+        )
         .catch(error => {
           console.log(error);
         });

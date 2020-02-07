@@ -52,36 +52,12 @@
           <q-icon @click="playAll()" name="arrow_upward" />
         </q-item-section>
       </div>
-      <q-intersection
-        v-for="song in queue"
-        :key="song.name"
-        once
-        transition="scale"
-      >
-        <q-item v-if="queue && queue.length > 0" clickable v-ripple>
-          <q-item-section avatar>
-            <q-img
-              :src="song.album.images[0].url"
-              v-on:click="playPreview(song.preview_url)"
-            >
-              <q-btn
-                v-if="audio && audio.src === song.preview_url"
-                round
-                color="transparent"
-                icon="pause"
-              />
-              <q-btn v-else round color="transparent" icon="play_arrow" />
-            </q-img>
-          </q-item-section>
-          <q-item-section>{{ song.name }}</q-item-section>
-          <q-item-section avatar>
-            <q-icon @click="playNow(song)" name="arrow_upward" />
-          </q-item-section>
-          <q-item-section avatar>
-            <q-icon @click="remove(song)" name="delete" />
-          </q-item-section>
-        </q-item>
-      </q-intersection>
+      <songList
+        :action="true"
+        :songs="queue"
+        @deleteAction="remove"
+        @postAction="playNow"
+      />
       <hr />
       <div v-if="currentlyPlaying" class="playing">
         <h6 class="title">Now Playing</h6>
@@ -140,6 +116,7 @@
 <script>
 import Vue from "vue";
 import axios from "axios";
+import songList from "components/songList";
 import {
   QSelect,
   QBtn,
@@ -148,7 +125,6 @@ import {
   QIcon,
   QItemSection,
   QItemLabel,
-  QIntersection,
   QLinearProgress
 } from "quasar";
 
@@ -164,8 +140,8 @@ export default {
     QItemLabel,
     QBtn,
     QIcon,
-    QIntersection,
-    QLinearProgress
+    QLinearProgress,
+    songList
   },
   data() {
     return {

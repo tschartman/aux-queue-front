@@ -135,15 +135,8 @@
       </div>
     </div>
     <hr />
-    <q-list>
-      <q-item-label header>Fused Plalist</q-item-label>
-      <q-item v-for="song in fused" :key="song.name" clickable v-ripple>
-        <q-item-section avatar>
-          <q-img :src="song.album.images[0].url" />
-        </q-item-section>
-        <q-item-section>{{ song.name }}</q-item-section>
-      </q-item>
-    </q-list>
+    <q-item-label header>Fused Plalist</q-item-label>
+    <songList :action="false" :songs="fused" />
   </div>
 </template>
 <script>
@@ -151,6 +144,7 @@ import Vue from "vue";
 import { spotify_api } from "src/utils/spotify-api";
 import { validationMixin } from "vuelidate";
 import { required } from "vuelidate/lib/validators";
+import songList from "components/songList";
 import {
   QBtn,
   QItem,
@@ -191,7 +185,8 @@ export default {
     QBtn,
     QBtnDropdown,
     QInput,
-    QCheckbox
+    QCheckbox,
+    songList
   },
   data() {
     return {
