@@ -20,70 +20,30 @@
       />
       <hr />
       <q-item-label header>
-        <q-btn-dropdown
-          stretch
-          flat
-          :label="playlist === null ? 'Playlists' : playlist.name"
-        >
-          <q-list>
-            <q-item
-              v-for="plist in playlists"
-              :key="plist.id"
-              @click="updatePlaylist(plist)"
-              clickable
-              v-close-popup
-              tabindex="0"
-            >
-              <q-item-section avatar>
-                <q-img
-                  v-if="plist.images.length > 0"
-                  :src="plist.images[0].url"
-                />
-                <q-icon class="q-pl-md q-pt-xs" v-else name="camera_alt" />
-              </q-item-section>
-              <q-item-section>
-                <q-item-label>{{ plist.name }}</q-item-label>
-                <q-item-label caption>{{
-                  plist.owner.display_name
-                }}</q-item-label>
-              </q-item-section>
-            </q-item>
-          </q-list>
-        </q-btn-dropdown>
+        <playlistSelect
+          :playlists="playlists"
+          :playlist="playlist"
+          @update="updatePlaylist"
+        />
       </q-item-label>
       <songList :action="false" :songs="songs" />
     </div>
   </div>
 </template>
 <script>
-import Vue from "vue";
 import { spotify_api } from "src/utils/spotify-api";
 import songSearch from "components/songSearch";
 import songList from "components/songList";
-import {
-  QBtnDropdown,
-  QBtn,
-  QItem,
-  QImg,
-  QIcon,
-  QItemSection,
-  QItemLabel
-} from "quasar";
-
-Vue.component("Queue");
+import playlistSelect from "components/playlistSelect";
+import { QItemLabel } from "quasar";
 
 export default {
-  name: "Queue",
+  name: "playlists",
   components: {
-    QBtnDropdown,
-    QItem,
-    QImg,
-    QItemSection,
     QItemLabel,
-    QBtn,
-    QIcon,
     songSearch,
-    songList
+    songList,
+    playlistSelect
   },
   data() {
     return {
@@ -93,9 +53,7 @@ export default {
       queue: [],
       songs: [],
       playlist: null,
-      playlists: [],
-      category: null,
-      categories: ["artist", "track", "album"]
+      playlists: []
     };
   },
 

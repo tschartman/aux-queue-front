@@ -1,64 +1,37 @@
 <template>
-  <div>
+  <div class="q-pa-md row items-start q-gutter-md">
     <q-card>
-      <q-card-section>
-        <div class="text-h6">Share a Playlist!</div>
+      <q-card-section horizontal>
+        <q-card-section class="q-pt-xs">
+          <div class="text-h6">Share a Playlist!</div>
+          <playlistSelect
+            :playlists="playlists"
+            :playlist="playlist"
+            @update="updatePlaylist"
+          />
+        </q-card-section>
+        <q-card-section class="col-5 flex flex-center">
+          <q-img
+            :src="playlist.images[0].url"
+            style="width: 150px"
+            :ratio="1"
+            basic
+            spinner-color="white"
+            class="rounded-borders"
+          />
+        </q-card-section>
       </q-card-section>
-      <q-card-section class="q-pt-none">
-        <q-btn-dropdown
-          stretch
-          flat
-          :label="model === null ? 'Playlists' : model.name"
-        >
-          <q-list>
-            <q-item
-              v-for="plist in playlists"
-              :key="plist.id"
-              @click="updatePlaylist(plist)"
-              clickable
-              v-close-popup
-              tabindex="0"
-            >
-              <q-item-section avatar>
-                <q-img :src="plist.images[0].url" />
-              </q-item-section>
-              <q-item-section>
-                <q-item-label>{{ plist.name }}</q-item-label>
-                <q-item-label caption>{{
-                  plist.owner.display_name
-                }}</q-item-label>
-              </q-item-section>
-            </q-item>
-          </q-list>
-        </q-btn-dropdown>
-        <q-btn @click="copy">
-          Copy to clipboard
-        </q-btn>
-      </q-card-section>
-
-      <q-card-section class="q-pt-none justify-center">
-        <q-img
-          :src="model.images[0].url"
-          style="width: 150px"
-          :ratio="1"
-          basic
-          spinner-color="white"
-          class="rounded-borders"
-        />
-      </q-card-section>
+      <q-separator />
+      <q-card-actions>
+        <q-btn flat color="primary" @click="copy" label="Copy To Clipboard" />
+      </q-card-actions>
     </q-card>
   </div>
 </template>
 <script>
 import { spotify_api } from "src/utils/spotify-api";
-import {
-  QBtnDropdown,
-  QItemLabel,
-  QItem,
-  QItemSection,
-  QImg,
-  QBtn
-} from "quasar";
+import playlistSelect from "components/playlistSelect";
+import { QImg, QBtn, QSeparator } from "quasar";
 import Store from "src/store/index";
 const alerts = [
   {
@@ -69,17 +42,15 @@ const alerts = [
 ];
 export default {
   components: {
-    QBtnDropdown,
-    QItemLabel,
-    QItem,
-    QItemSection,
     QImg,
-    QBtn
+    QBtn,
+    QSeparator,
+    playlistSelect
   },
   data() {
     return {
       playlists: [],
-      model: null,
+      playlist: null,
       id: ""
     };
   },
@@ -101,8 +72,7 @@ export default {
       this.$q.notify(alerts[0]);
     },
     updatePlaylist(plist) {
-      console.log(plist);
-      this.model = plist;
+      this.playlist = plist;
       this.id = plist.id;
     }
   },
@@ -111,10 +81,15 @@ export default {
       .get("/users/" + Store.getters.sUser.id + "/playlists")
       .then(res => {
         this.playlists = res.data.items;
-        this.model = res.data.items[0];
+        this.playlist = res.data.items[0];
         this.id = res.data.items[0].id;
         this.name = res.data.items[0].name;
       });
   }
 };
 </script>
+<style scoped>
+.share-card {
+  width: 100%;
+}
+</style>

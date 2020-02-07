@@ -39,72 +39,24 @@
       </div>
       <div class="row justify-center items-center q-py-lg">
         <div class="col-xs-6">
-          <q-btn-dropdown
-            class="drop"
-            :label="model1 === null ? 'Playlists' : model1.name"
-          >
-            <q-list>
-              <q-item
-                v-for="plist in playlists"
-                :key="plist.id"
-                @click="model1 = plist"
-                clickable
-                v-close-popup
-                tabindex="0"
-              >
-                <q-item-section avatar>
-                  <q-img
-                    v-if="plist.images.length > 0"
-                    :src="plist.images[0].url"
-                  />
-                  <q-icon class="q-pl-md q-pt-xs" v-else name="camera_alt" />
-                </q-item-section>
-                <q-item-section>
-                  <q-item-label>{{ plist.name }}</q-item-label>
-                  <q-item-label caption>{{
-                    plist.owner.display_name
-                  }}</q-item-label>
-                </q-item-section>
-              </q-item>
-            </q-list>
-          </q-btn-dropdown>
+          <playlistSelect
+            :playlists="playlists"
+            :playlist="playlist1"
+            @update="updatePlaylist1"
+          />
         </div>
         <div class="col-xs-6">
-          <q-btn-dropdown
-            class="drop"
-            :label="model2 === null ? 'Playlists' : model2.name"
-          >
-            <q-list>
-              <q-item
-                v-for="plist in playlists"
-                :key="plist.id"
-                @click="model2 = plist"
-                clickable
-                v-close-popup
-                tabindex="0"
-              >
-                <q-item-section avatar>
-                  <q-img
-                    v-if="plist.images.length > 0"
-                    :src="plist.images[0].url"
-                  />
-                  <q-icon class="q-pl-md q-pt-xs" v-else name="camera_alt" />
-                </q-item-section>
-                <q-item-section>
-                  <q-item-label>{{ plist.name }}</q-item-label>
-                  <q-item-label caption>{{
-                    plist.owner.display_name
-                  }}</q-item-label>
-                </q-item-section>
-              </q-item>
-            </q-list>
-          </q-btn-dropdown>
+          <playlistSelect
+            :playlists="playlists"
+            :playlist="playlist2"
+            @update="updatePlaylist2"
+          />
         </div>
       </div>
       <div class="row justify-center items-center q-pb-lg">
         <div class="col-xs-6">
           <q-img
-            :src="model1.images[0].url"
+            :src="playlist1.images[0].url"
             style="width: 150px"
             :ratio="1"
             basic
@@ -114,7 +66,7 @@
         </div>
         <div class="col-xs-6">
           <q-img
-            :src="model2.images[0].url"
+            :src="playlist2.images[0].url"
             style="width: 150px"
             :ratio="1"
             basic
@@ -145,17 +97,8 @@ import { spotify_api } from "src/utils/spotify-api";
 import { validationMixin } from "vuelidate";
 import { required } from "vuelidate/lib/validators";
 import songList from "components/songList";
-import {
-  QBtn,
-  QItem,
-  QImg,
-  QList,
-  QItemSection,
-  QItemLabel,
-  QBtnDropdown,
-  QInput,
-  QCheckbox
-} from "quasar";
+import playlistSelect from "components/playlistSelect";
+import { QBtn, QItemLabel, QInput, QCheckbox, QImg } from "quasar";
 
 Vue.component("Queue");
 const alerts = [
@@ -177,22 +120,19 @@ export default {
   },
   name: "Queue",
   components: {
-    QItem,
-    QImg,
-    QList,
-    QItemSection,
     QItemLabel,
     QBtn,
-    QBtnDropdown,
     QInput,
     QCheckbox,
-    songList
+    QImg,
+    songList,
+    playlistSelect
   },
   data() {
     return {
-      playlists: null,
-      model1: null,
-      model2: null,
+      playlists: [],
+      playlist1: null,
+      playlist2: null,
       text: "",
       priv: false,
       colab: false,
@@ -209,12 +149,18 @@ export default {
     }
   },
   methods: {
+    updatePlaylist1(playlist) {
+      this.playlist1 = playlist;
+    },
+    updatePlaylist2(playlist) {
+      this.playlist2 = playlist;
+    },
     fusePlaylists() {
       spotify_api
-        .get("/playlists/" + this.model1.id + "/tracks")
+        .get("/playlists/" + this.playlist1.id + "/tracks")
         .then(res1 => {
           spotify_api
-            .get("/playlists/" + this.model2.id + "/tracks")
+            .get("/playlists/" + this.playlist2.id + "/tracks")
             .then(res2 => {
               this.addUnique(res1.data.items, res2.data.items);
             })
@@ -288,14 +234,13 @@ export default {
       }
     }
   },
-
   created() {
     spotify_api
       .get("/users/" + this.$store.getters.sUser.id + "/playlists")
       .then(res => {
         this.playlists = res.data.items;
-        this.model1 = res.data.items[0];
-        this.model2 = res.data.items[1];
+        this.playlist1 = res.data.items[0];
+        this.playlist2 = res.data.items[1];
       });
   }
 };
