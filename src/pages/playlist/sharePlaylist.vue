@@ -4,45 +4,7 @@
       <h4 class="title">{{ user }}'s Queue</h4>
       <div class="row">
         <div class="col-xs-12 q-pa-md">
-          <q-select
-            rounded
-            outlined
-            v-model="model"
-            label="Search Songs"
-            use-input
-            hide-selected
-            fill-input
-            input-debounce="0"
-            :options="options"
-            @filter="filterFn"
-          >
-            <template v-slot:option="scope">
-              <q-item
-                v-bind="scope.itemProps"
-                v-on="scope.itemEvents"
-                v-on:click="addToQueue(scope.opt)"
-                clickable
-                v-close-popup
-              >
-                <q-item-section avatar>
-                  <q-img :src="scope.opt.album.images[0].url" />
-                </q-item-section>
-                <q-item-section>
-                  <q-item-label v-html="scope.opt.name" />
-                  <q-item-label caption>{{
-                    scope.opt.artists[0].name
-                  }}</q-item-label>
-                </q-item-section>
-              </q-item>
-            </template>
-            <template v-slot:no-option>
-              <q-item>
-                <q-item-section class="text-grey">
-                  No results
-                </q-item-section>
-              </q-item>
-            </template>
-          </q-select>
+          <songSearch @selectSong="addToQueue" />
         </div>
       </div>
       <div class="row justify-center items-center">
@@ -65,19 +27,17 @@
 <script>
 import Vue from "vue";
 import axios from "axios";
+import songSearch from "components/songSearch";
 import songList from "components/songList";
-import { QSelect, QBtn, QItem, QImg, QItemSection, QItemLabel } from "quasar";
+import { QBtn, QItemLabel } from "quasar";
 Vue.component("Share");
 
 export default {
   name: "Share",
   components: {
-    QSelect,
-    QItem,
-    QImg,
-    QItemSection,
     QItemLabel,
     QBtn,
+    songSearch,
     songList
   },
   data() {

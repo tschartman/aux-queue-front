@@ -4,45 +4,7 @@
       <h4 class="title">My Queue</h4>
       <div class="row">
         <div class="col-xs-12 q-pa-md">
-          <q-select
-            rounded
-            outlined
-            v-model="model"
-            label="Search Songs"
-            use-input
-            hide-selected
-            fill-input
-            input-debounce="0"
-            :options="options"
-            @filter="filterFn"
-          >
-            <template v-slot:option="scope">
-              <q-item
-                v-bind="scope.itemProps"
-                v-on="scope.itemEvents"
-                v-on:click="addToQueue(scope.opt)"
-                clickable
-                v-close-popup
-              >
-                <q-item-section avatar>
-                  <q-img :src="scope.opt.album.images[0].url" />
-                </q-item-section>
-                <q-item-section>
-                  <q-item-label v-html="scope.opt.name" />
-                  <q-item-label caption>{{
-                    scope.opt.artists[0].name
-                  }}</q-item-label>
-                </q-item-section>
-              </q-item>
-            </template>
-            <template v-slot:no-option>
-              <q-item>
-                <q-item-section class="text-grey">
-                  No results
-                </q-item-section>
-              </q-item>
-            </template>
-          </q-select>
+          <songSearch @selectSong="addToQueue" />
         </div>
       </div>
       <div class="row justify-center items-center">
@@ -122,11 +84,10 @@
 <script>
 import { spotify_api } from "src/utils/spotify-api";
 import shareQueue from "src/modals/shareQueue";
+import songSearch from "components/songSearch";
 import songList from "components/songList";
 import {
-  QSelect,
   QBtn,
-  QItem,
   QImg,
   QIcon,
   QItemSection,
@@ -137,8 +98,6 @@ import {
 export default {
   name: "Queue",
   components: {
-    QSelect,
-    QItem,
     QImg,
     QItemSection,
     QItemLabel,
@@ -146,21 +105,18 @@ export default {
     QIcon,
     QLinearProgress,
     shareQueue,
+    songSearch,
     songList
   },
   data() {
     return {
-      model: null,
       currentlyPlaying: null,
-      options: [],
       paused: false,
       queue: [],
       progress: 0,
       duration: 0,
       share: false,
-      interval: "",
-      category: null,
-      categories: ["artist", "track", "album"]
+      interval: ""
     };
   },
 
@@ -177,17 +133,7 @@ export default {
       let index = this.queue.indexOf(song);
       this.queue.splice(index, 1);
     },
-    filterFn(val, update, abort) {
-      if (val.length < 1) {
-        abort();
-        return;
-      }
-      update(() => {
-        spotify_api
-          .get("/search?q=" + val + "&type=track")
-          .then(res => (this.options = res.data.tracks.items));
-      });
-    },
+
     pauseCurrentSong() {
       spotify_api.put("/me/player/pause").then(res => {
         if (res.status === 204) {
