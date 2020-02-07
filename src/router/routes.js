@@ -3,40 +3,38 @@ const routes = [
     path: "/",
     component: () => import("layouts/AppBar.vue"),
     meta: { requiresAuth: true },
-    children: [
-      { path: "", component: () => import("components/queue/queue.vue") }
-    ]
+    children: [{ path: "", component: () => import("pages/queue/queue.vue") }]
   },
   {
     path: "/shareQueue",
     name: "shareQueue",
     component: () => import("layouts/AppBar.vue"),
     children: [
-      { path: "", component: () => import("components/queue/shareQueue.vue") }
+      { path: "", component: () => import("pages/queue/shareQueue.vue") }
     ]
   },
   {
     path: "/login",
     name: "Login",
-    component: () => import("components/auth/login.vue")
+    component: () => import("pages/auth/login.vue")
   },
   {
     path: "/register",
     name: "Register",
-    component: () => import("components/auth/register.vue")
+    component: () => import("pages/auth/register.vue")
   },
   {
     path: "/link",
     name: "link",
     meta: { requiresAuth: true },
-    component: () => import("components/auth/link.vue")
+    component: () => import("pages/auth/link.vue")
   },
   {
     path: "/playlists",
     name: "playlists",
     component: () => import("layouts/AppBar.vue"),
     children: [
-      { path: "", component: () => import("components/playlist/playlists.vue") }
+      { path: "", component: () => import("pages/playlist/playlists.vue") }
     ]
   },
   {
@@ -46,7 +44,7 @@ const routes = [
     children: [
       {
         path: "",
-        component: () => import("components/playlist/sharePlaylist.vue")
+        component: () => import("pages/playlist/sharePlaylist.vue")
       }
     ]
   },
@@ -55,18 +53,14 @@ const routes = [
     name: "fuse",
     meta: { requiresAuth: true },
     component: () => import("layouts/AppBar.vue"),
-    children: [
-      { path: "", component: () => import("components/playlist/fuse.vue") }
-    ]
+    children: [{ path: "", component: () => import("pages/playlist/fuse.vue") }]
   },
   {
     path: "/user",
     name: "user",
     meta: { requiresAuth: true },
     component: () => import("layouts/AppBar.vue"),
-    children: [
-      { path: "", component: () => import("components/user/user.vue") }
-    ]
+    children: [{ path: "", component: () => import("pages/user/user.vue") }]
   }
 ];
 
