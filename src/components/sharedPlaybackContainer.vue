@@ -137,6 +137,9 @@ export default {
             this.duration = res.data.item.duration_ms;
             this.progress = res.data.progress_ms;
             this.paused = true;
+          } else {
+            this.duration = res.data.item.duration_ms;
+            this.progress = res.data.progress_ms;
           }
         });
     }

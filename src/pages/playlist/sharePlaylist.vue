@@ -1,14 +1,14 @@
 <template>
   <div>
     <div>
-      <h4 class="title">{{ user }}'s Queue</h4>
+      <h4 class="title">{{ name }}</h4>
       <div class="row">
         <div class="col-xs-12 q-pa-md">
           <sharedSearchContainer :config="config" @selectSong="addToQueue" />
         </div>
       </div>
       <div class="row justify-center items-center">
-        <q-btn flat color="black" label="Submit" @click="addSongs" />
+        <q-btn flat color="black" label="Add All" @click="addSongs" />
       </div>
       <hr />
       <q-item-label header>Queue</q-item-label>

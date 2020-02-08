@@ -28,6 +28,7 @@ export default {
   data() {
     return {
       currentlyPlaying: null,
+      id: "",
       paused: false,
       progress: 0,
       duration: 0,
@@ -110,8 +111,13 @@ export default {
       clearInterval(this.interval);
       spotify_api.get("/me/player/currently-playing").then(res => {
         console.log(res);
-        if (res.data !== "" && res.data.is_playing) {
+        if (
+          res.data !== "" &&
+          res.data.is_playing &&
+          res.data.item.id != this.id
+        ) {
           this.currentlyPlaying = res.data.item;
+          this.id = res.data.item.id;
           this.duration = res.data.item.duration_ms;
           this.progress = res.data.progress_ms;
           this.interval = setInterval(() => {
@@ -122,12 +128,16 @@ export default {
               this.progress = this.progress + 10;
             }
           }, 10);
-        } else if (!res.data.is_playing) {
+        } else if (!res.data.is_playing && res.data.item.id != this.id) {
           console.log("here");
           this.currentlyPlaying = res.data.item;
+          this.id = res.data.id;
           this.duration = res.data.item.duration_ms;
           this.progress = res.data.progress_ms;
           this.paused = true;
+        } else {
+          this.duration = res.data.item.duration_ms;
+          this.progress = res.data.progress_ms;
         }
       });
     }
