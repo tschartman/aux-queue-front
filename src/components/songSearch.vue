@@ -40,12 +40,13 @@
   </div>
 </template>
 <script>
-import { spotify_api } from "src/utils/spotify-api";
 import { QSelect, QItem, QImg } from "quasar";
 
 export default {
   name: "songSearch",
   props: {
+    options: Array,
+    model: Object,
     method: { type: Function }
   },
   components: {
@@ -53,23 +54,10 @@ export default {
     QItem,
     QImg
   },
-  data() {
-    return {
-      options: [],
-      model: null
-    };
-  },
+
   methods: {
     filterFn(val, update, abort) {
-      if (val.length < 1) {
-        abort();
-        return;
-      }
-      update(() => {
-        spotify_api
-          .get("/search?q=" + val + "&type=track")
-          .then(res => (this.options = res.data.tracks.items));
-      });
+      this.$emit("filterFn", val, update, abort);
     }
   }
 };

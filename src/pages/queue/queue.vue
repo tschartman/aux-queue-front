@@ -4,7 +4,7 @@
       <h4 class="title">My Queue</h4>
       <div class="row">
         <div class="col-xs-12 q-pa-md">
-          <songSearch @selectSong="addToQueue" />
+          <searchContainer @selectSong="addToQueue" />
         </div>
       </div>
       <div class="row justify-center items-center">
@@ -38,7 +38,7 @@
 </template>
 <script>
 import shareQueue from "src/modals/shareQueue";
-import songSearch from "components/songSearch";
+import searchContainer from "components/searchContainer";
 import songList from "components/songList";
 import playbackContainer from "components/playbackContainer";
 import { QBtn, QItemSection, QItemLabel } from "quasar";
@@ -50,7 +50,7 @@ export default {
     QItemLabel,
     QBtn,
     shareQueue,
-    songSearch,
+    searchContainer,
     songList,
     playbackContainer
   },

@@ -4,7 +4,7 @@
       <h4 class="title">{{ user }}'s Queue</h4>
       <div class="row">
         <div class="col-xs-12 q-pa-md">
-          <songSearch @selectSong="addToQueue" />
+          <sharedSearchContainer :config="config" @selectSong="addToQueue" />
         </div>
       </div>
       <div class="row justify-center items-center">
@@ -27,7 +27,7 @@
 <script>
 import Vue from "vue";
 import axios from "axios";
-import songSearch from "components/songSearch";
+import sharedSearchContainer from "components/searchContainer";
 import songList from "components/songList";
 import { QBtn, QItemLabel } from "quasar";
 Vue.component("Share");
@@ -37,7 +37,7 @@ export default {
   components: {
     QItemLabel,
     QBtn,
-    songSearch,
+    sharedSearchContainer,
     songList
   },
   data() {

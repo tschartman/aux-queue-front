@@ -3,7 +3,7 @@
     <h4 class="title">{{ user }}'s Queue</h4>
     <div class="row">
       <div class="col-xs-12 q-pa-md">
-        <songSearch @selectSong="addToQueue" />
+        <sharedSearchContainer :config="config" @selectSong="addToQueue" />
       </div>
     </div>
     <hr />
@@ -23,15 +23,15 @@
     <sharedPlaybackContainer
       ref="child"
       :auth="false"
-      @setUser="setUser"
+      @setParent="setParent"
       @remove="remove"
       @removeAll="removeAll"
     />
   </div>
 </template>
 <script>
-import songSearch from "components/songSearch";
 import songList from "components/songList";
+import sharedSearchContainer from "components/sharedSearchContainer";
 import sharedPlaybackContainer from "components/sharedPlaybackContainer";
 import { QIcon, QItemSection, QItemLabel } from "quasar";
 
@@ -41,14 +41,15 @@ export default {
     QItemSection,
     QItemLabel,
     QIcon,
-    songSearch,
+    sharedSearchContainer,
     songList,
     sharedPlaybackContainer
   },
   data() {
     return {
       user: "",
-      queue: []
+      queue: [],
+      config: {}
     };
   },
 
@@ -71,8 +72,9 @@ export default {
     removeAll() {
       this.queue = [];
     },
-    setUser(user) {
+    setParent(user, config) {
       this.user = user;
+      this.config = config;
     }
   }
 };

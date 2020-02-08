@@ -4,7 +4,7 @@
       <h4 class="title">My Playlists</h4>
       <div class="row">
         <div class="col-xs-12 q-pa-md">
-          <songSearch @selectSong="addToQueue" />
+          <searchContainer @selectSong="addToQueue" />
         </div>
       </div>
       <div class="row justify-center items-center">
@@ -32,7 +32,7 @@
 </template>
 <script>
 import { spotify_api } from "src/utils/spotify-api";
-import songSearch from "components/songSearch";
+import searchContainer from "components/searchContainer";
 import songList from "components/songList";
 import playlistSelect from "components/playlistSelect";
 import { QItemLabel } from "quasar";
@@ -41,7 +41,7 @@ export default {
   name: "playlists",
   components: {
     QItemLabel,
-    songSearch,
+    searchContainer,
     songList,
     playlistSelect
   },

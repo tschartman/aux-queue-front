@@ -149,7 +149,7 @@ export default {
         }
       };
       axios.get(this.baseUrl + "/me", this.config).then(res => {
-        this.$emit("setUser", res.data.display_name);
+        this.$emit("setParent", res.data.display_name, this.config);
         this.init();
       });
     } else {
