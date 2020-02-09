@@ -105,14 +105,21 @@ const Store = new Vuex.Store({
         return app_api
           .get("/users/" + this.state.user.id + "/spotify/")
           .then(res => {
-            let token = res.data.access_token;
-            let refresh = res.data.refresh_token;
-            commit("link_spotify", { token: token, refresh: refresh });
+            if (
+              res.data.access_token != null &&
+              res.data.refresh_token != null
+            ) {
+              let token = res.data.access_token;
+              let refresh = res.data.refresh_token;
+              commit("link_spotify", { token: token, refresh: refresh });
 
-            spotify_api.get("/me").then(re => {
-              commit("set_spotify", re.data);
-              resolve(res);
-            });
+              spotify_api.get("/me").then(re => {
+                commit("set_spotify", re.data);
+                resolve(res);
+              });
+            } else {
+              reject({ error: "Spotify account not linked" });
+            }
           })
           .catch(error => {
             reject(error);

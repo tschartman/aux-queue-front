@@ -17,6 +17,8 @@
             <img height="35px" width="140px" src="/statics/AuxQueue-logo.png" />
           </q-toolbar-title>
           <q-btn
+            flat
+            color="black"
             v-if="!$store.getters.isLinked && $store.getters.isLoggedIn"
             v-on:click="redirect()"
             >link spotify</q-btn
