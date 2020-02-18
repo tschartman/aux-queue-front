@@ -19,7 +19,10 @@ function addSubscriber(callback) {
 
 spotify_api.interceptors.request.use(
   config => {
-    if (Store.getters.spotifyToken != undefined) {
+    if (
+      Store.getters.spotifyToken != undefined &&
+      Store.getters.spotifyToken != null
+    ) {
       config.headers["Authorization"] = "Bearer " + Store.getters.spotifyToken;
     }
     return config;
@@ -37,25 +40,32 @@ spotify_api.interceptors.response.use(
   function(error) {
     const originalRequest = error.config;
     if (error.response.status == 401) {
-      if (!isAlreadyFetchingAccessToken) {
-        isAlreadyFetchingAccessToken = true;
-        //Store.dispatch("clearSpotify");
-        app_api
-          .post("/spotify/refresh", { token: Store.getters.spotifyRefresh })
-          .then(res => {
-            isAlreadyFetchingAccessToken = false;
-            onAccessTokenFetched(res.data.access_token);
-            const data = {
-              access_token: res.data.access_token,
-              refresh_token: Store.getters.refresh_token
-            };
+      if (
+        Store.getters.spotifyToken != undefined &&
+        Store.getters.spotifyToken != null
+      ) {
+        if (!isAlreadyFetchingAccessToken) {
+          isAlreadyFetchingAccessToken = true;
+          //Store.dispatch("clearSpotify");
+          app_api
+            .post("/spotify/refresh", { token: Store.getters.spotifyRefresh })
+            .then(res => {
+              isAlreadyFetchingAccessToken = false;
+              onAccessTokenFetched(res.data.access_token);
+              const data = {
+                access_token: res.data.access_token,
+                refresh_token: Store.getters.refresh_token
+              };
 
-            app_api
-              .put("/users/" + Store.getters.user.id + "/spotify/", data)
-              .then(() => {
-                Store.dispatch("linkSpotify").then(() => {});
-              });
-          });
+              app_api
+                .put("/users/" + Store.getters.user.id + "/spotify/", data)
+                .then(() => {
+                  Store.dispatch("linkSpotify").then(() => {});
+                });
+            });
+        }
+      } else {
+        return Promise.reject({ error: "No spotify token set" });
       }
 
       const retryOriginalRequest = new Promise(resolve => {

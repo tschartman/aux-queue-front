@@ -56,6 +56,10 @@
 import { validationMixin } from "vuelidate";
 import { required } from "vuelidate/lib/validators";
 import {
+  TOKEN_AUTH_MUTATION,
+  SPOTIFY_AUTH_QUERY
+} from "src/graphql/queries/authQueries";
+import {
   QBtn,
   QCard,
   QCardActions,
@@ -102,30 +106,40 @@ export default {
     }
   },
   methods: {
-    login() {
+    async login() {
       this.$v.$touch();
       if (!this.$v.$invalid) {
         let username = this.username.toLowerCase();
         let password = this.password;
         this.loading = true;
-        this.$store
-          .dispatch("login", { username, password })
-          .then(() => {
-            this.$store
-              .dispatch("linkSpotify")
-              .then(() => {
-                this.$router.push("/");
-                this.loading = false;
-              })
-              .catch(() => {
-                this.$router.push("/");
-                this.loading = false;
-              });
-          })
-          .catch(() => {
-            this.loading = false;
-            this.authError = "Username or password incorrect";
+        await this.$store.commit("auth_request");
+        try {
+          const loggedInUser = await this.$apollo.mutate({
+            mutation: TOKEN_AUTH_MUTATION,
+            variables: {
+              email: username,
+              password: password
+            }
           });
+          if (loggedInUser.data) {
+            await this.$store.dispatch("login", loggedInUser);
+            const userSpotify = await this.$apollo.query({
+              query: SPOTIFY_AUTH_QUERY
+            });
+            if (userSpotify.data) {
+              await this.$store.dispatch("linkSpotify", userSpotify);
+              try {
+                await this.$router.push("/");
+              } catch (er) {
+                console.log(er);
+              }
+            }
+          }
+        } catch (err) {
+          console.log(err);
+          this.loading = false;
+          this.authError = "Username or password incorrect";
+        }
       }
     }
   }
