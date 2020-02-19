@@ -85,8 +85,11 @@ const Store = new Vuex.Store({
     tempAuth({ commit }) {
       commit("auth_success", null, null, null);
     },
-    setSpotify({ commit }, token) {
-      commit("link_spotify", { token: token, refresh: null });
+    setSpotify({ commit }, data) {
+      commit("link_spotify", {
+        token: data.access_token,
+        refresh: data.refresh_token
+      });
       commit("auth_success", null, null, null);
     },
     clearSpotify({ commit }) {

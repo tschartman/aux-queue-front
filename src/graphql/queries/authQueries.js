@@ -16,3 +16,13 @@ export const SPOTIFY_AUTH_QUERY = gql`
     }
   }
 `;
+
+export const SPOTIFY_AUTH_MUTATION = gql`
+  mutation updateTokens($accessToken: String!, $refreshToken: String!) {
+    updateTokens(
+      input: { accessToken: $accessToken, refreshToken: $refreshToken }
+    ) {
+      ok
+    }
+  }
+`;
