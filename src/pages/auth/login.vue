@@ -127,13 +127,14 @@ export default {
               query: SPOTIFY_AUTH_QUERY
             });
             if (userSpotify.data) {
-              await this.$store.dispatch("linkSpotify", userSpotify);
-              try {
-                await this.$router.push("/");
-              } catch (er) {
-                console.log(er);
-              }
+              let data = {
+                access_token: userSpotify.data.user.accessToken,
+                refresh_token: userSpotify.data.user.refreshToken
+              };
+              await this.$store.dispatch("linkSpotify", data);
             }
+
+            this.$router.push("/");
           }
         } catch (err) {
           console.log(err);

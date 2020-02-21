@@ -33,7 +33,11 @@ export default {
       });
       console.log(response);
       if (response.data) {
-        await this.$store.dispatch("setSpotify", data);
+        let data = {
+          access_token: data.data.user.access_token,
+          refresh_token: data.data.user.refresh_token
+        };
+        await this.$store.dispatch("linkSpotify", data);
         this.$router.push("/");
       }
     }

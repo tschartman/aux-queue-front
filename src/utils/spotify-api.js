@@ -1,6 +1,6 @@
 import axios from "axios";
 import Store from "src/store";
-import { app_api } from "./app-api";
+import { app_api } from "src/utils/app-api";
 
 export const spotify_api = axios.create({
   baseURL: "https://api.spotify.com/v1"
@@ -37,7 +37,7 @@ spotify_api.interceptors.response.use(
     return response;
   },
 
-  function(error) {
+  async function(error) {
     const originalRequest = error.config;
     if (error.response.status == 401) {
       if (
@@ -46,23 +46,17 @@ spotify_api.interceptors.response.use(
       ) {
         if (!isAlreadyFetchingAccessToken) {
           isAlreadyFetchingAccessToken = true;
-          //Store.dispatch("clearSpotify");
-          app_api
-            .post("/spotify/refresh", { token: Store.getters.spotifyRefresh })
-            .then(res => {
-              isAlreadyFetchingAccessToken = false;
-              onAccessTokenFetched(res.data.access_token);
-              const data = {
-                access_token: res.data.access_token,
-                refresh_token: Store.getters.refresh_token
-              };
+          const refresh = await app_api.post("/spotify/refresh", {
+            token: Store.getters.spotifyRefresh
+          });
+          isAlreadyFetchingAccessToken = false;
+          onAccessTokenFetched(refresh.data.access_token);
+          const data = {
+            access_token: refresh.data.access_token,
+            refresh_token: Store.getters.refresh_token
+          };
 
-              app_api
-                .put("/users/" + Store.getters.user.id + "/spotify/", data)
-                .then(() => {
-                  Store.dispatch("linkSpotify").then(() => {});
-                });
-            });
+          Store.dispatch("linkSpotify", data);
         }
       } else {
         return Promise.reject({ error: "No spotify token set" });

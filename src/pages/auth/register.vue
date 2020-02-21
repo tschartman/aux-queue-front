@@ -179,7 +179,7 @@ export default {
     }
   },
   methods: {
-    submit: function() {
+    async submit() {
       this.$v.$touch();
       if (!this.$v.$invalid) {
         let data = {
@@ -188,17 +188,12 @@ export default {
           email: this.email.toLowerCase(),
           password: this.password
         };
-        app_api
-          .post("/users/", data)
-          .then(res => {
-            this.$router.push("/login"), console.log(res);
-          })
-          .catch(err => {
-            console.log(err);
-          });
+
+        const created = await app_api.post("/users/", data);
+        this.$router.push("/login"), console.log(res);
       }
     },
-    cancel: function() {
+    cancel() {
       this.$router.push("/login");
     }
   }

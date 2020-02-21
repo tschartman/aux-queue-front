@@ -110,34 +110,30 @@ export default {
     init() {
       clearInterval(this.interval);
       spotify_api.get("/me/player/currently-playing").then(res => {
-        console.log(res);
-        if (
-          res.data !== "" &&
-          res.data.is_playing &&
-          res.data.item.id != this.id
-        ) {
-          this.currentlyPlaying = res.data.item;
-          this.id = res.data.item.id;
-          this.duration = res.data.item.duration_ms;
-          this.progress = res.data.progress_ms;
-          this.interval = setInterval(() => {
-            if (this.progress >= this.duration) {
-              this.resetView();
-              this.init();
-            } else if (!this.paused) {
-              this.progress = this.progress + 10;
-            }
-          }, 10);
-        } else if (!res.data.is_playing && res.data.item.id != this.id) {
-          console.log("here");
-          this.currentlyPlaying = res.data.item;
-          this.id = res.data.id;
-          this.duration = res.data.item.duration_ms;
-          this.progress = res.data.progress_ms;
-          this.paused = true;
-        } else {
-          this.duration = res.data.item.duration_ms;
-          this.progress = res.data.progress_ms;
+        if (res.data !== "" && res.data.item) {
+          if (res.data.is_playing && res.data.item.id != this.id) {
+            this.currentlyPlaying = res.data.item;
+            this.id = res.data.item.id;
+            this.duration = res.data.item.duration_ms;
+            this.progress = res.data.progress_ms;
+            this.interval = setInterval(() => {
+              if (this.progress >= this.duration) {
+                this.resetView();
+                this.init();
+              } else if (!this.paused) {
+                this.progress = this.progress + 10;
+              }
+            }, 10);
+          } else if (!res.data.is_playing && res.data.item.id != this.id) {
+            this.currentlyPlaying = res.data.item;
+            this.id = res.data.id;
+            this.duration = res.data.item.duration_ms;
+            this.progress = res.data.progress_ms;
+            this.paused = true;
+          } else {
+            this.duration = res.data.item.duration_ms;
+            this.progress = res.data.progress_ms;
+          }
         }
       });
     }
