@@ -76,6 +76,7 @@ const Store = new Vuex.Store({
       return true;
     },
     linkSpotify({ commit }, data) {
+      console.log(data);
       commit("link_spotify", {
         token: data.access_token,
         refresh: data.refresh_token

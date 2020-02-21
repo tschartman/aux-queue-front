@@ -2,7 +2,7 @@ import axios from "axios";
 import Store from "src/store/index";
 import router from "src/router/index";
 export const app_api = axios.create({
-  baseURL: "http://localhost:8000",
+  baseURL: "https://auxstack.herokuapp.com",
   timeout: 100000,
   headers: {
     "Content-Type": "application/json"

@@ -45,15 +45,17 @@ spotify_api.interceptors.response.use(
         Store.getters.spotifyToken != null
       ) {
         if (!isAlreadyFetchingAccessToken) {
+          const refreshToken = Store.getters.spotifyRefresh;
           isAlreadyFetchingAccessToken = true;
           const refresh = await app_api.post("/spotify/refresh", {
-            token: Store.getters.spotifyRefresh
+            token: refreshToken
           });
+
           isAlreadyFetchingAccessToken = false;
           onAccessTokenFetched(refresh.data.access_token);
           const data = {
             access_token: refresh.data.access_token,
-            refresh_token: Store.getters.refresh_token
+            refresh_token: refreshToken
           };
 
           Store.dispatch("linkSpotify", data);

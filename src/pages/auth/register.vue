@@ -189,8 +189,8 @@ export default {
           password: this.password
         };
 
-        const created = await app_api.post("/users/", data);
-        this.$router.push("/login"), console.log(res);
+        await app_api.post("/users/", data);
+        this.$router.push("/login");
       }
     },
     cancel() {
