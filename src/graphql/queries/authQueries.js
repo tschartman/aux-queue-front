@@ -26,23 +26,3 @@ export const SPOTIFY_AUTH_MUTATION = gql`
     }
   }
 `;
-
-export const USER_CREATION_MUTATON = gql`
-  mutation createUser(
-    $firstName: String!
-    $lastName: String!
-    $email: String!
-    $password: String!
-  ) {
-    createUser(
-      input: {
-        firstName: $firstName
-        lastName: $lastName
-        email: $email
-        password: $password
-      }
-    ) {
-      ok
-    }
-  }
-`;

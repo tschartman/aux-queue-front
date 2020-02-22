@@ -8,7 +8,7 @@
         src="/statics/AuxQueue-logo.png"
       />
     </div>
-    <div class="row justify-center items-center ">
+    <div class="row justify-center items-center">
       <q-card class="screen" flat>
         <div class="row items-center justify-center">
           <div class="q-mx-lg">
@@ -96,10 +96,8 @@
 <script>
 import { validationMixin } from "vuelidate";
 import { required, sameAs, minLength, email } from "vuelidate/lib/validators";
-import {
-  USER_CREATION_MUTATON,
-  TOKEN_AUTH_MUTATION
-} from "src/graphql/queries/authQueries";
+import { TOKEN_AUTH_MUTATION } from "src/graphql/queries/authQueries";
+import { USER_CREATION_MUTATON } from "src/graphql/queries/userQueries";
 
 const alerts = [
   {

@@ -29,8 +29,8 @@
               />
             </q-item-section>
             <q-item-section>
-              <q-item-label v-html="scope.opt.emaik" />
-              <q-item-label caption>{{ scope.opt.email }}</q-item-label>
+              <q-item-label v-html="scope.opt.userName" />
+              <q-item-label caption>{{ scope.opt.userName }}</q-item-label>
             </q-item-section>
           </q-item>
         </template>
@@ -44,7 +44,7 @@
       </q-select>
     </div>
     <br />
-    <div class="row justify-center">
+    <div class="row justify-center q-pa-md">
       <q-card class="my-card" flat bordered>
         <q-item>
           <q-item-section avatar>
@@ -55,44 +55,91 @@
 
           <q-item-section>
             <q-item-label
-              >{{ user.first_name }} {{ user.last_name }}</q-item-label
+              >{{ user.firstName }} {{ user.lastName }}</q-item-label
             >
             <q-item-label caption>
-              {{ user.email }}
+              {{ user.userName }}
             </q-item-label>
           </q-item-section>
         </q-item>
-
-        <q-separator />
-
         <q-card-section horizontal>
           <q-card-section> </q-card-section>
-
-          <q-separator vertical />
-
           <q-card-section class="col-4">
             This is where a bio could go
           </q-card-section>
         </q-card-section>
       </q-card>
     </div>
+    <q-separator />
+    <div class="row justify-center">
+      <h5>Top Spotify Artists</h5>
+    </div>
+    <div class="row justify-center">
+      <q-carousel
+        v-model="slide"
+        transition-prev="slide-right"
+        transition-next="slide-left"
+        swipeable
+        animated
+        control-color="primary"
+        navigation
+        padding
+        arrows
+        style="width:500px"
+        height="475px"
+        class="rounded-borders"
+      >
+        <q-carousel-slide
+          v-for="(matrix, index) in artistMatrix"
+          :name="index"
+          v-bind:key="index"
+        >
+          <div class="row">
+            <q-img
+              class="col-6"
+              ratio="1"
+              v-for="artist in matrix.row"
+              :src="artist.images[0].url"
+              v-bind:key="artist.id"
+            />
+          </div>
+        </q-carousel-slide>
+      </q-carousel>
+    </div>
   </div>
 </template>
 <script>
 import gql from "graphql-tag";
 import md5 from "md5";
-import { QAvatar, QCard, QSelect, QItem, QImg } from "quasar";
+import { spotify_api } from "src/utils/spotify-api";
+import {
+  QAvatar,
+  QCard,
+  QSelect,
+  QItem,
+  QImg,
+  QSeparator,
+  QCarousel,
+  QCarouselSlide
+} from "quasar";
+import { USER_DATA_QUERY } from "src/graphql/queries/userQueries";
 export default {
   components: {
     QAvatar,
     QCard,
     QSelect,
     QItem,
-    QImg
+    QImg,
+    QSeparator,
+    QCarousel,
+    QCarouselSlide
   },
   data() {
     return {
+      slide: 1,
       user: {},
+      artistMatrix: [],
+      friends: [],
       imageUrl: "",
       friend: null,
       options: []
@@ -104,6 +151,16 @@ export default {
       return md5(string);
     },
 
+    splitArray(array) {
+      let templist = [];
+      let i,
+        j,
+        chunk = 4;
+      for (i = 0, j = array.length; i < j; i += chunk) {
+        templist.push({ row: array.slice(i, i + chunk) });
+      }
+      this.artistMatrix = Array.from(templist);
+    },
     filterFn(val, update, abort) {
       if (val.length < 1) {
         abort();
@@ -131,10 +188,15 @@ export default {
     }
   },
 
-  created() {
-    this.imageUrl =
-      "https://www.gravatar.com/avatar/" + md5(this.$store.getters.user.email);
-    this.user = this.$store.getters.user;
+  async created() {
+    const userData = await this.$apollo.query({
+      query: USER_DATA_QUERY
+    });
+
+    const spotifyData = await spotify_api.get("/me/top/artists");
+    this.splitArray(spotifyData.data.items);
+    this.user = userData.data.user;
+    this.imageUrl = "https://www.gravatar.com/avatar/" + md5(this.user.email);
   }
 };
 </script>
