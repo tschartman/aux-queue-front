@@ -1,11 +1,23 @@
 <template>
-  <div class="page justify-center items-center">
-    <img height="75px" width="300px" src="/statics/AuxQueue-logo.png" />
-    <div class="col-xs-12">
-      <q-card class="screen" flat bordered>
-        <q-toolbar class="bg-black text-white">
-          <q-toolbar-title>Sign Up</q-toolbar-title>
-        </q-toolbar>
+  <div class="justify-center items-center">
+    <div class="row">
+      <img
+        class="logo"
+        height="75px"
+        width="300px"
+        src="/statics/AuxQueue-logo.png"
+      />
+    </div>
+    <div class="row justify-center items-center ">
+      <q-card class="screen" flat>
+        <div class="row items-center justify-center">
+          <div class="q-mx-lg">
+            <h4>Sign Up</h4>
+          </div>
+          <div>
+            <q-spinner-radio v-if="loading" color="cyan" class="loading" />
+          </div>
+        </div>
         <q-card-section>
           <form>
             <h5>User Info</h5>
@@ -36,7 +48,6 @@
               :error="emailErrors.length > 0"
               label="E-mail"
               required
-              @input="$v.email.$touch()"
               @blur="$v.email.$touch()"
             ></q-input>
             <div class="sep"></div>
@@ -49,7 +60,6 @@
               type="password"
               label="Password"
               required
-              @input="$v.password.$touch()"
               @blur="$v.password.$touch()"
             ></q-input>
             <q-input
@@ -60,7 +70,6 @@
               type="password"
               label="Confirm Password"
               required
-              @input="$v.repeatPassword.$touch()"
               @blur="$v.repeatPassword.$touch()"
             ></q-input>
             <q-checkbox
@@ -88,15 +97,32 @@
 import { validationMixin } from "vuelidate";
 import { required, sameAs, minLength, email } from "vuelidate/lib/validators";
 import {
+  USER_CREATION_MUTATON,
+  TOKEN_AUTH_MUTATION
+} from "src/graphql/queries/authQueries";
+
+const alerts = [
+  {
+    color: "negative",
+    message: "User Created Successfully!",
+    icon: "thumb_up"
+  },
+  {
+    color: "negative",
+    message: "Error occured during creation",
+    icon: "report_problem"
+  }
+];
+
+import {
   QBtn,
   QCard,
   QCardActions,
   QInput,
-  QToolbar,
   QCardSection,
-  QCheckbox
+  QCheckbox,
+  QSpinnerRadio
 } from "quasar";
-import { app_api } from "src/utils/app-api";
 export default {
   mixins: [validationMixin],
   validations: {
@@ -122,8 +148,8 @@ export default {
     QCardActions,
     QCardSection,
     QInput,
-    QToolbar,
-    QCheckbox
+    QCheckbox,
+    QSpinnerRadio
   },
   data() {
     return {
@@ -132,7 +158,8 @@ export default {
       email: "",
       password: "",
       repeatPassword: "",
-      checkbox: false
+      checkbox: false,
+      loading: false
     };
   },
   computed: {
@@ -180,17 +207,39 @@ export default {
   },
   methods: {
     async submit() {
+      this.loading = true;
       this.$v.$touch();
       if (!this.$v.$invalid) {
         let data = {
-          first_name: this.firstName,
-          last_name: this.lastName,
+          firstName: this.firstName,
+          lastName: this.lastName,
           email: this.email.toLowerCase(),
           password: this.password
         };
 
-        await app_api.post("/users/", data);
-        this.$router.push("/login");
+        const createdUser = await this.$apollo.mutate({
+          mutation: USER_CREATION_MUTATON,
+          variables: data
+        });
+        if (createdUser.data.createUser.ok) {
+          const loggedInUser = await this.$apollo.mutate({
+            mutation: TOKEN_AUTH_MUTATION,
+            variables: {
+              email: data.email,
+              password: data.password
+            }
+          });
+          if (loggedInUser.data) {
+            await this.$store.dispatch("login", loggedInUser);
+            this.$router.push("/user");
+          } else {
+            this.$router.push("/login");
+            this.$q.notify(alerts[0]);
+          }
+        } else {
+          this.loading = false;
+          this.$q.notify(alerts[1]);
+        }
       }
     },
     cancel() {
@@ -199,9 +248,23 @@ export default {
   }
 };
 </script>
-<style>
+<style scoped>
 h5 {
   margin: 0;
+}
+.loading {
+  font-size: 25px;
+}
+
+.logo {
+  margin: auto;
+  display: block;
+}
+
+.screen {
+  margin: 3em;
+  flex: 1;
+  max-width: 700px;
 }
 
 .sep {
