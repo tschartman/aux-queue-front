@@ -1,165 +1,188 @@
 <template>
   <div>
-    <div class="row justify-center">
-      <q-select
-        rounded
-        outlined
-        v-model="friends"
-        label="Search Friends"
-        use-input
-        hide-selected
-        fill-input
-        input-debounce="0"
-        :options="options"
-        @filter="filterFn"
-      >
-        <template v-slot:option="scope">
-          <q-item
-            v-bind="scope.itemProps"
-            v-on="scope.itemEvents"
-            v-on:click="selectUser(scope.opt)"
-            clickable
-            v-close-popup
-          >
-            <q-item-section avatar>
-              <q-img
-                :src="
-                  'https://www.gravatar.com/avatar/' + hash(scope.opt.email)
-                "
-              />
-            </q-item-section>
-            <q-item-section>
-              <q-item-label v-html="scope.opt.userName" />
-              <q-item-label caption>{{ scope.opt.userName }}</q-item-label>
-            </q-item-section>
-          </q-item>
-        </template>
-        <template v-slot:no-option>
-          <q-item>
-            <q-item-section class="text-grey">
-              No results
-            </q-item-section>
-          </q-item>
-        </template>
-      </q-select>
-    </div>
-    <br />
-    <div class="row justify-center q-pa-md">
-      <q-card class="my-card" flat bordered>
-        <q-item>
-          <q-item-section avatar>
-            <q-avatar>
-              <img :src="imageUrl" />
-            </q-avatar>
-          </q-item-section>
+    <q-splitter v-model="splitterModel">
+      <template v-slot:before>
+        <q-tabs v-model="tab" vertical class="text-teal">
+          <q-tab name="profile" icon="person" label="Profile" />
+          <q-tab name="friends" icon="people" label="Friends" />
+        </q-tabs>
+      </template>
+      <template v-slot:after>
+        <q-tab-panels
+          v-model="tab"
+          animated
+          swipeable
+          vertical
+          transition-prev="jump-up"
+          transition-next="jump-up"
+        >
+          <q-tab-panel name="profile">
+            <div class="row justify-center q-pa-md">
+              <q-card class="my-card" flat bordered>
+                <q-item>
+                  <q-item-section avatar>
+                    <q-avatar>
+                      <img :src="imageUrl" />
+                    </q-avatar>
+                  </q-item-section>
 
-          <q-item-section>
-            <q-item-label
-              >{{ user.firstName }} {{ user.lastName }}</q-item-label
+                  <q-item-section>
+                    <q-item-label
+                      >{{ user.firstName }} {{ user.lastName }}</q-item-label
+                    >
+                    <q-item-label caption>
+                      {{ user.userName }}
+                    </q-item-label>
+                  </q-item-section>
+                </q-item>
+                <q-card-section horizontal>
+                  <q-card-section> </q-card-section>
+                  <q-card-section class="col-4">
+                    This is where a bio could go
+                  </q-card-section>
+                </q-card-section>
+              </q-card>
+            </div>
+            <q-separator />
+            <div class="row justify-center">
+              <div class="q-mx-lg">
+                <h5>Top Spotify {{ category }}</h5>
+              </div>
+            </div>
+            <div class="row justify-center">
+              <q-btn
+                flat
+                v-if="category === 'Artists'"
+                @click="category = 'Tracks'"
+                label="See Tracks"
+              />
+              <q-btn
+                v-else
+                flat
+                @click="category = 'Artists'"
+                label="See Artists"
+              />
+            </div>
+            <div class="row justify-center">
+              <q-carousel
+                v-if="category === 'Artists'"
+                v-model="slide"
+                transition-prev="slide-right"
+                transition-next="slide-left"
+                swipeable
+                animated
+                control-color="primary"
+                navigation
+                padding
+                arrows
+                style="width:500px"
+                height="475px"
+                class="rounded-borders"
+              >
+                <q-carousel-slide
+                  v-for="(matrix, index) in artistMatrix"
+                  :name="index"
+                  v-bind:key="index"
+                >
+                  <div class="row">
+                    <q-img
+                      class="col-6"
+                      ratio="1"
+                      v-for="artist in matrix.row"
+                      :src="artist.images[0].url"
+                      v-bind:key="artist.id"
+                    />
+                  </div>
+                </q-carousel-slide>
+              </q-carousel>
+              <q-carousel
+                v-else
+                v-model="slide"
+                transition-prev="slide-right"
+                transition-next="slide-left"
+                swipeable
+                animated
+                control-color="primary"
+                navigation
+                padding
+                arrows
+                style="width:500px"
+                height="475px"
+                class="rounded-borders"
+              >
+                <q-carousel-slide
+                  v-for="(matrix, index) in trackMatrix"
+                  :name="index"
+                  v-bind:key="index"
+                >
+                  <div class="row">
+                    <q-img
+                      class="col-6"
+                      ratio="1"
+                      v-for="track in matrix.row"
+                      :src="track.album.images[0].url"
+                      v-bind:key="track.id"
+                    />
+                  </div>
+                </q-carousel-slide>
+              </q-carousel>
+            </div>
+          </q-tab-panel>
+          <q-tab-panel name="friends">
+            <q-select
+              rounded
+              outlined
+              v-model="friends"
+              label="Search Friends"
+              use-input
+              hide-selected
+              fill-input
+              input-debounce="0"
+              :options="options"
+              @filter="filterFn"
             >
-            <q-item-label caption>
-              {{ user.userName }}
-            </q-item-label>
-          </q-item-section>
-        </q-item>
-        <q-card-section horizontal>
-          <q-card-section> </q-card-section>
-          <q-card-section class="col-4">
-            This is where a bio could go
-          </q-card-section>
-        </q-card-section>
-      </q-card>
-    </div>
-    <q-separator />
-    <div class="row justify-center">
-      <div class="q-mx-lg">
-        <h5>Top Spotify {{ category }}</h5>
-      </div>
-      <div>
-        <q-btn
-          v-if="category === 'Artists'"
-          round
-          @click="category = 'Tracks'"
-          style="height: 50px"
-          icon="art_track"
-        />
-        <q-btn
-          v-else
-          round
-          @click="category = 'Artists'"
-          style="height: 50px"
-          icon="face"
-        />
-      </div>
-    </div>
-    <div class="row justify-center">
-      <q-carousel
-        v-if="category === 'Artists'"
-        v-model="slide"
-        transition-prev="slide-right"
-        transition-next="slide-left"
-        swipeable
-        animated
-        control-color="primary"
-        navigation
-        padding
-        arrows
-        style="width:500px"
-        height="475px"
-        class="rounded-borders"
-      >
-        <q-carousel-slide
-          v-for="(matrix, index) in artistMatrix"
-          :name="index"
-          v-bind:key="index"
-        >
-          <div class="row">
-            <q-img
-              class="col-6"
-              ratio="1"
-              v-for="artist in matrix.row"
-              :src="artist.images[0].url"
-              v-bind:key="artist.id"
-            />
-          </div>
-        </q-carousel-slide>
-      </q-carousel>
-      <q-carousel
-        v-else
-        v-model="slide"
-        transition-prev="slide-right"
-        transition-next="slide-left"
-        swipeable
-        animated
-        control-color="primary"
-        navigation
-        padding
-        arrows
-        style="width:500px"
-        height="475px"
-        class="rounded-borders"
-      >
-        <q-carousel-slide
-          v-for="(matrix, index) in trackMatrix"
-          :name="index"
-          v-bind:key="index"
-        >
-          <div class="row">
-            <q-img
-              class="col-6"
-              ratio="1"
-              v-for="track in matrix.row"
-              :src="track.album.images[0].url"
-              v-bind:key="track.id"
-            />
-          </div>
-        </q-carousel-slide>
-      </q-carousel>
-    </div>
+              <template v-slot:option="scope">
+                <q-item
+                  v-bind="scope.itemProps"
+                  v-on="scope.itemEvents"
+                  v-on:click="selectUser(scope.opt)"
+                  clickable
+                  v-close-popup
+                >
+                  <q-item-section avatar>
+                    <q-img
+                      :src="
+                        'https://www.gravatar.com/avatar/' +
+                          hash(scope.opt.email)
+                      "
+                    />
+                  </q-item-section>
+                  <q-item-section>
+                    <q-item-label v-html="scope.opt.userName" />
+                    <q-item-label caption>{{
+                      scope.opt.firstName
+                    }}</q-item-label>
+                  </q-item-section>
+                </q-item>
+              </template>
+              <template v-slot:no-option>
+                <q-item>
+                  <q-item-section class="text-grey">
+                    No results
+                  </q-item-section>
+                </q-item>
+              </template>
+            </q-select>
+            <div>
+              <h5>My Friends</h5>
+            </div>
+          </q-tab-panel>
+        </q-tab-panels>
+      </template>
+    </q-splitter>
   </div>
 </template>
 <script>
-import gql from "graphql-tag";
 import md5 from "md5";
 import { spotify_api } from "src/utils/spotify-api";
 import {
@@ -170,9 +193,17 @@ import {
   QImg,
   QSeparator,
   QCarousel,
-  QCarouselSlide
+  QCarouselSlide,
+  QTabs,
+  QTab,
+  QTabPanel,
+  QTabPanels,
+  QSplitter
 } from "quasar";
-import { USER_DATA_QUERY } from "src/graphql/queries/userQueries";
+import {
+  USER_DATA_QUERY,
+  GET_USERS_QUERY
+} from "src/graphql/queries/userQueries";
 export default {
   components: {
     QAvatar,
@@ -182,7 +213,12 @@ export default {
     QImg,
     QSeparator,
     QCarousel,
-    QCarouselSlide
+    QCarouselSlide,
+    QTabs,
+    QTab,
+    QTabPanel,
+    QTabPanels,
+    QSplitter
   },
   data() {
     return {
@@ -193,7 +229,9 @@ export default {
       friends: [],
       imageUrl: "",
       friend: null,
-      options: []
+      options: [],
+      tab: "profile",
+      splitterModel: 20
     };
   },
   computed: {},
@@ -220,13 +258,7 @@ export default {
       update(() => {
         this.$apollo
           .query({
-            query: gql`
-              query getUsers {
-                users {
-                  email
-                }
-              }
-            `
+            query: GET_USERS_QUERY
           })
           .then(result => {
             this.options = result.data.users;

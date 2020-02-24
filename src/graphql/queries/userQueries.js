@@ -30,3 +30,13 @@ export const USER_CREATION_MUTATON = gql`
     }
   }
 `;
+
+export const GET_USERS_QUERY = gql`
+  query getUsers {
+    users {
+      userName
+      firstName
+      email
+    }
+  }
+`;
