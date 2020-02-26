@@ -31,6 +31,26 @@ export const USER_CREATION_MUTATON = gql`
   }
 `;
 
+export const UPDATE_USER_MUTATION = gql`
+  mutation updateUser(
+    $firstName: String!
+    $lastName: String!
+    $email: String!
+  ) {
+    updateUser(
+      input: { firstName: $firstName, lastName: $lastName, email: $email }
+    ) {
+      ok
+      user {
+        firstName
+        lastName
+        email
+        userName
+      }
+    }
+  }
+`;
+
 export const GET_USERS_QUERY = gql`
   query getUsers {
     users {

@@ -34,15 +34,34 @@
                       {{ user.userName }}
                     </q-item-label>
                   </q-item-section>
+                  <q-btn color="grey-7" round flat icon="more_vert">
+                    <q-menu cover auto-close>
+                      <q-list>
+                        <q-item clickable v-on:click="edit = true">
+                          <q-item-section>Edit</q-item-section>
+                        </q-item>
+                        <q-item clickable>
+                          <q-item-section>Share</q-item-section>
+                        </q-item>
+                      </q-list>
+                    </q-menu>
+                  </q-btn>
                 </q-item>
                 <q-card-section horizontal>
                   <q-card-section> </q-card-section>
-                  <q-card-section class="col-4">
+                  <q-card-section>
                     This is where a bio could go
                   </q-card-section>
                 </q-card-section>
               </q-card>
             </div>
+            <q-dialog v-model="edit">
+              <editUser
+                :user="user"
+                @cancel="edit = false"
+                @success="userUpdated"
+              />
+            </q-dialog>
             <q-separator />
             <div class="row justify-center">
               <div class="q-mx-lg">
@@ -185,6 +204,7 @@
 <script>
 import md5 from "md5";
 import { spotify_api } from "src/utils/spotify-api";
+import editUser from "src/modals/editUser";
 import {
   QAvatar,
   QCard,
@@ -198,7 +218,10 @@ import {
   QTab,
   QTabPanel,
   QTabPanels,
-  QSplitter
+  QSplitter,
+  QBtn,
+  QMenu,
+  QDialog
 } from "quasar";
 import {
   USER_DATA_QUERY,
@@ -218,7 +241,11 @@ export default {
     QTab,
     QTabPanel,
     QTabPanels,
-    QSplitter
+    QSplitter,
+    QBtn,
+    QMenu,
+    QDialog,
+    editUser
   },
   data() {
     return {
@@ -231,7 +258,8 @@ export default {
       friend: null,
       options: [],
       tab: "profile",
-      splitterModel: 20
+      splitterModel: 20,
+      edit: false
     };
   },
   computed: {},
@@ -239,7 +267,10 @@ export default {
     hash(string) {
       return md5(string);
     },
-
+    userUpdated(user) {
+      this.edit = false;
+      this.user = user;
+    },
     splitArray(array) {
       let templist = [];
       let i,
