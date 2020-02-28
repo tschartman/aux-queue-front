@@ -51,6 +51,14 @@ export const UPDATE_USER_MUTATION = gql`
   }
 `;
 
+export const CHECK_USER_MUTATION = gql`
+  mutation checkUserName($userName: String!) {
+    checkUserName(input: { userName: $userName }) {
+      ok
+    }
+  }
+`;
+
 export const GET_USERS_QUERY = gql`
   query getUsers {
     users {
@@ -58,5 +66,11 @@ export const GET_USERS_QUERY = gql`
       firstName
       email
     }
+  }
+`;
+
+export const GET_RND_USER_NAME = gql`
+  query getUserName {
+    userName
   }
 `;

@@ -175,9 +175,7 @@ export default {
       window.location = "https://auxstack.herokuapp.com/spotify/";
     }
   },
-  created() {
-    console.log(this.$store.getters.isLinked);
-  }
+  created() {}
 };
 </script>
 

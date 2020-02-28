@@ -19,48 +19,71 @@
           <q-tab-panel name="profile">
             <div class="row justify-center q-pa-md">
               <q-card class="my-card" flat bordered>
+                <q-btn class="icon" color="grey-7" round flat icon="more_vert">
+                  <q-menu cover auto-close>
+                    <q-list>
+                      <q-item
+                        clickable
+                        v-on:click="(modal = 'info'), (edit = true)"
+                      >
+                        <q-item-section>Edit Info</q-item-section>
+                      </q-item>
+                      <q-item
+                        clickable
+                        v-on:click="(modal = 'userName'), (edit = true)"
+                      >
+                        <q-item-section>Cange Friend Code</q-item-section>
+                      </q-item>
+                      <q-item
+                        clickable
+                        v-on:click="
+                          edit = true;
+                          modal = 'password';
+                        "
+                      >
+                        <q-item-section>Cange Password</q-item-section>
+                      </q-item>
+                      <q-item clickable>
+                        <q-item-section>Share</q-item-section>
+                      </q-item>
+                    </q-list>
+                  </q-menu>
+                </q-btn>
                 <q-item>
                   <q-item-section avatar>
                     <q-avatar>
                       <img :src="imageUrl" />
                     </q-avatar>
                   </q-item-section>
-
                   <q-item-section>
-                    <q-item-label
-                      >{{ user.firstName }} {{ user.lastName }}</q-item-label
-                    >
-                    <q-item-label caption>
-                      {{ user.userName }}
+                    <q-item-label>
+                      <div class="text-h6">
+                        {{ user.firstName }} {{ user.lastName }}
+                      </div>
+                    </q-item-label>
+                    <q-item-label>
+                      Friend Code:
+                      <div class="text-subtitle2">
+                        {{ user.userName }}
+                      </div>
                     </q-item-label>
                   </q-item-section>
-                  <q-btn color="grey-7" round flat icon="more_vert">
-                    <q-menu cover auto-close>
-                      <q-list>
-                        <q-item clickable v-on:click="edit = true">
-                          <q-item-section>Edit</q-item-section>
-                        </q-item>
-                        <q-item clickable>
-                          <q-item-section>Share</q-item-section>
-                        </q-item>
-                      </q-list>
-                    </q-menu>
-                  </q-btn>
                 </q-item>
                 <q-card-section horizontal>
                   <q-card-section> </q-card-section>
-                  <q-card-section>
-                    This is where a bio could go
-                  </q-card-section>
+                  <q-card-section> </q-card-section>
                 </q-card-section>
               </q-card>
             </div>
             <q-dialog v-model="edit">
               <editUser
+                v-if="modal == 'info'"
                 :user="user"
                 @cancel="edit = false"
                 @success="userUpdated"
               />
+              <editUserName v-if="modal == 'userName'" @cancel="edit = false" />
+              <editPassword v-if="modal == 'password'" @cancel="edit = false" />
             </q-dialog>
             <q-separator />
             <div class="row justify-center">
@@ -205,6 +228,8 @@
 import md5 from "md5";
 import { spotify_api } from "src/utils/spotify-api";
 import editUser from "src/modals/editUser";
+import editUserName from "src/modals/editUserName";
+import editPassword from "src/modals/editPassword";
 import {
   QAvatar,
   QCard,
@@ -245,10 +270,13 @@ export default {
     QBtn,
     QMenu,
     QDialog,
-    editUser
+    editUser,
+    editUserName,
+    editPassword
   },
   data() {
     return {
+      modal: "",
       slide: 1,
       user: {},
       category: "Artists",
@@ -320,5 +348,8 @@ export default {
 .my-card {
   width: 100%;
   max-width: 350px;
+}
+.icon {
+  float: right;
 }
 </style>
