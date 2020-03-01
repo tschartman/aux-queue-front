@@ -179,53 +179,7 @@
             </div>
           </q-tab-panel>
           <q-tab-panel name="friends">
-            <q-select
-              rounded
-              outlined
-              v-model="friends"
-              label="Search Friends"
-              use-input
-              hide-selected
-              fill-input
-              input-debounce="0"
-              :options="options"
-              @filter="filterFn"
-            >
-              <template v-slot:option="scope">
-                <q-item
-                  v-bind="scope.itemProps"
-                  v-on="scope.itemEvents"
-                  v-on:click="selectUser(scope.opt)"
-                  clickable
-                  v-close-popup
-                >
-                  <q-item-section avatar>
-                    <q-img
-                      :src="
-                        'https://www.gravatar.com/avatar/' +
-                          hash(scope.opt.email)
-                      "
-                    />
-                  </q-item-section>
-                  <q-item-section>
-                    <q-item-label v-html="scope.opt.userName" />
-                    <q-item-label caption>{{
-                      scope.opt.firstName
-                    }}</q-item-label>
-                  </q-item-section>
-                </q-item>
-              </template>
-              <template v-slot:no-option>
-                <q-item>
-                  <q-item-section class="text-grey">
-                    No results
-                  </q-item-section>
-                </q-item>
-              </template>
-            </q-select>
-            <div>
-              <h5>My Friends</h5>
-            </div>
+            <Friends :user="user" />
           </q-tab-panel>
         </q-tab-panels>
       </template>
@@ -238,10 +192,10 @@ import { spotify_api } from "src/utils/spotify-api";
 import editUser from "src/modals/editUser";
 import editUserName from "src/modals/editUserName";
 import editPassword from "src/modals/editPassword";
+import Friends from "src/pages/user/Friends";
 import {
   QAvatar,
   QCard,
-  QSelect,
   QItem,
   QImg,
   QSeparator,
@@ -275,15 +229,11 @@ const alerts = {
   }
 };
 
-import {
-  USER_DATA_QUERY,
-  GET_USERS_QUERY
-} from "src/graphql/queries/userQueries";
+import { USER_DATA_QUERY } from "src/graphql/queries/userQueries";
 export default {
   components: {
     QAvatar,
     QCard,
-    QSelect,
     QItem,
     QImg,
     QSeparator,
@@ -299,7 +249,8 @@ export default {
     QDialog,
     editUser,
     editUserName,
-    editPassword
+    editPassword,
+    Friends
   },
   data() {
     return {
@@ -345,25 +296,6 @@ export default {
         templist.push({ row: array.slice(i, i + chunk) });
       }
       return templist;
-    },
-    filterFn(val, update, abort) {
-      if (val.length < 1) {
-        abort();
-        return;
-      }
-      update(() => {
-        this.$apollo
-          .query({
-            query: GET_USERS_QUERY
-          })
-          .then(result => {
-            this.options = result.data.users;
-          });
-      });
-    },
-
-    selectUser(user) {
-      console.log(user);
     }
   },
 
@@ -372,11 +304,11 @@ export default {
       query: USER_DATA_QUERY
     });
 
+    this.user = userData.data.user;
     const artists = await spotify_api.get("/me/top/artists");
     const tracks = await spotify_api.get("/me/top/tracks");
     this.artistMatrix = this.splitArray(artists.data.items);
     this.trackMatrix = this.splitArray(tracks.data.items);
-    this.user = userData.data.user;
     this.imageUrl = "https://www.gravatar.com/avatar/" + md5(this.user.email);
   }
 };
