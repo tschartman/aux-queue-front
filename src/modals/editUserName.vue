@@ -41,7 +41,8 @@ import { validationMixin } from "vuelidate";
 import { required } from "vuelidate/lib/validators";
 import {
   GET_RND_USER_NAME,
-  CHECK_USER_MUTATION
+  CHECK_USER_MUTATION,
+  UPDATE_USER_NAME_MUTATION
 } from "src/graphql/queries/userQueries";
 import {
   QBtn,
@@ -53,11 +54,6 @@ import {
 } from "quasar";
 
 const alerts = [
-  {
-    color: "",
-    message: "User Created Successfully!",
-    icon: "thumb_up"
-  },
   {
     color: "negative",
     message: "Error occured generating username",
@@ -106,20 +102,18 @@ export default {
   },
   methods: {
     async submit() {
-      //   if (!this.$v.$invalid) {
-      //     let data = {
-      //       firstName: this.firstName,
-      //       lastName: this.lastName,
-      //       email: this.email
-      //     };
-      //     const updateUser = await this.$apollo.mutate({
-      //       mutation: UPDATE_USER_MUTATION,
-      //       variables: data
-      //     });
-      //     if (updateUser.data.updateUser.ok) {
-      //       this.$emit("success", updateUser.data.updateUser.user);
-      //     }
-      //   }
+      if (!this.$v.$invalid) {
+        let data = {
+          userName: this.userName
+        };
+        const updateUserName = await this.$apollo.mutate({
+          mutation: UPDATE_USER_NAME_MUTATION,
+          variables: data
+        });
+        if (updateUserName.data.updateUserName.ok) {
+          this.$emit("success", updateUserName.data.updateUserName.userName);
+        }
+      }
     },
     async genUserName() {
       this.loading = true;
@@ -129,7 +123,7 @@ export default {
       if (rndUserName.data) {
         this.userName = rndUserName.data.userName;
       } else {
-        this.$q.notify(alerts[1]);
+        this.$q.notify(alerts[0]);
       }
       this.loading = false;
     }

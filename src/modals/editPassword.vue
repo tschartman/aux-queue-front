@@ -7,12 +7,12 @@
           <q-input
             @keyup.enter="submit"
             v-model="oldPassword"
-            :error-message="passwordErrors[0]"
-            :error="passwordErrors.length > 0"
+            :error-message="oldPasswordErrors[0]"
+            :error="oldPasswordErrors.length > 0"
             type="password"
             label="Old Password"
             required
-            @blur="$v.password.$touch()"
+            @blur="$v.oldPassword.$touch()"
           ></q-input>
           <div class="sep"></div>
           <q-input
@@ -36,6 +36,7 @@
             @blur="$v.repeatPassword.$touch()"
           ></q-input>
         </form>
+        <p class="authError" v-if="authError">{{ authError }}</p>
       </q-card-section>
       <q-card-actions align="around">
         <q-btn flat @click="cancel" color="dark">cancel</q-btn>
@@ -47,21 +48,7 @@
 <script>
 import { validationMixin } from "vuelidate";
 import { required, sameAs, minLength } from "vuelidate/lib/validators";
-// import { TOKEN_AUTH_MUTATION } from "src/graphql/queries/authQueries";
-// import { USER_CREATION_MUTATON } from "src/graphql/queries/userQueries";
-
-// const alerts = [
-//   {
-//     color: "negative",
-//     message: "User Created Successfully!",
-//     icon: "thumb_up"
-//   },
-//   {
-//     color: "negative",
-//     message: "Error occured during creation",
-//     icon: "report_problem"
-//   }
-// ];
+import { UPDATE_PASSWORD_MUTATION } from "src/graphql/queries/userQueries";
 
 import {
   QBtn,
@@ -99,10 +86,17 @@ export default {
       password: "",
       repeatPassword: "",
       checkbox: false,
-      loading: false
+      loading: false,
+      authError: ""
     };
   },
   computed: {
+    oldPasswordErrors() {
+      const errors = [];
+      if (!this.$v.password.$dirty) return errors;
+      !this.$v.password.required && errors.push("Password is required");
+      return errors;
+    },
     passwordErrors() {
       const errors = [];
       if (!this.$v.password.$dirty) return errors;
@@ -125,39 +119,23 @@ export default {
       this.loading = true;
       this.$v.$touch();
       if (!this.$v.$invalid) {
-        // let data = {
-        //   firstName: this.firstName,
-        //   lastName: this.lastName,
-        //   email: this.email.toLowerCase(),
-        //   password: this.password
-        // };
-        // const createdUser = await this.$apollo.mutate({
-        //   mutation: USER_CREATION_MUTATON,
-        //   variables: data
-        // });
-        // if (createdUser.data.createUser.ok) {
-        //   const loggedInUser = await this.$apollo.mutate({
-        //     mutation: TOKEN_AUTH_MUTATION,
-        //     variables: {
-        //       email: data.email,
-        //       password: data.password
-        //     }
-        //   });
-        //   if (loggedInUser.data) {
-        //     await this.$store.dispatch("login", loggedInUser);
-        //     this.$router.push("/user");
-        //   } else {
-        //     this.$router.push("/login");
-        //     this.$q.notify(alerts[0]);
-        //   }
-        // } else {
-        //   this.loading = false;
-        //   this.$q.notify(alerts[1]);
-        // }
+        let data = {
+          oldPass: this.oldPassword,
+          newPass: this.password
+        };
+        const changedPassword = await this.$apollo.mutate({
+          mutation: UPDATE_PASSWORD_MUTATION,
+          variables: data
+        });
+        if (changedPassword.data.updatePassword.ok) {
+          this.$emit("success");
+        } else {
+          this.authError = changedPassword.data.updatePassword.error;
+        }
       }
     },
     cancel() {
-      this.$router.push("/login");
+      this.$emit("cancel");
     }
   }
 };
@@ -173,6 +151,10 @@ h5 {
 .logo {
   margin: auto;
   display: block;
+}
+
+.authError {
+  color: red;
 }
 
 .screen {

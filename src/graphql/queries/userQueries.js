@@ -51,6 +51,24 @@ export const UPDATE_USER_MUTATION = gql`
   }
 `;
 
+export const UPDATE_USER_NAME_MUTATION = gql`
+  mutation updateUserName($userName: String!) {
+    updateUserName(input: { userName: $userName }) {
+      ok
+      userName
+    }
+  }
+`;
+
+export const UPDATE_PASSWORD_MUTATION = gql`
+  mutation updatePassword($oldPass: String!, $newPass: String!) {
+    updatePassword(input: { oldPass: $oldPass, newPass: $newPass }) {
+      ok
+      error
+    }
+  }
+`;
+
 export const CHECK_USER_MUTATION = gql`
   mutation checkUserName($userName: String!) {
     checkUserName(input: { userName: $userName }) {

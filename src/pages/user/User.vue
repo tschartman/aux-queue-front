@@ -82,8 +82,16 @@
                 @cancel="edit = false"
                 @success="userUpdated"
               />
-              <editUserName v-if="modal == 'userName'" @cancel="edit = false" />
-              <editPassword v-if="modal == 'password'" @cancel="edit = false" />
+              <editUserName
+                v-if="modal == 'userName'"
+                @cancel="edit = false"
+                @success="userNameUpdated"
+              />
+              <editPassword
+                v-if="modal == 'password'"
+                @cancel="edit = false"
+                @success="passwordUpdated"
+              />
             </q-dialog>
             <q-separator />
             <div class="row justify-center">
@@ -248,6 +256,25 @@ import {
   QMenu,
   QDialog
 } from "quasar";
+
+const alerts = {
+  username: {
+    color: "positive",
+    message: "Username Updated Sucuessfully!",
+    icon: "thumb_up"
+  },
+  password: {
+    color: "positive",
+    message: "Password Updated Sucuessfully!",
+    icon: "thumb_up"
+  },
+  user: {
+    color: "positive",
+    message: "User Updated Sucuessfully!",
+    icon: "thumb_up"
+  }
+};
+
 import {
   USER_DATA_QUERY,
   GET_USERS_QUERY
@@ -298,6 +325,16 @@ export default {
     userUpdated(user) {
       this.edit = false;
       this.user = user;
+      this.$q.notify(alerts["user"]);
+    },
+    userNameUpdated(userName) {
+      this.edit = false;
+      this.user.userName = userName;
+      this.$q.notify(alerts["username"]);
+    },
+    passwordUpdated() {
+      this.edit = false;
+      this.$q.notify(alerts["password"]);
     },
     splitArray(array) {
       let templist = [];
