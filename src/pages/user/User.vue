@@ -17,64 +17,37 @@
           transition-next="jump-up"
         >
           <q-tab-panel name="profile">
-            <div class="row justify-center q-pa-md">
-              <q-card class="my-card" flat bordered>
-                <q-btn class="icon" color="grey-7" round flat icon="more_vert">
-                  <q-menu cover auto-close>
-                    <q-list>
-                      <q-item
-                        clickable
-                        v-on:click="(modal = 'info'), (edit = true)"
-                      >
-                        <q-item-section>Edit Info</q-item-section>
-                      </q-item>
-                      <q-item
-                        clickable
-                        v-on:click="(modal = 'userName'), (edit = true)"
-                      >
-                        <q-item-section>Cange Friend Code</q-item-section>
-                      </q-item>
-                      <q-item
-                        clickable
-                        v-on:click="
-                          edit = true;
-                          modal = 'password';
-                        "
-                      >
-                        <q-item-section>Cange Password</q-item-section>
-                      </q-item>
-                      <q-item clickable>
-                        <q-item-section>Share</q-item-section>
-                      </q-item>
-                    </q-list>
-                  </q-menu>
-                </q-btn>
-                <q-item>
-                  <q-item-section avatar>
-                    <q-avatar>
-                      <img :src="imageUrl" />
-                    </q-avatar>
-                  </q-item-section>
-                  <q-item-section>
-                    <q-item-label>
-                      <div class="text-h6">
-                        {{ user.firstName }} {{ user.lastName }}
-                      </div>
-                    </q-item-label>
-                    <q-item-label>
-                      Friend Code:
-                      <div class="text-subtitle2">
-                        {{ user.userName }}
-                      </div>
-                    </q-item-label>
-                  </q-item-section>
-                </q-item>
-                <q-card-section horizontal>
-                  <q-card-section> </q-card-section>
-                  <q-card-section> </q-card-section>
-                </q-card-section>
-              </q-card>
-            </div>
+            <q-btn class="icon" color="grey-7" round flat icon="more_vert">
+              <q-menu cover auto-close>
+                <q-list>
+                  <q-item
+                    clickable
+                    v-on:click="(modal = 'info'), (edit = true)"
+                  >
+                    <q-item-section>Edit Info</q-item-section>
+                  </q-item>
+                  <q-item
+                    clickable
+                    v-on:click="(modal = 'userName'), (edit = true)"
+                  >
+                    <q-item-section>Cange Friend Code</q-item-section>
+                  </q-item>
+                  <q-item
+                    clickable
+                    v-on:click="
+                      edit = true;
+                      modal = 'password';
+                    "
+                  >
+                    <q-item-section>Cange Password</q-item-section>
+                  </q-item>
+                  <q-item clickable>
+                    <q-item-section>Share</q-item-section>
+                  </q-item>
+                </q-list>
+              </q-menu>
+            </q-btn>
+            <userView :user="user" />
             <q-dialog v-model="edit">
               <editUser
                 v-if="modal == 'info'"
@@ -187,17 +160,13 @@
   </div>
 </template>
 <script>
-import md5 from "md5";
 import { spotify_api } from "src/utils/spotify-api";
 import editUser from "src/modals/editUser";
 import editUserName from "src/modals/editUserName";
 import editPassword from "src/modals/editPassword";
 import Friends from "src/pages/user/Friends";
+import userView from "src/components/userView";
 import {
-  QAvatar,
-  QCard,
-  QItem,
-  QImg,
   QSeparator,
   QCarousel,
   QCarouselSlide,
@@ -208,7 +177,8 @@ import {
   QSplitter,
   QBtn,
   QMenu,
-  QDialog
+  QDialog,
+  QImg
 } from "quasar";
 
 const alerts = {
@@ -232,10 +202,6 @@ const alerts = {
 import { USER_DATA_QUERY } from "src/graphql/queries/userQueries";
 export default {
   components: {
-    QAvatar,
-    QCard,
-    QItem,
-    QImg,
     QSeparator,
     QCarousel,
     QCarouselSlide,
@@ -247,10 +213,12 @@ export default {
     QBtn,
     QMenu,
     QDialog,
+    QImg,
     editUser,
     editUserName,
     editPassword,
-    Friends
+    Friends,
+    userView
   },
   data() {
     return {
@@ -270,9 +238,6 @@ export default {
   },
   computed: {},
   methods: {
-    hash(string) {
-      return md5(string);
-    },
     userUpdated(user) {
       this.edit = false;
       this.user = user;
@@ -309,7 +274,6 @@ export default {
     const tracks = await spotify_api.get("/me/top/tracks");
     this.artistMatrix = this.splitArray(artists.data.items);
     this.trackMatrix = this.splitArray(tracks.data.items);
-    this.imageUrl = "https://www.gravatar.com/avatar/" + md5(this.user.email);
   }
 };
 </script>

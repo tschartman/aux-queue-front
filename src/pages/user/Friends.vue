@@ -34,8 +34,8 @@
             size="md"
             name="person_add"
           />
-          <q-icon v-if="scope.opt.status == 'pending'" size="md" name="loop" />
-          <q-icon v-if="scope.opt.status == 'accepted'" size="md" name="done" />
+          <q-icon v-if="scope.opt.status == 'pending'" size="sm" name="loop" />
+          <q-icon v-if="scope.opt.status == 'accepted'" size="sm" name="done" />
         </q-item>
       </template>
       <template v-slot:no-option>
@@ -47,15 +47,21 @@
       </template>
     </q-select>
     <div>
-      <h5>My Friends</h5>
+      <userView v-if="friend" :user="friend" />
+      <h5 v-else>Select Friend</h5>
+      <q-separator />
     </div>
   </div>
 </template>
 <script>
 import md5 from "md5";
-import { QSelect, QImg } from "quasar";
+import { QSelect, QImg, QSeparator } from "quasar";
 import { GET_USERS_QUERY } from "src/graphql/queries/userQueries";
-import { GET_FRIENDS_QUERY } from "src/graphql/queries/friendQueries";
+import {
+  GET_FRIENDS_QUERY,
+  GET_FRIEND_QUERY
+} from "src/graphql/queries/friendQueries";
+import userView from "src/components/userView";
 const statusList = ["pending", "accepted", "declined", "blocked"];
 export default {
   props: {
@@ -63,18 +69,38 @@ export default {
   },
   components: {
     QSelect,
-    QImg
+    QImg,
+    QSeparator,
+    userView
   },
   data() {
     return {
       friends: [],
       options: [],
-      filterOptions: []
+      filterOptions: [],
+      friend: null
     };
   },
   methods: {
     hash(string) {
       return md5(string);
+    },
+    async selectUser(user) {
+      this.friend = user;
+      if (user.status === "accepted") {
+        let data = { userName: user.userName };
+        const friendData = await this.$apollo.query({
+          query: GET_FRIEND_QUERY,
+          variables: data
+        });
+        if (friendData.data.friend) {
+          console.log("good request");
+        } else {
+          console.log("not friends");
+        }
+      } else {
+        console.log("no friend no query");
+      }
     },
     filterFn(val, update, abort) {
       if (val.length < 1 || val === "" || !val) {
