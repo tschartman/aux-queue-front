@@ -3,7 +3,7 @@
     <q-item>
       <q-item-section avatar>
         <q-avatar>
-          <img :src="'https://www.gravatar.com/avatar/' + hash(user.email)" />
+          <img :src="user.userImage || 'https://secure.gravatar.com/avatar'" />
         </q-avatar>
       </q-item-section>
       <q-item-section>
@@ -25,7 +25,6 @@
   </div>
 </template>
 <script>
-import md5 from "md5";
 import { QAvatar, QItem } from "quasar";
 export default {
   components: {
@@ -38,10 +37,6 @@ export default {
   data() {
     return {};
   },
-  methods: {
-    hash(string) {
-      return md5(string);
-    }
-  }
+  methods: {}
 };
 </script>

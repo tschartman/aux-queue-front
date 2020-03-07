@@ -82,7 +82,7 @@ export const GET_USERS_QUERY = gql`
     users {
       userName
       firstName
-      email
+      userImage
     }
   }
 `;

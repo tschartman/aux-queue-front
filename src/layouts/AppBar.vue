@@ -95,7 +95,7 @@
                 <q-icon name="person" />
               </q-item-section>
               <q-item-section>
-                <q-item-label>User Profile</q-item-label>
+                <q-item-label>Social</q-item-label>
               </q-item-section>
             </q-item>
             <q-separator />

@@ -64,7 +64,7 @@ import { validationMixin } from "vuelidate";
 import { required } from "vuelidate/lib/validators";
 import {
   TOKEN_AUTH_MUTATION,
-  SPOTIFY_AUTH_QUERY
+  SPOTIFY_REFRESH_MUTATION
 } from "src/graphql/queries/authQueries";
 import {
   QBtn,
@@ -128,15 +128,18 @@ export default {
           });
           if (loggedInUser.data) {
             await this.$store.dispatch("login", loggedInUser);
-            const userSpotify = await this.$apollo.query({
-              query: SPOTIFY_AUTH_QUERY
+            const refreshed = await this.$apollo.mutate({
+              mutation: SPOTIFY_REFRESH_MUTATION
             });
-            if (userSpotify.data) {
+            if (refreshed.data.refreshTokens.ok) {
               let data = {
-                access_token: userSpotify.data.user.accessToken,
-                refresh_token: userSpotify.data.user.refreshToken
+                access_token: refreshed.data.refreshTokens.user.accessToken,
+                refresh_token: refreshed.data.refreshTokens.user.refreshToken
               };
-              await this.$store.dispatch("linkSpotify", data);
+
+              this.$store.dispatch("linkSpotify", data);
+              const user = await this.$spotify.get("/me");
+              this.$store.dispatch("linkSpotifyUser", user.data);
             }
 
             this.$router.push("/");

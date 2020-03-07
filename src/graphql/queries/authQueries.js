@@ -26,3 +26,15 @@ export const SPOTIFY_AUTH_MUTATION = gql`
     }
   }
 `;
+
+export const SPOTIFY_REFRESH_MUTATION = gql`
+  mutation refreshTokens {
+    refreshTokens {
+      ok
+      user {
+        accessToken
+        refreshToken
+      }
+    }
+  }
+`;

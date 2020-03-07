@@ -6,9 +6,11 @@ export const GET_FRIENDS_QUERY = gql`
       status
       userOne {
         userName
+        firstName
       }
       userTwo {
         userName
+        firstName
       }
     }
   }

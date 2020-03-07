@@ -4,7 +4,7 @@
       rounded
       outlined
       v-model="friends"
-      label="Search Friends"
+      label="Search"
       use-input
       hide-selected
       fill-input
@@ -22,7 +22,7 @@
         >
           <q-item-section avatar>
             <q-img
-              :src="'https://www.gravatar.com/avatar/' + hash(scope.opt.email)"
+              :src="user.userImage || 'https://www.gravatar.com/avatar/'"
             />
           </q-item-section>
           <q-item-section>
@@ -48,13 +48,12 @@
     </q-select>
     <div>
       <userView v-if="friend" :user="friend" />
-      <h5 v-else>Select Friend</h5>
+      <h5 v-else>Place Holder</h5>
       <q-separator />
     </div>
   </div>
 </template>
 <script>
-import md5 from "md5";
 import { QSelect, QImg, QSeparator } from "quasar";
 import { GET_USERS_QUERY } from "src/graphql/queries/userQueries";
 import {
@@ -82,9 +81,6 @@ export default {
     };
   },
   methods: {
-    hash(string) {
-      return md5(string);
-    },
     async selectUser(user) {
       this.friend = user;
       if (user.status === "accepted") {

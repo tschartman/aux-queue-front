@@ -11,7 +11,7 @@ app_api.defaults.xsrfHeaderName = "X-CSRFToken";
 
 const Store = new Vuex.Store({
   state: {
-    status: "",
+    status: "pending",
     expires_in: null,
     token: null,
     refresh: null,
@@ -37,6 +37,9 @@ const Store = new Vuex.Store({
     })
   ],
   mutations: {
+    updateStatus(state, status) {
+      this.state = status;
+    },
     auth_request(state) {
       state.status = "loading";
     },
@@ -58,7 +61,7 @@ const Store = new Vuex.Store({
     set_user(state, user) {
       state.user = user;
     },
-    set_spotify(state, user) {
+    set_spotify_user(state, user) {
       state.sUser = user;
     },
     auth_error(state) {
@@ -76,12 +79,13 @@ const Store = new Vuex.Store({
       return true;
     },
     linkSpotify({ commit }, data) {
-      console.log(data);
       commit("link_spotify", {
         token: data.access_token,
         refresh: data.refresh_token
       });
-      return true;
+    },
+    linkSpotifyUser({ commit }, data) {
+      commit("set_spotify_user", data);
     },
     tempAuth({ commit }) {
       commit("auth_success", null, null, null);
