@@ -29,13 +29,6 @@
             <q-item-label v-html="scope.opt.userName" />
             <q-item-label caption>{{ scope.opt.firstName }}</q-item-label>
           </q-item-section>
-          <q-icon
-            v-if="scope.opt.status == 'none'"
-            size="md"
-            name="person_add"
-          />
-          <q-icon v-if="scope.opt.status == 'pending'" size="sm" name="loop" />
-          <q-icon v-if="scope.opt.status == 'accepted'" size="sm" name="done" />
         </q-item>
       </template>
       <template v-slot:no-option>
@@ -47,7 +40,19 @@
       </template>
     </q-select>
     <div>
-      <userView v-if="friend" :user="friend" />
+      <div class="row" v-if="friend">
+        <userView :user="friend" />
+        <div class="action q-pt-lg">
+          <q-icon
+            v-if="friend.status == 'none'"
+            size="lg"
+            name="person_add"
+            v-on:click="sendFollowRequest"
+          />
+          <q-icon v-if="friend.status == 'pending'" size="lg" name="loop" />
+          <q-icon v-if="friend.status == 'accepted'" size="lg" name="done" />
+        </div>
+      </div>
       <h5 v-else>Place Holder</h5>
       <q-separator />
     </div>
@@ -57,9 +62,9 @@
 import { QSelect, QImg, QSeparator } from "quasar";
 import { GET_USERS_QUERY } from "src/graphql/queries/userQueries";
 import {
-  GET_FRIENDS_QUERY,
-  GET_FRIEND_QUERY
-} from "src/graphql/queries/friendQueries";
+  GET_FOLLOWING_QUERY
+  //  SEND_FOLLOW_MUTATION
+} from "src/graphql/queries/followerQueries";
 import userView from "src/components/userView";
 const statusList = ["pending", "accepted", "declined", "blocked"];
 export default {
@@ -82,21 +87,28 @@ export default {
   },
   methods: {
     async selectUser(user) {
-      this.friend = user;
-      if (user.status === "accepted") {
-        let data = { userName: user.userName };
-        const friendData = await this.$apollo.query({
-          query: GET_FRIEND_QUERY,
-          variables: data
-        });
-        if (friendData.data.friend) {
-          console.log("good request");
-        } else {
-          console.log("not friends");
-        }
+      const followingData = await this.$apollo.query({
+        query: GET_FOLLOWING_QUERY
+      });
+      let found = followingData.data.following.find(
+        f => f.following.userName === user.userName
+      );
+      if (found) {
+        user.status = statusList[found.status];
       } else {
-        console.log("no friend no query");
+        user.status = "none";
       }
+      this.friend = user;
+    },
+    sendFollowRequest() {
+      // const follow = this.$apollo.mutate({
+      //   mutation: SEND_FOLLOW_MUTATION,
+      //   variables: {userName: this.friend.userName}
+      // })
+      console.log(this.friend.userName);
+      // if(follow.data..ok){
+      //   friend.status === 'pending'
+      // }
     },
     filterFn(val, update, abort) {
       if (val.length < 1 || val === "" || !val) {
@@ -114,25 +126,12 @@ export default {
   },
   async created() {
     let users = await this.$apollo.query({ query: GET_USERS_QUERY });
-    const friends = await this.$apollo.query({ query: GET_FRIENDS_QUERY });
-    this.options = users.data.users
-      .filter(user => {
-        if (user.userName == this.user.userName) {
-          return false;
-        }
-        return true;
-      })
-      .map(user => {
-        let foundUser = friends.data.friends.find(
-          friend => friend.userTwo.userName === user.userName
-        );
-        if (foundUser) {
-          user["status"] = statusList[foundUser.status];
-        } else {
-          user["status"] = "none";
-        }
-        return user;
-      });
+    this.options = users.data.users.filter(user => {
+      if (user.userName == this.user.userName) {
+        return false;
+      }
+      return true;
+    });
     this.filterOptions = this.options;
   }
 };

@@ -28,11 +28,13 @@
       />
       <hr />
       <playbackContainer
+        v-if="$store.getters.isLinked"
         ref="child"
         :auth="true"
         @remove="remove"
         @removeAll="removeAll"
       />
+      <notLinked v-else />
     </div>
   </div>
 </template>
@@ -40,6 +42,7 @@
 import shareQueue from "src/modals/shareQueue";
 import searchContainer from "components/searchContainer";
 import songList from "components/songList";
+import notLinked from "src/pages/auth/notLinked";
 import playbackContainer from "components/playbackContainer";
 import { QBtn, QItemSection, QItemLabel } from "quasar";
 
@@ -52,7 +55,8 @@ export default {
     shareQueue,
     searchContainer,
     songList,
-    playbackContainer
+    playbackContainer,
+    notLinked
   },
   data() {
     return {

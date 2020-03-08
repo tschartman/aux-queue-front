@@ -70,7 +70,8 @@
               />
             </q-dialog>
             <q-separator />
-            <spotifyCarousel />
+            <spotifyCarousel v-if="$store.getters.isLinked" />
+            <notLinked v-else />
           </q-tab-panel>
         </q-tab-panels>
       </template>
@@ -84,6 +85,7 @@ import editUserName from "src/modals/editUserName";
 import editPassword from "src/modals/editPassword";
 import Friends from "src/pages/user/Friends";
 import userView from "src/components/userView";
+import notLinked from "src/pages/auth/notLinked";
 import {
   QSeparator,
   QTabs,
@@ -131,7 +133,8 @@ export default {
     editPassword,
     Friends,
     spotifyCarousel,
-    userView
+    userView,
+    notLinked
   },
   data() {
     return {
