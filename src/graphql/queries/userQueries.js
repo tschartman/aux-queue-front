@@ -15,6 +15,7 @@ export const USER_CREATION_MUTATON = gql`
   mutation createUser(
     $firstName: String!
     $lastName: String!
+    $userName: String!
     $email: String!
     $password: String!
   ) {
@@ -22,6 +23,7 @@ export const USER_CREATION_MUTATON = gql`
       input: {
         firstName: $firstName
         lastName: $lastName
+        userName: $userName
         email: $email
         password: $password
       }

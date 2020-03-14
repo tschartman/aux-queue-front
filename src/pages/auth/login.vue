@@ -118,36 +118,37 @@ export default {
         let password = this.password;
         this.loading = true;
         await this.$store.commit("auth_request");
+        let loggedInUser = {};
         try {
-          const loggedInUser = await this.$apollo.mutate({
+          loggedInUser = await this.$apollo.mutate({
             mutation: TOKEN_AUTH_MUTATION,
             variables: {
               email: username,
               password: password
             }
           });
-          if (loggedInUser.data) {
-            await this.$store.dispatch("login", loggedInUser);
-            const refreshed = await this.$apollo.mutate({
-              mutation: SPOTIFY_REFRESH_MUTATION
-            });
-            if (refreshed.data.refreshTokens.ok) {
-              let data = {
-                access_token: refreshed.data.refreshTokens.user.accessToken,
-                refresh_token: refreshed.data.refreshTokens.user.refreshToken
-              };
-
-              this.$store.dispatch("linkSpotify", data);
-              const user = await this.$spotify.get("/me");
-              this.$store.dispatch("linkSpotifyUser", user.data);
-            }
-
-            this.$router.push("/");
-          }
+          await this.$store.dispatch("login", loggedInUser);
         } catch (err) {
           console.log(err);
           this.loading = false;
           this.authError = "Username or password incorrect";
+        }
+        if (loggedInUser.data) {
+          const refreshed = await this.$apollo.mutate({
+            mutation: SPOTIFY_REFRESH_MUTATION
+          });
+          if (refreshed.data.refreshTokens.user.refreshToken) {
+            let data = {
+              access_token: refreshed.data.refreshTokens.user.accessToken,
+              refresh_token: refreshed.data.refreshTokens.user.refreshToken
+            };
+            this.$store.dispatch("linkSpotify", data);
+            const user = await this.$spotify.get("/me");
+            this.$store.dispatch("linkSpotifyUser", user.data);
+            this.$router.push("/");
+          } else {
+            this.$router.push("/");
+          }
         }
       }
     }

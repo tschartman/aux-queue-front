@@ -43,6 +43,16 @@
             ></q-input>
             <q-input
               @keyup.enter="submit"
+              v-model="userName"
+              :error-message="userNameErrors[0]"
+              :error="userNameErrors.length > 0"
+              label="User Name"
+              required
+              @input="$v.userName.$touch()"
+              @blur="$v.userName.$touch()"
+            ></q-input>
+            <q-input
+              @keyup.enter="submit"
               v-model="email"
               :error-message="emailErrors[0]"
               :error="emailErrors.length > 0"
@@ -95,10 +105,19 @@
 </template>
 <script>
 import { validationMixin } from "vuelidate";
-import { required, sameAs, minLength, email } from "vuelidate/lib/validators";
+import {
+  required,
+  sameAs,
+  minLength,
+  email,
+  helpers
+} from "vuelidate/lib/validators";
 import { TOKEN_AUTH_MUTATION } from "src/graphql/queries/authQueries";
-import { USER_CREATION_MUTATON } from "src/graphql/queries/userQueries";
-
+import {
+  USER_CREATION_MUTATON,
+  CHECK_USER_MUTATION
+} from "src/graphql/queries/userQueries";
+const alpha = helpers.regex("alpha", /^(?=.*\d)(?=.*[a-zA-Z]).{8,25}$/);
 const alerts = [
   {
     color: "negative",
@@ -127,9 +146,11 @@ export default {
     firstName: { required },
     lastName: { required },
     email: { required, email },
+    userName: { required },
     password: {
       required,
-      minLength: minLength(8)
+      minLength: minLength(8),
+      alpha
     },
     repeatPassword: {
       sameAsPassword: sameAs("password")
@@ -154,11 +175,22 @@ export default {
       firstName: "",
       lastName: "",
       email: "",
+      userName: "",
+      unique: true,
       password: "",
       repeatPassword: "",
       checkbox: false,
       loading: false
     };
+  },
+  watch: {
+    userName: async function(val) {
+      const userNameStatus = await this.$apollo.mutate({
+        mutation: CHECK_USER_MUTATION,
+        variables: { userName: val }
+      });
+      this.unique = userNameStatus.data.checkUserName.ok;
+    }
   },
   computed: {
     checkboxErrors() {
@@ -186,11 +218,19 @@ export default {
       !this.$v.email.required && errors.push("E-mail is required");
       return errors;
     },
+    userNameErrors() {
+      const errors = [];
+      if (!this.$v.userName.$dirty) return errors;
+      !this.$v.userName.required && errors.push("First Name is required.");
+      !this.unique && errors.push("Username already taken");
+      return errors;
+    },
     passwordErrors() {
       const errors = [];
       if (!this.$v.password.$dirty) return errors;
       !this.$v.password.minLength && errors.push("Must be valid Password");
       !this.$v.password.required && errors.push("Password is required");
+      !this.$v.password.alpha && errors.push("Password must contain numbers");
       return errors;
     },
     repeatPasswordErrors() {
@@ -211,10 +251,11 @@ export default {
         let data = {
           firstName: this.firstName,
           lastName: this.lastName,
+          userName: this.userName,
           email: this.email.toLowerCase(),
           password: this.password
         };
-
+        console.log(data);
         const createdUser = await this.$apollo.mutate({
           mutation: USER_CREATION_MUTATON,
           variables: data

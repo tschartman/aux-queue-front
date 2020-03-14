@@ -44,13 +44,25 @@
         <userView :user="friend" />
         <div class="action q-pt-lg">
           <q-icon
-            v-if="friend.status == 'none'"
+            v-if="status === 'none'"
             size="lg"
             name="person_add"
             v-on:click="sendFollowRequest"
-          />
-          <q-icon v-if="friend.status == 'pending'" size="lg" name="loop" />
-          <q-icon v-if="friend.status == 'accepted'" size="lg" name="done" />
+          >
+            <q-tooltip>
+              Follow
+            </q-tooltip>
+          </q-icon>
+          <q-icon v-if="status === 'pending'" size="lg" name="loop">
+            <q-tooltip>
+              Pending
+            </q-tooltip>
+          </q-icon>
+          <q-icon v-if="status === 'accepted'" size="lg" name="done">
+            <q-tooltip>
+              Following
+            </q-tooltip>
+          </q-icon>
         </div>
       </div>
       <h5 v-else>Place Holder</h5>
@@ -59,11 +71,11 @@
   </div>
 </template>
 <script>
-import { QSelect, QImg, QSeparator } from "quasar";
+import { QSelect, QImg, QSeparator, QTooltip } from "quasar";
 import { GET_USERS_QUERY } from "src/graphql/queries/userQueries";
 import {
-  GET_FOLLOWING_QUERY
-  //  SEND_FOLLOW_MUTATION
+  GET_FOLLOWING_QUERY,
+  SEND_FOLLOW_MUTATION
 } from "src/graphql/queries/followerQueries";
 import userView from "src/components/userView";
 const statusList = ["pending", "accepted", "declined", "blocked"];
@@ -75,6 +87,7 @@ export default {
     QSelect,
     QImg,
     QSeparator,
+    QTooltip,
     userView
   },
   data() {
@@ -82,7 +95,8 @@ export default {
       friends: [],
       options: [],
       filterOptions: [],
-      friend: null
+      friend: {},
+      status: ""
     };
   },
   methods: {
@@ -94,21 +108,20 @@ export default {
         f => f.following.userName === user.userName
       );
       if (found) {
-        user.status = statusList[found.status];
+        this.status = statusList[found.status];
       } else {
-        user.status = "none";
+        this.status = "none";
       }
       this.friend = user;
     },
-    sendFollowRequest() {
-      // const follow = this.$apollo.mutate({
-      //   mutation: SEND_FOLLOW_MUTATION,
-      //   variables: {userName: this.friend.userName}
-      // })
-      console.log(this.friend.userName);
-      // if(follow.data..ok){
-      //   friend.status === 'pending'
-      // }
+    async sendFollowRequest() {
+      const follow = await this.$apollo.mutate({
+        mutation: SEND_FOLLOW_MUTATION,
+        variables: { userName: this.friend.userName }
+      });
+      if (follow.data.sendFollowRequest.ok) {
+        this.status = "pending";
+      }
     },
     filterFn(val, update, abort) {
       if (val.length < 1 || val === "" || !val) {
@@ -116,7 +129,6 @@ export default {
         return;
       }
       update(() => {
-        console.log(val);
         const needle = val.toLowerCase();
         this.filterOptions = this.options.filter(
           v => v.userName.toLowerCase().indexOf(needle) > -1

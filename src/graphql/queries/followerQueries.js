@@ -30,7 +30,7 @@ export const GET_FOLLOWING_QUERY = gql`
   }
 `;
 
-export const SEND_FOLLOW_MUTAION = gql`
+export const SEND_FOLLOW_MUTATION = gql`
   mutation sendFollowRequest($userName: String!) {
     sendFollowRequest(input: { userName: $userName }) {
       ok
