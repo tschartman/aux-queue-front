@@ -5,6 +5,7 @@
         <q-tabs v-model="tab" vertical class="text-teal">
           <q-tab name="social" icon="home" label="Social" />
           <q-tab name="profile" icon="person" label="Profile" />
+          <q-tab name="following" icon="person" label="Following" />
         </q-tabs>
       </template>
       <template v-slot:after>
@@ -73,6 +74,9 @@
             <spotifyCarousel v-if="$store.getters.isLinked" />
             <notLinked v-else />
           </q-tab-panel>
+          <q-tab-panel name="following">
+            <Following />
+          </q-tab-panel>
         </q-tab-panels>
       </template>
     </q-splitter>
@@ -86,6 +90,7 @@ import editPassword from "src/modals/editPassword";
 import Friends from "src/pages/user/Friends";
 import userView from "src/components/userView";
 import notLinked from "src/pages/auth/notLinked";
+import Following from "src/pages/user/Following";
 import {
   QSeparator,
   QTabs,
@@ -134,7 +139,8 @@ export default {
     Friends,
     spotifyCarousel,
     userView,
-    notLinked
+    notLinked,
+    Following
   },
   data() {
     return {

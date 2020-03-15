@@ -95,7 +95,7 @@ export default {
       friends: [],
       options: [],
       filterOptions: [],
-      friend: {},
+      friend: null,
       status: ""
     };
   },
