@@ -16,7 +16,7 @@
         <followingList :following="following" />
       </q-tab-panel>
       <q-tab-panel name="followers">
-        <followerList :followers="followers" />
+        <followerList :followers="followers" @updateFollow="updateFollow" />
       </q-tab-panel>
     </q-tab-panels>
   </div>
@@ -25,6 +25,7 @@
 import {
   GET_FOLLOWERS_QUERY,
   GET_FOLLOWING_QUERY
+  //UPDATE_FOLLOW_MUTATION
 } from "src/graphql/queries/followerQueries";
 import { QTabs, QTab, QTabPanel, QTabPanels, QSeparator } from "quasar";
 import followerList from "src/components/followerList";
@@ -48,7 +49,11 @@ export default {
     };
   },
   computed: {},
-  methods: {},
+  methods: {
+    updateFollow(status) {
+      console.log(status);
+    }
+  },
 
   async created() {
     const following = await this.$apollo.query({

@@ -1,6 +1,53 @@
 <template>
   <div>
-    <q-item v-for="user in followers" :key="user.userName" clickable>
+    <q-expansion-item
+      expand-separator
+      icon="perm_identity"
+      label="Requested"
+      :caption="String(requested.length)"
+      default-opened
+    >
+      <q-item v-for="user in requested" :key="user.userName" clickable>
+        <q-item-section avatar>
+          <q-avatar>
+            <q-img
+              :src="user.userImage || 'https://www.gravatar.com/avatar/'"
+            />
+          </q-avatar>
+        </q-item-section>
+        <q-item-section>
+          <q-item-label v-html="user.userName" />
+          <q-item-label caption>{{ user.firstName }}</q-item-label>
+        </q-item-section>
+        <q-item-section avatar>
+          <div class="row">
+            <div class="q-mx-md">
+              <q-icon
+                size="md"
+                name="clear"
+                @click="$emit('updateFollow', 'decline')"
+              >
+                <q-tooltip>
+                  Decline
+                </q-tooltip>
+              </q-icon>
+            </div>
+            <div class="q-mx-md">
+              <q-icon
+                size="md"
+                name="done"
+                @click="$emit('updateFollow', 'accepted')"
+              >
+                <q-tooltip>
+                  Accept
+                </q-tooltip>
+              </q-icon>
+            </div>
+          </div>
+        </q-item-section>
+      </q-item>
+    </q-expansion-item>
+    <q-item v-for="user in following" :key="user.userName" clickable>
       <q-item-section avatar>
         <q-avatar>
           <q-img :src="user.userImage || 'https://www.gravatar.com/avatar/'" />
@@ -8,40 +55,45 @@
       </q-item-section>
       <q-item-section>
         <q-item-label v-html="user.userName" />
-        <q-item-label caption>{{ user.firstName }}</q-item-label>
-      </q-item-section>
-      <q-item-section avatar>
-        <div class="row" v-if="user.status === 'pending'">
-          <div class="q-mx-md">
-            <q-icon size="lg" name="clear">
-              <q-tooltip>
-                Decline
-              </q-tooltip>
-            </q-icon>
-          </div>
-          <div class="q-mx-md">
-            <q-icon size="lg" name="done">
-              <q-tooltip>
-                Accept
-              </q-tooltip>
-            </q-icon>
-          </div>
-        </div>
+        <q-item-label caption
+          >{{ user.firstName }} {{ user.lastName }}</q-item-label
+        >
       </q-item-section>
     </q-item>
   </div>
 </template>
 <script>
-import { QImg, QAvatar, QTooltip } from "quasar";
+import { QImg, QAvatar, QTooltip, QExpansionItem } from "quasar";
 
 export default {
   components: {
     QImg,
     QAvatar,
-    QTooltip
+    QTooltip,
+    QExpansionItem
   },
   props: {
-    followers: Array
+    followers: Array,
+    method: { type: Function }
+  },
+  data() {
+    return {
+      requested: [],
+      accepted: []
+    };
+  },
+  created() {
+    let accepted = [];
+    let requested = [];
+    this.followers.forEach(user => {
+      if (user.status === "pending") {
+        requested.push(user);
+      } else if (user.status === "accepted") {
+        accepted.push(user);
+      }
+    });
+    this.accepted = accepted;
+    this.requested = requested;
   }
 };
 </script>

@@ -14,12 +14,12 @@
       </q-item-section>
       <q-item-section avatar>
         <div>
-          <q-icon v-if="user.status === 'pending'" size="lg" name="loop">
+          <q-icon v-if="user.status === 'pending'" size="md" name="loop">
             <q-tooltip>
               Pending
             </q-tooltip>
           </q-icon>
-          <q-icon v-if="user.status === 'accepted'" size="lg" name="done">
+          <q-icon v-if="user.status === 'accepted'" size="md" name="done">
             <q-tooltip>
               Following
             </q-tooltip>

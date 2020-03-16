@@ -37,3 +37,11 @@ export const SEND_FOLLOW_MUTATION = gql`
     }
   }
 `;
+
+export const UPDATE_FOLLOW_MUTATION = gql`
+  mutation UpdateFollowRequest($userName: String!, $status: String!) {
+    updateFollowRequest(input: { userName: $userName, status: $status }) {
+      ok
+    }
+  }
+`;
