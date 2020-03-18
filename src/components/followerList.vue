@@ -25,7 +25,7 @@
               <q-icon
                 size="md"
                 name="clear"
-                @click="$emit('updateFollow', 'decline')"
+                @click="$emit('updateFollow', 'declined', user.userName)"
               >
                 <q-tooltip>
                   Decline
@@ -36,7 +36,7 @@
               <q-icon
                 size="md"
                 name="done"
-                @click="$emit('updateFollow', 'accepted')"
+                @click="$emit('updateFollow', 'accepted', user.userName)"
               >
                 <q-tooltip>
                   Accept
@@ -47,7 +47,7 @@
         </q-item-section>
       </q-item>
     </q-expansion-item>
-    <q-item v-for="user in following" :key="user.userName" clickable>
+    <q-item v-for="user in accepted" :key="user.userName" clickable>
       <q-item-section avatar>
         <q-avatar>
           <q-img :src="user.userImage || 'https://www.gravatar.com/avatar/'" />
@@ -82,18 +82,28 @@ export default {
       accepted: []
     };
   },
+  watch: {
+    followers: function(updatedFollowers) {
+      this.categorizeFollowers(updatedFollowers);
+    }
+  },
+  methods: {
+    categorizeFollowers(followers) {
+      let accepted = [];
+      let requested = [];
+      followers.forEach(user => {
+        if (user.status === "pending") {
+          requested.push(user);
+        } else if (user.status === "accepted") {
+          accepted.push(user);
+        }
+      });
+      this.accepted = accepted;
+      this.requested = requested;
+    }
+  },
   created() {
-    let accepted = [];
-    let requested = [];
-    this.followers.forEach(user => {
-      if (user.status === "pending") {
-        requested.push(user);
-      } else if (user.status === "accepted") {
-        accepted.push(user);
-      }
-    });
-    this.accepted = accepted;
-    this.requested = requested;
+    this.categorizeFollowers(this.followers);
   }
 };
 </script>

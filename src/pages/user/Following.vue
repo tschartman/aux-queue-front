@@ -24,8 +24,8 @@
 <script>
 import {
   GET_FOLLOWERS_QUERY,
-  GET_FOLLOWING_QUERY
-  //UPDATE_FOLLOW_MUTATION
+  GET_FOLLOWING_QUERY,
+  UPDATE_FOLLOW_MUTATION
 } from "src/graphql/queries/followerQueries";
 import { QTabs, QTab, QTabPanel, QTabPanels, QSeparator } from "quasar";
 import followerList from "src/components/followerList";
@@ -50,8 +50,26 @@ export default {
   },
   computed: {},
   methods: {
-    updateFollow(status) {
-      console.log(status);
+    async updateFollow(status, userName) {
+      const updatedFollow = await this.$apollo.mutate({
+        mutation: UPDATE_FOLLOW_MUTATION,
+        variables: {
+          userName: userName,
+          status: status
+        }
+      });
+      if (updatedFollow.data.updateFollowRequest.ok) {
+        let updatedFollowers = this.followers.slice(0);
+        const followerIndex = updatedFollowers.findIndex(user => {
+          return user.userName === userName;
+        });
+        if (status === "declined") {
+          updatedFollowers.splice(followerIndex, 1);
+        } else {
+          updatedFollowers[followerIndex].status = status;
+        }
+        this.followers = updatedFollowers;
+      }
     }
   },
 
@@ -62,16 +80,26 @@ export default {
     const followers = await this.$apollo.query({
       query: GET_FOLLOWERS_QUERY
     });
-    this.following = following.data.following.map(user => {
-      let tempUser = user.following;
-      tempUser["status"] = statusList[user.status];
-      return tempUser;
-    });
-    this.followers = followers.data.followers.map(user => {
-      let tempUser = user.follower;
-      tempUser["status"] = statusList[user.status];
-      return tempUser;
-    });
+
+    this.following = following.data.following
+      .filter(user => {
+        return user.status !== 2;
+      })
+      .map(user => {
+        let tempUser = user.following;
+        tempUser["status"] = statusList[user.status];
+        return tempUser;
+      });
+
+    this.followers = followers.data.followers
+      .filter(user => {
+        return user.status !== 2;
+      })
+      .map(user => {
+        let tempUser = user.follower;
+        tempUser["status"] = statusList[user.status];
+        return tempUser;
+      });
   }
 };
 </script>
