@@ -9,8 +9,8 @@ Vue.use(Vuex);
 app_api.defaults.xsrfCookieName = "csrftoken";
 app_api.defaults.xsrfHeaderName = "X-CSRFToken";
 
-const Store = new Vuex.Store({
-  state: {
+const getDefaultState = () => {
+  return {
     status: "pending",
     expires_in: null,
     token: null,
@@ -21,7 +21,11 @@ const Store = new Vuex.Store({
     spotify_refresh: null,
     user: {},
     sUser: {}
-  },
+  };
+};
+
+const Store = new Vuex.Store({
+  state: getDefaultState(),
   plugins: [
     createPersistedState({
       storage: {
@@ -48,11 +52,6 @@ const Store = new Vuex.Store({
       state.spotify_refresh = tokens.refresh;
       state.sauth = true;
     },
-    clear_spotify(state) {
-      state.spotify_token = null;
-      state.spotify_refresh = null;
-      state.sauth = false;
-    },
     auth_success(state, token) {
       state.status = "success";
       state.auth = true;
@@ -68,9 +67,7 @@ const Store = new Vuex.Store({
       state.status = "error";
     },
     logout(state) {
-      state.status = "";
-      state.token = "";
-      state.auth = false;
+      Object.assign(state, getDefaultState());
     }
   },
   actions: {
@@ -116,7 +113,6 @@ const Store = new Vuex.Store({
     logout({ commit }) {
       return new Promise(resolve => {
         commit("logout");
-        commit("clear_spotify");
         resolve();
       });
     }

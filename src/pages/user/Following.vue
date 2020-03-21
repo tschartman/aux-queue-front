@@ -25,7 +25,8 @@
 import {
   GET_FOLLOWERS_QUERY,
   GET_FOLLOWING_QUERY,
-  UPDATE_FOLLOW_MUTATION
+  UPDATE_FOLLOW_MUTATION,
+  REMOVE_FOLLOWER_MUTATION
 } from "src/graphql/queries/followerQueries";
 import { QTabs, QTab, QTabPanel, QTabPanels, QSeparator } from "quasar";
 import followerList from "src/components/followerList";
@@ -51,24 +52,33 @@ export default {
   computed: {},
   methods: {
     async updateFollow(status, userName) {
-      const updatedFollow = await this.$apollo.mutate({
-        mutation: UPDATE_FOLLOW_MUTATION,
-        variables: {
-          userName: userName,
-          status: status
-        }
+      let updatedFollowers = this.followers.slice(0);
+      const followerIndex = updatedFollowers.findIndex(user => {
+        return user.userName === userName;
       });
-      if (updatedFollow.data.updateFollowRequest.ok) {
-        let updatedFollowers = this.followers.slice(0);
-        const followerIndex = updatedFollowers.findIndex(user => {
-          return user.userName === userName;
+      if (status === "declined") {
+        const removeFollow = await this.$apollo.mutate({
+          mutation: REMOVE_FOLLOWER_MUTATION,
+          variables: {
+            userName: userName
+          }
         });
-        if (status === "declined") {
+        if (removeFollow.data.removeFollowerRequest.ok) {
           updatedFollowers.splice(followerIndex, 1);
-        } else {
-          updatedFollowers[followerIndex].status = status;
+          this.followers = updatedFollowers;
         }
-        this.followers = updatedFollowers;
+      } else {
+        const updatedFollow = await this.$apollo.mutate({
+          mutation: UPDATE_FOLLOW_MUTATION,
+          variables: {
+            userName: userName,
+            status: status
+          }
+        });
+        if (updatedFollow.data.updateFollowRequest.ok) {
+          updatedFollowers[followerIndex].status = status;
+          this.followers = updatedFollowers;
+        }
       }
     }
   },
@@ -83,7 +93,7 @@ export default {
 
     this.following = following.data.following
       .filter(user => {
-        return user.status !== 2;
+        return user.status !== 3;
       })
       .map(user => {
         let tempUser = user.following;
@@ -93,7 +103,7 @@ export default {
 
     this.followers = followers.data.followers
       .filter(user => {
-        return user.status !== 2;
+        return user.status !== 3;
       })
       .map(user => {
         let tempUser = user.follower;

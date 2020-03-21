@@ -45,3 +45,19 @@ export const UPDATE_FOLLOW_MUTATION = gql`
     }
   }
 `;
+
+export const REMOVE_FOLLOW_MUTATION = gql`
+  mutation RemoveFollowRequest($userName: String!) {
+    removeFollowRequest(input: { userName: $userName }) {
+      ok
+    }
+  }
+`;
+
+export const REMOVE_FOLLOWER_MUTATION = gql`
+  mutation RemoveFollowerRequest($userName: String!) {
+    removeFollowerRequest(input: { userName: $userName }) {
+      ok
+    }
+  }
+`;
