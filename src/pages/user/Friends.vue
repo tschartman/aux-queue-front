@@ -44,12 +44,22 @@
         <userView :user="friend" />
         <div class="row justify-center" q-ma-md>
           <div v-if="friend.followingStatus === 'none'">
-            <q-btn flat color="primary" label="Follow" />
+            <q-btn
+              flat
+              color="primary"
+              label="Follow"
+              @click="sendFollowRequest"
+            />
           </div>
           <div v-if="friend.followingStatus === 'pending'">
             <q-btn flat color="primary" label="Requested">
               <q-menu>
-                <q-item style="width: 110px" clickable v-close-popup>
+                <q-item
+                  style="width: 110px"
+                  @click="unFollow"
+                  clickable
+                  v-close-popup
+                >
                   <q-item-section>Cancel</q-item-section>
                 </q-item>
               </q-menu>
@@ -58,7 +68,12 @@
           <div v-if="friend.followingStatus === 'accepted'">
             <q-btn flat color="primary" label="Following">
               <q-menu>
-                <q-item style="width: 110px" clickable v-close-popup>
+                <q-item
+                  style="width: 110px"
+                  @click="unFollow"
+                  clickable
+                  v-close-popup
+                >
                   <q-item-section>Unfollow</q-item-section>
                 </q-item>
               </q-menu>
@@ -67,8 +82,27 @@
           <div v-if="friend.followerStatus === 'accepted'">
             <q-btn flat color="primary" label="Follows You">
               <q-menu>
-                <q-item style="width: 110px" clickable v-close-popup>
+                <q-item
+                  style="width: 110px"
+                  @click="block"
+                  clickable
+                  v-close-popup
+                >
                   <q-item-section>Block</q-item-section>
+                </q-item>
+              </q-menu>
+            </q-btn>
+          </div>
+          <div v-if="friend.followerStatus === 'blocked'">
+            <q-btn flat color="primary" label="Blocked">
+              <q-menu>
+                <q-item
+                  style="width: 110px"
+                  @click="unBlock"
+                  clickable
+                  v-close-popup
+                >
+                  <q-item-section>Unblock</q-item-section>
                 </q-item>
               </q-menu>
             </q-btn>
@@ -86,7 +120,10 @@ import { GET_USERS_QUERY } from "src/graphql/queries/userQueries";
 import {
   GET_FOLLOWING_QUERY,
   GET_FOLLOWERS_QUERY,
-  SEND_FOLLOW_MUTATION
+  SEND_FOLLOW_MUTATION,
+  UPDATE_FOLLOWER_MUTATION,
+  REMOVE_FOLLOW_MUTATION,
+  REMOVE_FOLLOWER_MUTATION
 } from "src/graphql/queries/followerQueries";
 import userView from "src/components/userView";
 const statusList = ["pending", "accepted", "declined", "blocked"];
@@ -107,8 +144,7 @@ export default {
       friends: [],
       options: [],
       filterOptions: [],
-      friend: null,
-      status: ""
+      friend: null
     };
   },
   watch: {
@@ -116,12 +152,18 @@ export default {
       immediate: true,
       deep: true,
       async handler(selectedFriend) {
-        this.friend = selectedFriend.friend;
-        const followerStatus = await this.findFollowerStatus(
-          selectedFriend.friend.userName
-        );
-        this.$set(this.friend, "followingStatus", selectedFriend.friend.status);
-        this.$set(this.friend, "followerStatus", followerStatus);
+        if (selectedFriend.friend) {
+          this.friend = selectedFriend.friend;
+          const followerStatus = await this.findFollowerStatus(
+            selectedFriend.friend.userName
+          );
+          this.$set(
+            this.friend,
+            "followingStatus",
+            selectedFriend.friend.status
+          );
+          this.$set(this.friend, "followerStatus", followerStatus);
+        }
       }
     }
   },
@@ -133,7 +175,6 @@ export default {
       this.$set(this.friend, "followingStatus", followingStatus);
       this.$set(this.friend, "followerStatus", followerStatus);
     },
-
     async findFollowingStatus(userName) {
       const followingData = await this.$apollo.query({
         query: GET_FOLLOWING_QUERY
@@ -164,7 +205,41 @@ export default {
         variables: { userName: this.friend.userName }
       });
       if (follow.data.sendFollowRequest.ok) {
-        this.$set(this.friend, "status", "pending");
+        this.$set(this.friend, "followingStatus", "pending");
+      }
+    },
+    async unFollow() {
+      const removeFollow = await this.$apollo.mutate({
+        mutation: REMOVE_FOLLOW_MUTATION,
+        variables: {
+          userName: this.friend.userName
+        }
+      });
+      if (removeFollow.data.removeFollowRequest.ok) {
+        this.$set(this.friend, "followingStatus", "none");
+      }
+    },
+    async block() {
+      const updatedFollower = await this.$apollo.mutate({
+        mutation: UPDATE_FOLLOWER_MUTATION,
+        variables: {
+          userName: this.friend.userName,
+          status: "blocked"
+        }
+      });
+      if (updatedFollower.data.updateFollowerRequest.ok) {
+        this.$set(this.friend, "followerStatus", "blocked");
+      }
+    },
+    async unBlock() {
+      const removeFollower = await this.$apollo.mutate({
+        mutation: REMOVE_FOLLOWER_MUTATION,
+        variables: {
+          userName: this.friend.userName
+        }
+      });
+      if (removeFollower.data.removeFollowerRequest.ok) {
+        this.$set(this.friend, "followerStatus", "none");
       }
     },
     filterFn(val, update, abort) {

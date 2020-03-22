@@ -29,7 +29,7 @@
 import {
   GET_FOLLOWERS_QUERY,
   GET_FOLLOWING_QUERY,
-  UPDATE_FOLLOW_MUTATION,
+  UPDATE_FOLLOWER_MUTATION,
   REMOVE_FOLLOWER_MUTATION
 } from "src/graphql/queries/followerQueries";
 import { QTabs, QTab, QTabPanel, QTabPanels, QSeparator } from "quasar";
@@ -76,14 +76,14 @@ export default {
           this.followers = updatedFollowers;
         }
       } else {
-        const updatedFollow = await this.$apollo.mutate({
-          mutation: UPDATE_FOLLOW_MUTATION,
+        const updatedFollower = await this.$apollo.mutate({
+          mutation: UPDATE_FOLLOWER_MUTATION,
           variables: {
             userName: userName,
             status: status
           }
         });
-        if (updatedFollow.data.updateFollowRequest.ok) {
+        if (updatedFollower.data.updateFollowerRequest.ok) {
           updatedFollowers[followerIndex].status = status;
           this.followers = updatedFollowers;
         }
