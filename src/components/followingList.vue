@@ -1,6 +1,11 @@
 <template>
   <div>
-    <q-item v-for="user in following" :key="user.userName" clickable>
+    <q-item
+      v-for="user in following"
+      :key="user.userName"
+      @click="$emit('selectUser', user)"
+      clickable
+    >
       <q-item-section avatar>
         <q-avatar>
           <q-img :src="user.userImage || 'https://www.gravatar.com/avatar/'" />
@@ -12,34 +17,21 @@
           >{{ user.firstName }} {{ user.lastName }}</q-item-label
         >
       </q-item-section>
-      <q-item-section avatar>
-        <div>
-          <q-icon v-if="user.status === 'pending'" size="md" name="loop">
-            <q-tooltip>
-              Pending
-            </q-tooltip>
-          </q-icon>
-          <q-icon v-if="user.status === 'accepted'" size="md" name="done">
-            <q-tooltip>
-              Following
-            </q-tooltip>
-          </q-icon>
-        </div>
-      </q-item-section>
+      <q-item-section avatar> </q-item-section>
     </q-item>
   </div>
 </template>
 <script>
-import { QImg, QAvatar, QTooltip } from "quasar";
+import { QImg, QAvatar } from "quasar";
 
 export default {
   components: {
     QImg,
-    QAvatar,
-    QTooltip
+    QAvatar
   },
   props: {
-    following: Array
+    following: Array,
+    method: { type: Function }
   }
 };
 </script>

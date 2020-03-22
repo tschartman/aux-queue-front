@@ -7,7 +7,12 @@
       :caption="String(requested.length)"
       default-opened
     >
-      <q-item v-for="user in requested" :key="user.userName" clickable>
+      <q-item
+        v-for="user in requested"
+        :key="user.userName"
+        @click="$emit('selectUser', user)"
+        clickable
+      >
         <q-item-section avatar>
           <q-avatar>
             <q-img
@@ -47,7 +52,12 @@
         </q-item-section>
       </q-item>
     </q-expansion-item>
-    <q-item v-for="user in accepted" :key="user.userName" clickable>
+    <q-item
+      v-for="user in accepted"
+      :key="user.userName"
+      @click="$emit('selectUser', user)"
+      clickable
+    >
       <q-item-section avatar>
         <q-avatar>
           <q-img :src="user.userImage || 'https://www.gravatar.com/avatar/'" />

@@ -3,9 +3,9 @@
     <q-splitter v-model="splitterModel">
       <template v-slot:before>
         <q-tabs v-model="tab" vertical class="text-teal">
-          <q-tab name="social" icon="home" label="Social" />
+          <q-tab name="social" icon="public" label="Social" />
+          <q-tab name="following" icon="plus_one" label="Following" />
           <q-tab name="profile" icon="person" label="Profile" />
-          <q-tab name="following" icon="person" label="Following" />
         </q-tabs>
       </template>
       <template v-slot:after>
@@ -18,7 +18,10 @@
           transition-next="jump-up"
         >
           <q-tab-panel name="social">
-            <Friends :user="user" />
+            <Friends :user="user" :selectedFriend="selectedFriend" />
+          </q-tab-panel>
+          <q-tab-panel name="following">
+            <Following @selectUser="selectUser" />
           </q-tab-panel>
           <q-tab-panel name="profile">
             <q-btn class="icon" color="grey-7" round flat icon="more_vert">
@@ -73,9 +76,6 @@
             <q-separator />
             <spotifyCarousel v-if="$store.getters.isLinked" />
             <notLinked v-else />
-          </q-tab-panel>
-          <q-tab-panel name="following">
-            <Following />
           </q-tab-panel>
         </q-tab-panels>
       </template>
@@ -147,6 +147,7 @@ export default {
       modal: "",
       slide: 1,
       user: {},
+      selectedFriend: {},
       friends: [],
       imageUrl: "",
       friend: null,
@@ -158,6 +159,10 @@ export default {
   },
   computed: {},
   methods: {
+    selectUser(user) {
+      this.tab = "social";
+      this.$set(this.selectedFriend, "friend", user);
+    },
     userUpdated(user) {
       this.edit = false;
       this.user = user;

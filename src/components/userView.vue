@@ -1,5 +1,5 @@
 <template>
-  <div class="row justify-center q-pa-md">
+  <div class="row justify-center">
     <q-item>
       <q-item-section avatar>
         <q-avatar>

@@ -13,10 +13,14 @@
       transition-next="jump-up"
     >
       <q-tab-panel name="following">
-        <followingList :following="following" />
+        <followingList :following="following" @selectUser="selectUser" />
       </q-tab-panel>
       <q-tab-panel name="followers">
-        <followerList :followers="followers" @updateFollow="updateFollow" />
+        <followerList
+          :followers="followers"
+          @selectUser="selectUser"
+          @updateFollow="updateFollow"
+        />
       </q-tab-panel>
     </q-tab-panels>
   </div>
@@ -33,6 +37,7 @@ import followerList from "src/components/followerList";
 import followingList from "src/components/followingList";
 const statusList = ["pending", "accepted", "declined", "blocked"];
 export default {
+  props: { method: { type: Function } },
   components: {
     QTabs,
     QTab,
@@ -51,6 +56,9 @@ export default {
   },
   computed: {},
   methods: {
+    selectUser(user) {
+      this.$emit("selectUser", user);
+    },
     async updateFollow(status, userName) {
       let updatedFollowers = this.followers.slice(0);
       const followerIndex = updatedFollowers.findIndex(user => {
@@ -93,7 +101,7 @@ export default {
 
     this.following = following.data.following
       .filter(user => {
-        return user.status !== 3;
+        return user.status === 1;
       })
       .map(user => {
         let tempUser = user.following;
