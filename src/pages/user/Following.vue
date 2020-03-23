@@ -37,7 +37,9 @@ import followerList from "src/components/followerList";
 import followingList from "src/components/followingList";
 const statusList = ["pending", "accepted", "declined", "blocked"];
 export default {
-  props: { method: { type: Function } },
+  props: {
+    method: { type: Function }
+  },
   components: {
     QTabs,
     QTab,
@@ -54,7 +56,6 @@ export default {
       followers: []
     };
   },
-  computed: {},
   methods: {
     selectUser(user) {
       this.$emit("selectUser", user);
@@ -65,13 +66,13 @@ export default {
         return user.userName === userName;
       });
       if (status === "declined") {
-        const removeFollow = await this.$apollo.mutate({
+        const removeFollower = await this.$apollo.mutate({
           mutation: REMOVE_FOLLOWER_MUTATION,
           variables: {
             userName: userName
           }
         });
-        if (removeFollow.data.removeFollowerRequest.ok) {
+        if (removeFollower.data.removeFollowerRequest.ok) {
           updatedFollowers.splice(followerIndex, 1);
           this.followers = updatedFollowers;
         }
@@ -98,7 +99,6 @@ export default {
     const followers = await this.$apollo.query({
       query: GET_FOLLOWERS_QUERY
     });
-
     this.following = following.data.following
       .filter(user => {
         return user.status === 1;

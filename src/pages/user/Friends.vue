@@ -93,6 +93,30 @@
               </q-menu>
             </q-btn>
           </div>
+          <div v-if="friend.followerStatus === 'pending'">
+            <q-btn flat color="primary" label="Requesting">
+              <q-menu>
+                <q-list>
+                  <q-item
+                    style="width: 110px"
+                    @click="acceptFollower"
+                    clickable
+                    v-close-popup
+                  >
+                    <q-item-section>Accept</q-item-section>
+                  </q-item>
+                  <q-item
+                    style="width: 110px"
+                    @click="declineFollower"
+                    clickable
+                    v-close-popup
+                  >
+                    <q-item-section>Decline</q-item-section>
+                  </q-item>
+                </q-list>
+              </q-menu>
+            </q-btn>
+          </div>
           <div v-if="friend.followerStatus === 'blocked'">
             <q-btn flat color="primary" label="Blocked">
               <q-menu>
@@ -120,6 +144,8 @@ import { GET_USERS_QUERY } from "src/graphql/queries/userQueries";
 import {
   GET_FOLLOWING_QUERY,
   GET_FOLLOWERS_QUERY,
+  SET_FOLLOWING_QUERY,
+  SET_FOLLOWERS_QUERY,
   SEND_FOLLOW_MUTATION,
   UPDATE_FOLLOWER_MUTATION,
   REMOVE_FOLLOW_MUTATION,
@@ -153,16 +179,7 @@ export default {
       deep: true,
       async handler(selectedFriend) {
         if (selectedFriend.friend) {
-          this.friend = selectedFriend.friend;
-          const followerStatus = await this.findFollowerStatus(
-            selectedFriend.friend.userName
-          );
-          this.$set(
-            this.friend,
-            "followingStatus",
-            selectedFriend.friend.status
-          );
-          this.$set(this.friend, "followerStatus", followerStatus);
+          this.selectUser(selectedFriend.friend);
         }
       }
     }
@@ -199,12 +216,47 @@ export default {
       }
       return "none";
     },
+    updateFollowerCache(status) {
+      const followersData = this.$apollo
+        .getClient()
+        .readQuery({ query: GET_FOLLOWERS_QUERY });
+      let followers = followersData.followers.map(user => {
+        if (user.follower.userName === this.friend.userName) {
+          return { status: statusList.indexOf(status) };
+        }
+        return { status: user.status };
+      });
+      this.$apollo.getClient().writeQuery({
+        query: SET_FOLLOWERS_QUERY,
+        data: {
+          followers: followers
+        }
+      });
+    },
+    updateFollowingCache(status) {
+      const followingData = this.$apollo
+        .getClient()
+        .readQuery({ query: GET_FOLLOWING_QUERY });
+      let following = followingData.following.map(user => {
+        if (user.following.userName === this.friend.userName) {
+          return { status: statusList.indexOf(status) };
+        }
+        return { status: user.status };
+      });
+      this.$apollo.getClient().writeQuery({
+        query: SET_FOLLOWING_QUERY,
+        data: {
+          following: following
+        }
+      });
+    },
     async sendFollowRequest() {
       const follow = await this.$apollo.mutate({
         mutation: SEND_FOLLOW_MUTATION,
         variables: { userName: this.friend.userName }
       });
       if (follow.data.sendFollowRequest.ok) {
+        this.updateFollowingCache("pending");
         this.$set(this.friend, "followingStatus", "pending");
       }
     },
@@ -216,6 +268,7 @@ export default {
         }
       });
       if (removeFollow.data.removeFollowRequest.ok) {
+        this.updateFollowingCache("none");
         this.$set(this.friend, "followingStatus", "none");
       }
     },
@@ -228,6 +281,7 @@ export default {
         }
       });
       if (updatedFollower.data.updateFollowerRequest.ok) {
+        this.updateFollowerCache("blocked");
         this.$set(this.friend, "followerStatus", "blocked");
       }
     },
@@ -239,6 +293,32 @@ export default {
         }
       });
       if (removeFollower.data.removeFollowerRequest.ok) {
+        this.updateFollowerCache("none");
+        this.$set(this.friend, "followerStatus", "none");
+      }
+    },
+    async acceptFollower() {
+      const updatedFollower = await this.$apollo.mutate({
+        mutation: UPDATE_FOLLOWER_MUTATION,
+        variables: {
+          userName: this.friend.userName,
+          status: "accepted"
+        }
+      });
+      if (updatedFollower.data.updateFollowerRequest.ok) {
+        this.updateFollowerCache("accepted");
+        this.$set(this.friend, "followerStatus", "accepted");
+      }
+    },
+    async declineFollower() {
+      const removeFollower = await this.$apollo.mutate({
+        mutation: REMOVE_FOLLOWER_MUTATION,
+        variables: {
+          userName: this.friend.userName
+        }
+      });
+      if (removeFollower.data.removeFollowerRequest.ok) {
+        this.updateFollowerCache("none");
         this.$set(this.friend, "followerStatus", "none");
       }
     },

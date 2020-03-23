@@ -148,6 +148,7 @@ export default {
       slide: 1,
       user: {},
       selectedFriend: {},
+      updatedFriend: {},
       friends: [],
       imageUrl: "",
       friend: null,
@@ -184,7 +185,6 @@ export default {
       query: USER_DATA_QUERY
     });
     this.user = userData.data.user;
-    console.log(this.user);
   }
 };
 </script>
