@@ -269,7 +269,7 @@ export default {
           .map(user => {
             return {
               id: user.id,
-              status: statusList.indexOf(status),
+              status: user.status,
               __typename: "RelationshipType"
             };
           });
