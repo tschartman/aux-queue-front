@@ -220,18 +220,35 @@ export default {
       const followersData = this.$apollo
         .getClient()
         .readQuery({ query: GET_FOLLOWERS_QUERY });
-      let followers = followersData.followers.map(user => {
-        if (user.follower.userName === this.friend.userName) {
+      let followers = {};
+      if (status === "none") {
+        followers = followersData.followers
+          .filter(user => {
+            return user.follower.userName !== this.friend.userName;
+          })
+          .map(user => {
+            return {
+              id: user.id,
+              status: statusList.indexOf(status),
+              __typename: "RelationshipType"
+            };
+          });
+      } else {
+        followers = followersData.followers.map(user => {
+          if (user.follower.userName === this.friend.userName) {
+            return {
+              id: user.id,
+              status: statusList.indexOf(status),
+              __typename: "RelationshipType"
+            };
+          }
           return {
-            status: statusList.indexOf(status),
-            __typename: "Follower"
+            id: user.id,
+            status: user.status,
+            __typename: "RelationshipType"
           };
-        }
-        return {
-          status: user.status,
-          __typename: "Follower"
-        };
-      });
+        });
+      }
       this.$apollo.getClient().writeQuery({
         query: SET_FOLLOWERS_QUERY,
         data: {
@@ -243,18 +260,35 @@ export default {
       const followingData = this.$apollo
         .getClient()
         .readQuery({ query: GET_FOLLOWING_QUERY });
-      let following = followingData.following.map(user => {
-        if (user.following.userName === this.friend.userName) {
+      let following = {};
+      if (status === "none") {
+        following = followingData.following
+          .filter(user => {
+            return user.following.userName !== this.friend.userName;
+          })
+          .map(user => {
+            return {
+              id: user.id,
+              status: statusList.indexOf(status),
+              __typename: "RelationshipType"
+            };
+          });
+      } else {
+        following = followingData.following.map(user => {
+          if (user.following.userName === this.friend.userName) {
+            return {
+              id: user.id,
+              status: statusList.indexOf(status),
+              __typename: "RelationshipType"
+            };
+          }
           return {
-            status: statusList.indexOf(status),
-            __typename: "Following"
+            id: user.id,
+            status: user.status,
+            __typename: "RelationshipType"
           };
-        }
-        return {
-          status: user.status,
-          __typename: "Following"
-        };
-      });
+        });
+      }
       this.$apollo.getClient().writeQuery({
         query: SET_FOLLOWING_QUERY,
         data: {

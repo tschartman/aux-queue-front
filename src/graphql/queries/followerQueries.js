@@ -3,6 +3,7 @@ import gql from "graphql-tag";
 export const GET_FOLLOWERS_QUERY = gql`
   query getFollowers {
     followers {
+      id
       status
       follower {
         userName
@@ -18,6 +19,7 @@ export const GET_FOLLOWERS_QUERY = gql`
 export const GET_FOLLOWING_QUERY = gql`
   query getFollowing {
     following {
+      id
       status
       following {
         userName
