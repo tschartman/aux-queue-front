@@ -7,20 +7,15 @@
       :caption="String(requested.length)"
       default-opened
     >
-      <q-item
-        v-for="user in requested"
-        :key="user.userName"
-        @click="$emit('selectUser', user)"
-        clickable
-      >
-        <q-item-section avatar>
+      <q-item v-for="user in requested" :key="user.userName" clickable>
+        <q-item-section @click="$emit('selectUser', user)" avatar>
           <q-avatar>
             <q-img
               :src="user.userImage || 'https://www.gravatar.com/avatar/'"
             />
           </q-avatar>
         </q-item-section>
-        <q-item-section>
+        <q-item-section @click="$emit('selectUser', user)">
           <q-item-label v-html="user.userName" />
           <q-item-label caption>{{ user.firstName }}</q-item-label>
         </q-item-section>

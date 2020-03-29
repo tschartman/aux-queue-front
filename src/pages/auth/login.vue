@@ -134,6 +134,7 @@ export default {
           this.authError = "Username or password incorrect";
         }
         if (loggedInUser.data) {
+          this.$apollo.getClient().resetStore();
           const refreshed = await this.$apollo.mutate({
             mutation: SPOTIFY_REFRESH_MUTATION
           });

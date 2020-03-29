@@ -30,7 +30,7 @@ export const GET_FOLLOWING_QUERY = gql`
   }
 `;
 
-export const SET_FOLLOWER_QUERY = gql`
+export const SET_FOLLOWERS_QUERY = gql`
   query getFollwers {
     followers {
       status

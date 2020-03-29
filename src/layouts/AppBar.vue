@@ -166,10 +166,9 @@ export default {
 
   methods: {
     openURL,
-    logout() {
-      this.$store.dispatch("logout").then(() => {
-        this.$router.push("/login");
-      });
+    async logout() {
+      await this.$store.dispatch("logout");
+      this.$router.push("/login");
     },
     redirect() {
       window.location = "https://auxstack.herokuapp.com/spotify/";

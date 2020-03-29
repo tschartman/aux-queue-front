@@ -222,9 +222,15 @@ export default {
         .readQuery({ query: GET_FOLLOWERS_QUERY });
       let followers = followersData.followers.map(user => {
         if (user.follower.userName === this.friend.userName) {
-          return { status: statusList.indexOf(status) };
+          return {
+            status: statusList.indexOf(status),
+            __typename: "Follower"
+          };
         }
-        return { status: user.status };
+        return {
+          status: user.status,
+          __typename: "Follower"
+        };
       });
       this.$apollo.getClient().writeQuery({
         query: SET_FOLLOWERS_QUERY,
@@ -239,9 +245,15 @@ export default {
         .readQuery({ query: GET_FOLLOWING_QUERY });
       let following = followingData.following.map(user => {
         if (user.following.userName === this.friend.userName) {
-          return { status: statusList.indexOf(status) };
+          return {
+            status: statusList.indexOf(status),
+            __typename: "Following"
+          };
         }
-        return { status: user.status };
+        return {
+          status: user.status,
+          __typename: "Following"
+        };
       });
       this.$apollo.getClient().writeQuery({
         query: SET_FOLLOWING_QUERY,
@@ -256,8 +268,8 @@ export default {
         variables: { userName: this.friend.userName }
       });
       if (follow.data.sendFollowRequest.ok) {
-        this.updateFollowingCache("pending");
         this.$set(this.friend, "followingStatus", "pending");
+        this.updateFollowingCache("pending");
       }
     },
     async unFollow() {
@@ -268,8 +280,8 @@ export default {
         }
       });
       if (removeFollow.data.removeFollowRequest.ok) {
-        this.updateFollowingCache("none");
         this.$set(this.friend, "followingStatus", "none");
+        this.updateFollowingCache("none");
       }
     },
     async block() {
@@ -281,8 +293,8 @@ export default {
         }
       });
       if (updatedFollower.data.updateFollowerRequest.ok) {
-        this.updateFollowerCache("blocked");
         this.$set(this.friend, "followerStatus", "blocked");
+        this.updateFollowerCache("blocked");
       }
     },
     async unBlock() {
@@ -293,8 +305,8 @@ export default {
         }
       });
       if (removeFollower.data.removeFollowerRequest.ok) {
-        this.updateFollowerCache("none");
         this.$set(this.friend, "followerStatus", "none");
+        this.updateFollowerCache("none");
       }
     },
     async acceptFollower() {
@@ -306,8 +318,8 @@ export default {
         }
       });
       if (updatedFollower.data.updateFollowerRequest.ok) {
-        this.updateFollowerCache("accepted");
         this.$set(this.friend, "followerStatus", "accepted");
+        this.updateFollowerCache("accepted");
       }
     },
     async declineFollower() {
@@ -318,8 +330,8 @@ export default {
         }
       });
       if (removeFollower.data.removeFollowerRequest.ok) {
-        this.updateFollowerCache("none");
         this.$set(this.friend, "followerStatus", "none");
+        this.updateFollowerCache("none");
       }
     },
     filterFn(val, update, abort) {
