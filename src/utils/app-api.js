@@ -9,16 +9,6 @@ export const app_api = axios.create({
   }
 });
 
-app_api.interceptors.request.use(
-  config => {
-    config.headers.Authorization = "Bearer " + Store.getters.token;
-    return config;
-  },
-  error => {
-    return Promise.reject(error);
-  }
-);
-
 app_api.interceptors.response.use(
   function(response) {
     return response;

@@ -1,54 +1,61 @@
 <template>
-  <div>
-    <div class="page justify-center items-center">
-      <img height="75px" width="300px" src="/statics/AuxQueue-logo.png" />
-      <div class="row">
-        <div class="col-xs-12 ">
-          <q-card class="screen" flat bordered>
-            <q-toolbar class="bg-black text-white">
-              <q-toolbar-title>Login</q-toolbar-title>
-              <q-spinner-radio v-if="loading" color="cyan" class="loading" />
-            </q-toolbar>
-            <q-card-section>
-              <form>
-                <q-input
-                  @keyup.enter="login"
-                  v-model="username"
-                  :error-message="usernameErrors[0]"
-                  :error="usernameErrors.length > 0"
-                  label="Email"
-                  name="login"
-                  prepend-icon="person"
-                  type="text"
-                  required
-                  @input="$v.username.$touch()"
-                  @blur="$v.username.$touch()"
-                ></q-input>
-
-                <q-input
-                  @keyup.enter="login"
-                  v-model="password"
-                  :error-message="passwordErrors[0]"
-                  :error="passwordErrors.length > 0"
-                  id="password"
-                  label="Password"
-                  name="password"
-                  prepend-icon="lock"
-                  type="password"
-                  required
-                  @input="$v.password.$touch()"
-                  @blur="$v.password.$touch()"
-                ></q-input>
-              </form>
-              <p class="authError" v-if="authError">{{ authError }}</p>
-            </q-card-section>
-            <q-card-actions align="around">
-              <q-btn flat to="/register" color="dark">Sign up</q-btn>
-              <q-btn flat @click="login" color="primary">Login</q-btn>
-            </q-card-actions>
-          </q-card>
+  <div class="justify-center items-center">
+    <div class="row">
+      <img
+        class="logo"
+        height="75px"
+        width="300px"
+        src="/statics/AuxQueue-logo.png"
+      />
+    </div>
+    <div class="row justify-center items-center">
+      <q-card class="screen" flat>
+        <div class="row items-center justify-center">
+          <div class="q-mx-lg">
+            <h4>Log In</h4>
+          </div>
+          <div>
+            <q-spinner-radio v-if="loading" color="cyan" class="loading" />
+          </div>
         </div>
-      </div>
+        <q-card-section>
+          <form>
+            <q-input
+              @keyup.enter="login"
+              v-model="username"
+              :error-message="usernameErrors[0]"
+              :error="usernameErrors.length > 0"
+              label="Email"
+              name="login"
+              prepend-icon="person"
+              type="text"
+              required
+              @input="$v.username.$touch()"
+              @blur="$v.username.$touch()"
+            ></q-input>
+
+            <q-input
+              @keyup.enter="login"
+              v-model="password"
+              :error-message="passwordErrors[0]"
+              :error="passwordErrors.length > 0"
+              id="password"
+              label="Password"
+              name="password"
+              prepend-icon="lock"
+              type="password"
+              required
+              @input="$v.password.$touch()"
+              @blur="$v.password.$touch()"
+            ></q-input>
+          </form>
+          <p class="authError" v-if="authError">{{ authError }}</p>
+        </q-card-section>
+        <q-card-actions align="around">
+          <q-btn flat to="/register" color="dark">Sign up</q-btn>
+          <q-btn flat @click="login" color="primary">Login</q-btn>
+        </q-card-actions>
+      </q-card>
     </div>
   </div>
 </template>
@@ -56,11 +63,14 @@
 import { validationMixin } from "vuelidate";
 import { required } from "vuelidate/lib/validators";
 import {
+  TOKEN_AUTH_MUTATION,
+  SPOTIFY_REFRESH_MUTATION
+} from "src/graphql/queries/authQueries";
+import {
   QBtn,
   QCard,
   QCardActions,
   QInput,
-  QToolbar,
   QCardSection,
   QSpinnerRadio
 } from "quasar";
@@ -76,7 +86,6 @@ export default {
     QCardActions,
     QCardSection,
     QInput,
-    QToolbar,
     QSpinnerRadio
   },
   data() {
@@ -102,47 +111,66 @@ export default {
     }
   },
   methods: {
-    login() {
+    async login() {
       this.$v.$touch();
       if (!this.$v.$invalid) {
         let username = this.username.toLowerCase();
         let password = this.password;
         this.loading = true;
-        this.$store
-          .dispatch("login", { username, password })
-          .then(() => {
-            this.$store
-              .dispatch("linkSpotify")
-              .then(() => {
-                this.$router.push("/");
-                this.loading = false;
-              })
-              .catch(() => {
-                this.$router.push("/");
-                this.loading = false;
-              });
-          })
-          .catch(() => {
-            this.loading = false;
-            this.authError = "Username or password incorrect";
+        await this.$store.commit("auth_request");
+        let loggedInUser = {};
+        try {
+          loggedInUser = await this.$apollo.mutate({
+            mutation: TOKEN_AUTH_MUTATION,
+            variables: {
+              email: username,
+              password: password
+            }
           });
+          await this.$store.dispatch("login", loggedInUser);
+        } catch (err) {
+          console.log(err);
+          this.loading = false;
+          this.authError = "Username or password incorrect";
+        }
+        if (loggedInUser.data) {
+          this.$apollo.getClient().resetStore();
+          const refreshed = await this.$apollo.mutate({
+            mutation: SPOTIFY_REFRESH_MUTATION
+          });
+          if (refreshed.data.refreshTokens.user.refreshToken) {
+            let data = {
+              access_token: refreshed.data.refreshTokens.user.accessToken,
+              refresh_token: refreshed.data.refreshTokens.user.refreshToken
+            };
+            this.$store.dispatch("linkSpotify", data);
+            const user = await this.$spotify.get("/me");
+            this.$store.dispatch("linkSpotifyUser", user.data);
+            this.$router.push("/");
+          } else {
+            this.$router.push("/");
+          }
+        }
       }
     }
   }
 };
 </script>
-<style>
+<style scoped>
 .authError {
   color: red;
 }
-.screen {
-  margin-top: 3em;
+.logo {
+  margin: auto;
+  display: block;
+  position: relative;
 }
-.page {
-  margin-top: 1em;
-  display: grid;
+.screen {
+  margin: 3em;
+  flex: 1;
+  max-width: 400px;
 }
 .loading {
-  font-size: 20px;
+  font-size: 25px;
 }
 </style>

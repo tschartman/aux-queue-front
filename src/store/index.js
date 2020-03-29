@@ -1,7 +1,6 @@
 import Vue from "vue";
 import Vuex from "vuex";
 import { app_api } from "src/utils/app-api";
-import { spotify_api } from "src/utils/spotify-api";
 import createPersistedState from "vuex-persistedstate";
 import * as Cookies from "js-cookie";
 
@@ -10,9 +9,9 @@ Vue.use(Vuex);
 app_api.defaults.xsrfCookieName = "csrftoken";
 app_api.defaults.xsrfHeaderName = "X-CSRFToken";
 
-const Store = new Vuex.Store({
-  state: {
-    status: "",
+const getDefaultState = () => {
+  return {
+    status: "pending",
     expires_in: null,
     token: null,
     refresh: null,
@@ -22,7 +21,11 @@ const Store = new Vuex.Store({
     spotify_refresh: null,
     user: {},
     sUser: {}
-  },
+  };
+};
+
+const Store = new Vuex.Store({
+  state: getDefaultState(),
   plugins: [
     createPersistedState({
       storage: {
@@ -38,6 +41,9 @@ const Store = new Vuex.Store({
     })
   ],
   mutations: {
+    updateStatus(state, status) {
+      this.state = status;
+    },
     auth_request(state) {
       state.status = "loading";
     },
@@ -46,91 +52,39 @@ const Store = new Vuex.Store({
       state.spotify_refresh = tokens.refresh;
       state.sauth = true;
     },
-    clear_spotify(state) {
-      state.spotify_token = null;
-      state.spotify_refresh = null;
-      state.sauth = false;
-    },
-    auth_success(state, token, exp, refresh) {
+    auth_success(state, token) {
       state.status = "success";
-      state.token = token;
-      state.refresh = refresh;
-      state.expires_in = exp;
       state.auth = true;
+      state.token = token;
     },
     set_user(state, user) {
       state.user = user;
     },
-    set_spotify(state, user) {
+    set_spotify_user(state, user) {
       state.sUser = user;
     },
     auth_error(state) {
       state.status = "error";
     },
     logout(state) {
-      state.status = "";
-      state.token = "";
-      state.auth = false;
+      Object.assign(state, getDefaultState());
     }
   },
   actions: {
-    login({ commit }, user) {
-      return new Promise((resolve, reject) => {
-        commit("auth_request");
-        app_api
-          .post("/login/", user)
-          .then(resp => {
-            const token = resp.data.access_token;
-            const refresh = resp.data.refresh_token;
-            const exp = resp.data.expires_in;
-            commit("auth_success", token, exp, refresh);
-            app_api
-              .get("/users/")
-              .then(res => {
-                commit("set_user", res.data[0]);
-              })
-              .then(() => {
-                resolve();
-              });
-          })
-          .catch(error => {
-            commit("auth_error");
-            console.error(error);
-            reject(error);
-          });
+    login({ commit }, authData) {
+      commit("auth_success", authData.data.tokenAuth.token);
+      return true;
+    },
+    linkSpotify({ commit }, data) {
+      commit("link_spotify", {
+        token: data.access_token,
+        refresh: data.refresh_token
       });
     },
-    linkSpotify({ commit }) {
-      return new Promise((resolve, reject) => {
-        return app_api
-          .get("/users/" + this.state.user.id + "/spotify/")
-          .then(res => {
-            if (
-              res.data.access_token != null &&
-              res.data.refresh_token != null
-            ) {
-              let token = res.data.access_token;
-              let refresh = res.data.refresh_token;
-              commit("link_spotify", { token: token, refresh: refresh });
-
-              spotify_api.get("/me").then(re => {
-                commit("set_spotify", re.data);
-                resolve(res);
-              });
-            } else {
-              reject({ error: "Spotify account not linked" });
-            }
-          })
-          .catch(error => {
-            reject(error);
-          });
-      });
+    linkSpotifyUser({ commit }, data) {
+      commit("set_spotify_user", data);
     },
     tempAuth({ commit }) {
-      commit("auth_success", null, null, null);
-    },
-    setSpotify({ commit }, token) {
-      commit("link_spotify", { token: token, refresh: null });
       commit("auth_success", null, null, null);
     },
     clearSpotify({ commit }) {
@@ -159,7 +113,6 @@ const Store = new Vuex.Store({
     logout({ commit }) {
       return new Promise(resolve => {
         commit("logout");
-        commit("clear_spotify");
         resolve();
       });
     }

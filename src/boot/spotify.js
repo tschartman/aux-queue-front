@@ -1,4 +1,6 @@
+import Vue from "vue";
 import axios from "axios";
+
 import Store from "src/store";
 import { app_api } from "src/utils/app-api";
 
@@ -76,3 +78,4 @@ spotify_api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+Vue.prototype.$spotify = spotify_api;
