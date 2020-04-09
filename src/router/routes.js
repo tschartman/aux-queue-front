@@ -38,6 +38,12 @@ const routes = [
     ]
   },
   {
+    path: "/party",
+    name: "party",
+    component: () => import("layouts/AppBar.vue"),
+    children: [{ path: "", component: () => import("pages/party/parties.vue") }]
+  },
+  {
     path: "/sharePlaylist",
     name: "sharePlaylist",
     component: () => import("layouts/AppBar.vue"),
