@@ -11,7 +11,7 @@
     <q-item-label header>My Song List</q-item-label>
     <songList :action="true" :songs="queue" @deleteAction="remove" />
     <hr />
-    <partyView v-if="this.party" :party="this.party" />
+    <partyView v-if="party" :party="party" @updateQueue="updateQueue" />
     <h6 class="title" v-else>You are not in a party</h6>
   </div>
 </template>
@@ -41,6 +41,28 @@ export default {
   },
   computed: {},
   methods: {
+    updateQueue(action, song) {
+      const user = this.$store.getters.user;
+      let queue = Array.from(this.party.queue);
+      let songIndex = queue.findIndex(s => s.songUri === song.songUri);
+      let ratingIndex = queue[songIndex].rating.findIndex(
+        r => r.user.userName === user.userName
+      );
+
+      if (action === "likeSong" || action === "dislikeSong") {
+        if (ratingIndex === -1) {
+          queue[songIndex].rating.push({
+            like: action === "likeSong",
+            user: user
+          });
+        } else {
+          queue[songIndex].rating[ratingIndex].like = action === "likeSong";
+        }
+      } else if (action === "removeRating") {
+        queue[songIndex].rating.splice(ratingIndex, 1);
+      }
+      this.$set(this.party, "queue", queue);
+    },
     addToMySongList(newSong) {
       if (this.queue.some(song => song.id === newSong.id)) {
         return;

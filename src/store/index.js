@@ -75,6 +75,9 @@ const Store = new Vuex.Store({
       commit("auth_success", authData.data.tokenAuth.token);
       return true;
     },
+    linkUser({ commit }, data) {
+      commit("set_user", data);
+    },
     linkSpotify({ commit }, data) {
       commit("link_spotify", {
         token: data.access_token,

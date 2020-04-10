@@ -28,6 +28,7 @@ export const GET_PARTY_QUERY = gql`
         album
         artist
         coverUri
+        songUri
         rating {
           user {
             userName
@@ -35,6 +36,22 @@ export const GET_PARTY_QUERY = gql`
           like
         }
       }
+    }
+  }
+`;
+
+export const RATE_SONG_MUTATION = gql`
+  mutation rateSong($songUri: String!, $like: Boolean!) {
+    rateSong(input: { songUri: $songUri, like: $like }) {
+      ok
+    }
+  }
+`;
+
+export const REMOVE_RATING_MUTATION = gql`
+  mutation removeRating($songUri: String!) {
+    removeRating(input: { songUri: $songUri }) {
+      ok
     }
   }
 `;

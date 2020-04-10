@@ -23,7 +23,17 @@
         </q-item-section>
         <q-item-section>{{ song.title }} - {{ song.artist }}</q-item-section>
         <q-item-section avatar>
-          <q-icon @click="$emit('dislikeAction', song)" name="arrow_upward" />
+          <q-icon
+            :color="
+              song.rating.find(
+                r => r.user.userName === $store.getters.user.userName && r.like
+              )
+                ? 'blue'
+                : ''
+            "
+            @click="$emit('likeAction', song)"
+            name="arrow_upward"
+          />
         </q-item-section>
         <q-item-section avatar>
           {{
@@ -32,7 +42,17 @@
           }}
         </q-item-section>
         <q-item-section avatar>
-          <q-icon @click="$emit('likeAction', song)" name="arrow_downward" />
+          <q-icon
+            :color="
+              song.rating.find(
+                r => r.user.userName === $store.getters.user.userName && !r.like
+              )
+                ? 'red'
+                : ''
+            "
+            @click="$emit('dislikeAction', song)"
+            name="arrow_downward"
+          />
         </q-item-section>
       </q-item>
     </q-intersection>
