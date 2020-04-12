@@ -6,9 +6,7 @@ export const GET_PARTIES_QUERY = gql`
       name
       coverUri
       host {
-        firstName
         userName
-        userImage
       }
     }
   }
@@ -21,7 +19,6 @@ export const GET_PARTY_QUERY = gql`
       coverUri
       host {
         userName
-        userImage
       }
       queue {
         title
@@ -68,6 +65,35 @@ export const LEAVE_PARTY_MUTATION = gql`
   mutation leaveParty {
     leaveParty {
       ok
+    }
+  }
+`;
+
+export const JOIN_PARTY_MUTATION = gql`
+  mutation joinParty($userName: String!) {
+    joinParty(input: { userName: $userName }) {
+      ok
+      party {
+        name
+        coverUri
+        host {
+          userName
+          userImage
+        }
+        queue {
+          title
+          album
+          artist
+          coverUri
+          songUri
+          rating {
+            user {
+              userName
+            }
+            like
+          }
+        }
+      }
     }
   }
 `;

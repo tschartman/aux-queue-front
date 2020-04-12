@@ -23,7 +23,7 @@
       @updateQueue="updateQueue"
     />
     <div v-else class="row justify-center" q-ma-md>
-      <h6>You are not in a party</h6>
+      <followingParties @joinParty="joinParty" :parties="parties" />
     </div>
   </div>
 </template>
@@ -33,10 +33,12 @@ import {
   GET_PARTY_QUERY,
   SUGGEST_SONG_MUTATION,
   LEAVE_PARTY_MUTATION,
+  JOIN_PARTY_MUTATION,
   CREATE_PARTY_MUTATION
 } from "src/graphql/queries/partyQueries";
 import searchContainer from "components/searchContainer";
 import songList from "components/songList";
+import followingParties from "components/followingParties";
 import partyView from "components/partyView";
 import { QItemLabel } from "quasar";
 const alerts = [
@@ -54,6 +56,11 @@ const alerts = [
     color: "negative",
     message: "Error occured creating party",
     icon: "report_problem"
+  },
+  {
+    color: "negative",
+    message: "Error occured joining party",
+    icon: "report_problem"
   }
 ];
 export default {
@@ -62,7 +69,8 @@ export default {
     QItemLabel,
     searchContainer,
     songList,
-    partyView
+    partyView,
+    followingParties
   },
   data() {
     return {
@@ -128,6 +136,17 @@ export default {
       } else {
         // if song is already in queue simple remove it from my list
         this.remove(song);
+      }
+    },
+    async joinParty(userName) {
+      const joinParty = await this.$apollo.mutate({
+        mutation: JOIN_PARTY_MUTATION,
+        variables: { userName: userName }
+      });
+      if (joinParty.data.joinParty.ok) {
+        this.party = joinParty.data.joinParty.party;
+      } else {
+        this.$q.notify(alerts[3]);
       }
     },
     async startParty() {
