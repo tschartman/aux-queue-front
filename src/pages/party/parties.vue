@@ -9,7 +9,12 @@
     </div>
     <hr />
     <q-item-label header>My Song List</q-item-label>
-    <songList :action="true" :songs="queue" @deleteAction="remove" />
+    <songList
+      :action="true"
+      :songs="queue"
+      @postAction="suggestSong"
+      @deleteAction="remove"
+    />
     <hr />
     <partyView v-if="party" :party="party" @updateQueue="updateQueue" />
     <h6 class="title" v-else>You are not in a party</h6>
@@ -18,12 +23,20 @@
 <script>
 import {
   GET_PARTIES_QUERY,
-  GET_PARTY_QUERY
+  GET_PARTY_QUERY,
+  SUGGEST_SONG_MUTATION
 } from "src/graphql/queries/partyQueries";
 import searchContainer from "components/searchContainer";
 import songList from "components/songList";
 import partyView from "components/partyView";
 import { QItemLabel } from "quasar";
+const alerts = [
+  {
+    color: "negative",
+    message: "Error occured during suggesting song",
+    icon: "report_problem"
+  }
+];
 export default {
   name: "Queue",
   components: {
@@ -68,6 +81,36 @@ export default {
         return;
       } else {
         this.queue.push(newSong);
+      }
+    },
+    async suggestSong(song) {
+      let queue = Array.from(this.party.queue);
+      let newSong = {
+        title: song.name,
+        artist: song.artists[0].name,
+        album: song.album.name,
+        coverUri: song.album.images[0].url,
+        songUri: song.uri
+      };
+      //if the song is not in the queue we can continue
+      if (queue.findIndex(s => s.songUri === newSong.songUri) === -1) {
+        const suggestedSong = await this.$apollo.mutate({
+          mutation: SUGGEST_SONG_MUTATION,
+          variables: { input: newSong }
+        });
+        // if no errors occured then add then update ui to reflect changes
+        if (suggestedSong.data.suggestSong.ok) {
+          newSong.rating = [];
+          queue.push(newSong);
+          this.remove(song);
+          this.$set(this.party, "queue", queue);
+        } else {
+          // else an error has occured
+          this.$q.notify(alerts[0]);
+        }
+      } else {
+        // if song is already in queue simple remove it from my list
+        this.remove(song);
       }
     },
     remove(song) {

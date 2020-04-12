@@ -45,7 +45,7 @@ export default {
             songUri: song.songUri
           }
         });
-        if (removeRating.data.removeRating) {
+        if (removeRating.data.removeRating.ok) {
           this.$emit("updateQueue", "removeRating", song);
         } else {
           this.$q.notify(alerts[0]);
@@ -58,7 +58,7 @@ export default {
             like: true
           }
         });
-        if (rateSong.data.rateSong) {
+        if (rateSong.data.rateSong.ok) {
           this.$emit("updateQueue", "likeSong", song);
         } else {
           this.$q.notify(alerts[0]);
@@ -74,7 +74,7 @@ export default {
             songUri: song.songUri
           }
         });
-        if (removeRating.data.removeRating) {
+        if (removeRating.data.removeRating.ok) {
           this.$emit("updateQueue", "removeRating", song);
         } else {
           this.$q.notify(alerts[0]);
@@ -87,7 +87,7 @@ export default {
             like: false
           }
         });
-        if (rateSong.data.rateSong) {
+        if (rateSong.data.rateSong.ok) {
           this.$emit("updateQueue", "dislikeSong", song);
         } else {
           this.$q.notify(alerts[0]);

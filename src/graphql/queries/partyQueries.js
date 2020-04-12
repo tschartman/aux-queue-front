@@ -55,3 +55,11 @@ export const REMOVE_RATING_MUTATION = gql`
     }
   }
 `;
+
+export const SUGGEST_SONG_MUTATION = gql`
+  mutation suggestSong($input: SuggestSongInput!) {
+    suggestSong(input: $input) {
+      ok
+    }
+  }
+`;
