@@ -1,12 +1,12 @@
 <template>
   <div>
     <q-intersection
-      v-for="song in songs"
+      v-for="song in queue"
       :key="song.title"
       once
       transition="scale"
     >
-      <q-item v-if="songs && songs.length > 0">
+      <q-item v-if="queue && queue.length > 0">
         <q-item-section avatar>
           <q-img
             :src="song.coverUri"
@@ -36,10 +36,7 @@
           />
         </q-item-section>
         <q-item-section avatar>
-          {{
-            song.rating.filter(r => r.like).length -
-              song.rating.filter(r => !r.like).length
-          }}
+          {{ score(song) }}
         </q-item-section>
         <q-item-section avatar>
           <q-icon
@@ -78,10 +75,19 @@ export default {
 
   data() {
     return {
-      audio: null
+      audio: null,
+      queue: []
     };
   },
-
+  watch: {
+    songs: {
+      immediate: true,
+      handler() {
+        let sortedSongs = Array.from(this.songs);
+        this.queue = sortedSongs.sort((a, b) => this.score(b) - this.score(a));
+      }
+    }
+  },
   methods: {
     playPreview(url) {
       if (this.audio) {
@@ -95,6 +101,12 @@ export default {
         this.audio = new Audio(url);
         this.audio.play();
       }
+    },
+    score(song) {
+      return (
+        song.rating.filter(r => r.like).length -
+        song.rating.filter(r => !r.like).length
+      );
     }
   },
   created() {}

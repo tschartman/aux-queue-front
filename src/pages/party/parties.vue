@@ -52,7 +52,6 @@ export default {
       party: {}
     };
   },
-  computed: {},
   methods: {
     updateQueue(action, song) {
       const user = this.$store.getters.user;
@@ -61,7 +60,6 @@ export default {
       let ratingIndex = queue[songIndex].rating.findIndex(
         r => r.user.userName === user.userName
       );
-
       if (action === "likeSong" || action === "dislikeSong") {
         if (ratingIndex === -1) {
           queue[songIndex].rating.push({
