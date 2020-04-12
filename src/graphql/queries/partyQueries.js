@@ -63,3 +63,29 @@ export const SUGGEST_SONG_MUTATION = gql`
     }
   }
 `;
+
+export const LEAVE_PARTY_MUTATION = gql`
+  mutation leaveParty {
+    leaveParty {
+      ok
+    }
+  }
+`;
+
+export const CREATE_PARTY_MUTATION = gql`
+  mutation createParty {
+    createParty {
+      ok
+      party {
+        name
+        coverUri
+        queue {
+          title
+        }
+        host {
+          userName
+        }
+      }
+    }
+  }
+`;

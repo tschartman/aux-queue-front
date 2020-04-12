@@ -1,12 +1,12 @@
 <template>
   <div>
     <q-intersection
-      v-for="song in queue"
-      :key="song.title"
+      v-for="song in sortedSongs"
+      :key="song.songUri"
       once
       transition="scale"
     >
-      <q-item v-if="queue && queue.length > 0">
+      <q-item v-if="songs && songs.length > 0">
         <q-item-section avatar>
           <q-img
             :src="song.coverUri"
@@ -75,17 +75,13 @@ export default {
 
   data() {
     return {
-      audio: null,
-      queue: []
+      audio: null
     };
   },
-  watch: {
-    songs: {
-      immediate: true,
-      handler() {
-        let sortedSongs = Array.from(this.songs);
-        this.queue = sortedSongs.sort((a, b) => this.score(b) - this.score(a));
-      }
+  computed: {
+    sortedSongs: function() {
+      let songs = Array.from(this.songs);
+      return songs.sort((a, b) => this.score(b) - this.score(a));
     }
   },
   methods: {

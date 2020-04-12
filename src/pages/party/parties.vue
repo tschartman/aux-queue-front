@@ -5,7 +5,7 @@
       <searchContainer @selectSong="addToMySongList" />
     </div>
     <div class="row justify-center" q-ma-md>
-      <q-btn flat color="primary">Start One!</q-btn>
+      <q-btn @click="startParty" flat color="primary">Start One!</q-btn>
     </div>
     <hr />
     <q-item-label header>My Song List</q-item-label>
@@ -16,15 +16,24 @@
       @deleteAction="remove"
     />
     <hr />
-    <partyView v-if="party" :party="party" @updateQueue="updateQueue" />
-    <h6 class="title" v-else>You are not in a party</h6>
+    <partyView
+      v-if="party"
+      :party="party"
+      @leaveParty="leaveParty"
+      @updateQueue="updateQueue"
+    />
+    <div v-else class="row justify-center" q-ma-md>
+      <h6>You are not in a party</h6>
+    </div>
   </div>
 </template>
 <script>
 import {
   GET_PARTIES_QUERY,
   GET_PARTY_QUERY,
-  SUGGEST_SONG_MUTATION
+  SUGGEST_SONG_MUTATION,
+  LEAVE_PARTY_MUTATION,
+  CREATE_PARTY_MUTATION
 } from "src/graphql/queries/partyQueries";
 import searchContainer from "components/searchContainer";
 import songList from "components/songList";
@@ -34,6 +43,16 @@ const alerts = [
   {
     color: "negative",
     message: "Error occured during suggesting song",
+    icon: "report_problem"
+  },
+  {
+    color: "negative",
+    message: "Error occured while leaving party",
+    icon: "report_problem"
+  },
+  {
+    color: "negative",
+    message: "Error occured creating party",
     icon: "report_problem"
   }
 ];
@@ -49,7 +68,7 @@ export default {
     return {
       parties: [],
       queue: [],
-      party: {}
+      party: null
     };
   },
   methods: {
@@ -111,9 +130,29 @@ export default {
         this.remove(song);
       }
     },
+    async startParty() {
+      const createParty = await this.$apollo.mutate({
+        mutation: CREATE_PARTY_MUTATION
+      });
+      if (createParty.data.createParty.ok) {
+        this.party = createParty.data.createParty.party;
+      } else {
+        this.$q.notify(alerts[2]);
+      }
+    },
     remove(song) {
       let index = this.queue.indexOf(song);
       this.queue.splice(index, 1);
+    },
+    async leaveParty() {
+      const leaveParty = await this.$apollo.mutate({
+        mutation: LEAVE_PARTY_MUTATION
+      });
+      if (leaveParty.data.leaveParty.ok) {
+        this.$set(this, "party", null);
+      } else {
+        this.$q.notify(alerts[1]);
+      }
     }
   },
   async created() {

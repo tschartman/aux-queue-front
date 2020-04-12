@@ -2,7 +2,7 @@
   <div>
     <q-intersection
       v-for="song in songs"
-      :key="song.name"
+      :key="song.songUri"
       once
       transition="scale"
     >
