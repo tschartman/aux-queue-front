@@ -51,7 +51,7 @@ export default {
         const removeRating = await this.$apollo.mutate({
           mutation: REMOVE_RATING_MUTATION,
           variables: {
-            songUri: song.songUri
+            id: song.id
           }
         });
         if (removeRating.data.removeRating.ok) {
@@ -63,7 +63,7 @@ export default {
         const rateSong = await this.$apollo.mutate({
           mutation: RATE_SONG_MUTATION,
           variables: {
-            songUri: song.songUri,
+            id: song.id,
             like: true
           }
         });
@@ -80,7 +80,7 @@ export default {
         const removeRating = await this.$apollo.mutate({
           mutation: REMOVE_RATING_MUTATION,
           variables: {
-            songUri: song.songUri
+            id: song.id
           }
         });
         if (removeRating.data.removeRating.ok) {
@@ -92,7 +92,7 @@ export default {
         const rateSong = await this.$apollo.mutate({
           mutation: RATE_SONG_MUTATION,
           variables: {
-            songUri: song.songUri,
+            id: song.id,
             like: false
           }
         });

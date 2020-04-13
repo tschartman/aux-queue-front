@@ -1,19 +1,19 @@
 <template>
   <div>
     <q-intersection
-      v-for="song in sortedSongs"
-      :key="song.songUri"
+      v-for="suggested in sortedSongs"
+      :key="suggested.id"
       once
       transition="scale"
     >
-      <q-item v-if="songs && songs.length > 0">
+      <q-item>
         <q-item-section avatar>
           <q-img
-            :src="song.coverUri"
-            v-on:click="playPreview(song.preview_url)"
+            :src="suggested.song.coverUri"
+            v-on:click="playPreview(suggested.song.preview_url)"
           >
             <q-btn
-              v-if="audio && audio.src === song.preview_url"
+              v-if="audio && audio.src === suggested.song.preview_url"
               round
               color="transparent"
               icon="pause"
@@ -21,33 +21,36 @@
             <q-btn v-else round color="transparent" icon="play_arrow" />
           </q-img>
         </q-item-section>
-        <q-item-section>{{ song.title }} - {{ song.artist }}</q-item-section>
+        <q-item-section
+          >{{ suggested.song.title }} -
+          {{ suggested.song.artist }}</q-item-section
+        >
         <q-item-section avatar>
           <q-icon
             :color="
-              song.rating.find(
+              suggested.rating.find(
                 r => r.user.userName === $store.getters.user.userName && r.like
               )
                 ? 'blue'
                 : ''
             "
-            @click="$emit('likeAction', song)"
+            @click="$emit('likeAction', suggested)"
             name="arrow_upward"
           />
         </q-item-section>
         <q-item-section avatar>
-          {{ score(song) }}
+          {{ score(suggested) }}
         </q-item-section>
         <q-item-section avatar>
           <q-icon
             :color="
-              song.rating.find(
+              suggested.rating.find(
                 r => r.user.userName === $store.getters.user.userName && !r.like
               )
                 ? 'red'
                 : ''
             "
-            @click="$emit('dislikeAction', song)"
+            @click="$emit('dislikeAction', suggested)"
             name="arrow_downward"
           />
         </q-item-section>
@@ -80,8 +83,8 @@ export default {
   },
   computed: {
     sortedSongs: function() {
-      let songs = Array.from(this.songs);
-      return songs.sort((a, b) => this.score(b) - this.score(a));
+      let suggested = Array.from(this.songs);
+      return suggested.sort((a, b) => this.score(b) - this.score(a));
     }
   },
   methods: {

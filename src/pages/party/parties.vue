@@ -83,7 +83,7 @@ export default {
     updateQueue(action, song) {
       const user = this.$store.getters.user;
       let queue = Array.from(this.party.queue);
-      let songIndex = queue.findIndex(s => s.songUri === song.songUri);
+      let songIndex = queue.findIndex(s => s.id === song.id);
       let ratingIndex = queue[songIndex].rating.findIndex(
         r => r.user.userName === user.userName
       );
@@ -118,15 +118,14 @@ export default {
         songUri: song.uri
       };
       //if the song is not in the queue we can continue
-      if (queue.findIndex(s => s.songUri === newSong.songUri) === -1) {
+      if (queue.findIndex(s => s.song.songUri === newSong.songUri) === -1) {
         const suggestedSong = await this.$apollo.mutate({
           mutation: SUGGEST_SONG_MUTATION,
           variables: { input: newSong }
         });
         // if no errors occured then add then update ui to reflect changes
         if (suggestedSong.data.suggestSong.ok) {
-          newSong.rating = [];
-          queue.push(newSong);
+          queue.push(suggestedSong.data.suggestSong.suggested);
           this.remove(song);
           this.$set(this.party, "queue", queue);
         } else {

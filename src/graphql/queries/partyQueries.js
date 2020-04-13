@@ -4,7 +4,6 @@ export const GET_PARTIES_QUERY = gql`
   query getParties {
     parties {
       name
-      coverUri
       host {
         userName
       }
@@ -16,16 +15,18 @@ export const GET_PARTY_QUERY = gql`
   query getParty {
     party {
       name
-      coverUri
       host {
         userName
       }
       queue {
-        title
-        album
-        artist
-        coverUri
-        songUri
+        id
+        song {
+          title
+          album
+          artist
+          coverUri
+          songUri
+        }
         rating {
           user {
             userName
@@ -38,16 +39,16 @@ export const GET_PARTY_QUERY = gql`
 `;
 
 export const RATE_SONG_MUTATION = gql`
-  mutation rateSong($songUri: String!, $like: Boolean!) {
-    rateSong(input: { songUri: $songUri, like: $like }) {
+  mutation rateSong($id: ID!, $like: Boolean!) {
+    rateSong(input: { id: $id, like: $like }) {
       ok
     }
   }
 `;
 
 export const REMOVE_RATING_MUTATION = gql`
-  mutation removeRating($songUri: String!) {
-    removeRating(input: { songUri: $songUri }) {
+  mutation removeRating($id: ID!) {
+    removeRating(input: { id: $id }) {
       ok
     }
   }
@@ -57,6 +58,22 @@ export const SUGGEST_SONG_MUTATION = gql`
   mutation suggestSong($input: SuggestSongInput!) {
     suggestSong(input: $input) {
       ok
+      suggested {
+        id
+        song {
+          title
+          album
+          artist
+          coverUri
+          songUri
+        }
+        rating {
+          user {
+            userName
+          }
+          like
+        }
+      }
     }
   }
 `;
@@ -75,17 +92,19 @@ export const JOIN_PARTY_MUTATION = gql`
       ok
       party {
         name
-        coverUri
         host {
           userName
           userImage
         }
         queue {
-          title
-          album
-          artist
-          coverUri
-          songUri
+          id
+          song {
+            title
+            album
+            artist
+            coverUri
+            songUri
+          }
           rating {
             user {
               userName
@@ -104,9 +123,11 @@ export const CREATE_PARTY_MUTATION = gql`
       ok
       party {
         name
-        coverUri
         queue {
-          title
+          id
+          song {
+            title
+          }
         }
         host {
           userName
