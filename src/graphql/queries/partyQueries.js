@@ -4,6 +4,9 @@ export const GET_PARTIES_QUERY = gql`
   query getParties {
     parties {
       name
+      currentlyPlaying {
+        coverUri
+      }
       host {
         userName
       }
@@ -17,6 +20,12 @@ export const GET_PARTY_QUERY = gql`
       name
       host {
         userName
+      }
+      currentlyPlaying {
+        title
+        artist
+        album
+        coverUri
       }
       queue {
         id
@@ -95,6 +104,12 @@ export const JOIN_PARTY_MUTATION = gql`
         host {
           userName
           userImage
+        }
+        currentlyPlaying {
+          title
+          artist
+          album
+          coverUri
         }
         queue {
           id

@@ -1,25 +1,25 @@
 <template>
   <div>
+    <currentPlayback
+      :currentlyPlaying="party.currentlyPlaying"
+      :controller="false"
+    />
     <div class="row justify-center">
       <h6>{{ party.host.userName }}'s party</h6>
     </div>
-    <q-scroll-area style="height: 400px;">
+    <q-scroll-area style="height: 200px;">
       <suggestedSongs
         @likeAction="likeSong"
         @dislikeAction="dislikeSong"
         :songs="party.queue"
       />
     </q-scroll-area>
-    <div class="row justify-center">
-      <q-btn class="q-mt-md" @click="$emit('leaveParty')" flat color="red"
-        >Leave</q-btn
-      >
-    </div>
   </div>
 </template>
 <script>
-import { QScrollArea, QBtn } from "quasar";
+import { QScrollArea } from "quasar";
 import suggestedSongs from "src/components/suggestedSongs";
+import currentPlayback from "components/currentPlayback";
 import {
   RATE_SONG_MUTATION,
   REMOVE_RATING_MUTATION
@@ -34,8 +34,8 @@ const alerts = [
 export default {
   components: {
     suggestedSongs,
-    QScrollArea,
-    QBtn
+    currentPlayback,
+    QScrollArea
   },
   props: {
     party: Object,

@@ -113,6 +113,13 @@ export default {
       this.duration = 0;
       this.progress = 0;
     },
+    mapCurrentlyPlaying(data) {
+      return {
+        name: data.name,
+        artist: data.artists[0].name,
+        coverUri: data.album.images[0].url
+      };
+    },
     init() {
       clearInterval(this.interval);
       axios
@@ -120,7 +127,7 @@ export default {
         .then(res => {
           console.log(res);
           if (res.data !== "" && res.data.is_playing) {
-            this.currentlyPlaying = res.data.item;
+            this.currentlyPlaying = this.mapCurrentlyPlaying(res.data.item);
             this.duration = res.data.item.duration_ms;
             this.progress = res.data.progress_ms;
             this.interval = setInterval(() => {

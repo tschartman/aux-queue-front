@@ -11,7 +11,10 @@
           :key="party.host.userName"
         >
           <q-card class="party-card" flat bordered>
-            <q-img src="https://cdn.quasar.dev/img/parallax2.jpg" />
+            <q-img
+              v-if="party.currentlyPlaying"
+              :src="party.currentlyPlaying.coverUri"
+            />
             <q-card-section>
               <div class="text-h6 q-my-xs">{{ party.host.userName }}</div>
               <div class="text-caption text-grey">

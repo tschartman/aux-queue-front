@@ -5,17 +5,9 @@
       <searchContainer @selectSong="addToMySongList" />
     </div>
     <div class="row justify-center" q-ma-md>
-      <q-btn @click="startParty" flat color="primary">Start One!</q-btn>
+      <q-btn v-if="party" @click="leaveParty" flat color="red">Leave</q-btn>
+      <q-btn v-else @click="startParty" flat color="primary">Start One!</q-btn>
     </div>
-    <hr />
-    <q-item-label header>My Song List</q-item-label>
-    <songList
-      :action="true"
-      :songs="queue"
-      @postAction="suggestSong"
-      @deleteAction="remove"
-    />
-    <hr />
     <partyView
       v-if="party"
       :party="party"
@@ -37,10 +29,9 @@ import {
   CREATE_PARTY_MUTATION
 } from "src/graphql/queries/partyQueries";
 import searchContainer from "components/searchContainer";
-import songList from "components/songList";
 import followingParties from "components/followingParties";
 import partyView from "components/partyView";
-import { QItemLabel } from "quasar";
+//import { QItemLabel } from "quasar";
 const alerts = [
   {
     color: "negative",
@@ -66,9 +57,7 @@ const alerts = [
 export default {
   name: "Queue",
   components: {
-    QItemLabel,
     searchContainer,
-    songList,
     partyView,
     followingParties
   },

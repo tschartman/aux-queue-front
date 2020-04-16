@@ -40,7 +40,6 @@ export default {
       let uris = queue.map(song => {
         return song.uri;
       });
-
       spotify_api
         .put("/me/player/play", { uris: uris })
         .then(res => {
@@ -107,12 +106,19 @@ export default {
       this.duration = 0;
       this.progress = 0;
     },
+    mapCurrentlyPlaying(data) {
+      return {
+        name: data.name,
+        artist: data.artists[0].name,
+        coverUri: data.album.images[0].url
+      };
+    },
     init() {
       clearInterval(this.interval);
       spotify_api.get("/me/player/currently-playing").then(res => {
         if (res.data !== "" && res.data.item) {
           if (res.data.is_playing && res.data.item.id != this.id) {
-            this.currentlyPlaying = res.data.item;
+            this.currentlyPlaying = this.mapCurrentlyPlaying(res.data.item);
             this.id = res.data.item.id;
             this.duration = res.data.item.duration_ms;
             this.progress = res.data.progress_ms;
