@@ -6,21 +6,19 @@
     </div>
     <div v-if="party" class="row justify-center" q-ma-md>
       <q-btn
-        v-if="party.host.userName === this.$store.getters.user.userName"
+        v-if="party.host.userName === $store.getters.user.userName"
         @click="shutDownParty"
         flat
         color="red"
         >shut down party</q-btn
       >
-      <q-btn v-else-if="party" @click="leaveParty" flat color="red"
-        >Leave</q-btn
-      >
+      <q-btn v-else @click="leaveParty" flat color="red">Leave</q-btn>
     </div>
     <div v-else class="row justify-center" q-ma-md>
       <q-btn @click="startParty" flat color="primary">Start One!</q-btn>
     </div>
     <div v-if="party">
-      <q-pull-to-refresh @refresh="refresh">
+      <q-pull-to-refresh @refresh="pullRefresh">
         <partyView
           :party="party"
           @leaveParty="leaveParty"
@@ -29,7 +27,11 @@
       </q-pull-to-refresh>
     </div>
     <div v-else class="row justify-center" q-ma-md>
-      <followingParties @joinParty="joinParty" :parties="parties" />
+      <followingParties
+        @refresh="refresh"
+        @joinParty="joinParty"
+        :parties="parties"
+      />
     </div>
   </div>
 </template>
@@ -181,16 +183,18 @@ export default {
         this.$q.notify(alerts[1]);
       }
     },
-    async refresh(done) {
+    pullRefresh(done) {
+      this.refresh();
+      done();
+    },
+    async refresh() {
       const currentSong = await this.$apollo.mutate({
         mutation: REFRESH_CURRENT_SONG
       });
       if (currentSong.data.refreshCurrentSong.ok) {
         this.party.currentlyPlaying =
           currentSong.data.refreshCurrentSong.currentSong;
-        console.log(this.party);
       }
-      done();
     }
   },
   async created() {
