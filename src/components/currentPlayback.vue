@@ -15,7 +15,7 @@
 
     <div class="row justify-center items-center  q-pt-lg">
       <div class="text-subtitle1">
-        {{ currentlyPlaying.name }} - {{ currentlyPlaying.artist }}
+        {{ currentlyPlaying.title }} - {{ currentlyPlaying.artist }}
       </div>
     </div>
     <div class="row justify-center items-center">

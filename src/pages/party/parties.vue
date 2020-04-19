@@ -2,18 +2,32 @@
   <div>
     <h4 class="title">Parties</h4>
     <div class="q-pa-md">
-      <searchContainer @selectSong="addToMySongList" />
+      <searchContainer @selectSong="suggestSong" />
     </div>
-    <div class="row justify-center" q-ma-md>
-      <q-btn v-if="party" @click="leaveParty" flat color="red">Leave</q-btn>
-      <q-btn v-else @click="startParty" flat color="primary">Start One!</q-btn>
+    <div v-if="party" class="row justify-center" q-ma-md>
+      <q-btn
+        v-if="party.host.userName === this.$store.getters.user.userName"
+        @click="shutDownParty"
+        flat
+        color="red"
+        >shut down party</q-btn
+      >
+      <q-btn v-else-if="party" @click="leaveParty" flat color="red"
+        >Leave</q-btn
+      >
     </div>
-    <partyView
-      v-if="party"
-      :party="party"
-      @leaveParty="leaveParty"
-      @updateQueue="updateQueue"
-    />
+    <div v-else class="row justify-center" q-ma-md>
+      <q-btn @click="startParty" flat color="primary">Start One!</q-btn>
+    </div>
+    <div v-if="party">
+      <q-pull-to-refresh @refresh="refresh">
+        <partyView
+          :party="party"
+          @leaveParty="leaveParty"
+          @updateQueue="updateQueue"
+        />
+      </q-pull-to-refresh>
+    </div>
     <div v-else class="row justify-center" q-ma-md>
       <followingParties @joinParty="joinParty" :parties="parties" />
     </div>
@@ -26,12 +40,14 @@ import {
   SUGGEST_SONG_MUTATION,
   LEAVE_PARTY_MUTATION,
   JOIN_PARTY_MUTATION,
-  CREATE_PARTY_MUTATION
+  CREATE_PARTY_MUTATION,
+  SHUT_DOWN_PARTY_MUTATION,
+  REFRESH_CURRENT_SONG
 } from "src/graphql/queries/partyQueries";
 import searchContainer from "components/searchContainer";
 import followingParties from "components/followingParties";
 import partyView from "components/partyView";
-//import { QItemLabel } from "quasar";
+import { QPullToRefresh } from "quasar";
 const alerts = [
   {
     color: "negative",
@@ -59,7 +75,8 @@ export default {
   components: {
     searchContainer,
     partyView,
-    followingParties
+    followingParties,
+    QPullToRefresh
   },
   data() {
     return {
@@ -89,13 +106,6 @@ export default {
         queue[songIndex].rating.splice(ratingIndex, 1);
       }
       this.$set(this.party, "queue", queue);
-    },
-    addToMySongList(newSong) {
-      if (this.queue.some(song => song.id === newSong.id)) {
-        return;
-      } else {
-        this.queue.push(newSong);
-      }
     },
     async suggestSong(song) {
       let queue = Array.from(this.party.queue);
@@ -160,6 +170,27 @@ export default {
       } else {
         this.$q.notify(alerts[1]);
       }
+    },
+    async shutDownParty() {
+      const shutDownParty = await this.$apollo.mutate({
+        mutation: SHUT_DOWN_PARTY_MUTATION
+      });
+      if (shutDownParty.data.shutDownParty.ok) {
+        this.$set(this, "party", null);
+      } else {
+        this.$q.notify(alerts[1]);
+      }
+    },
+    async refresh(done) {
+      const currentSong = await this.$apollo.mutate({
+        mutation: REFRESH_CURRENT_SONG
+      });
+      if (currentSong.data.refreshCurrentSong.ok) {
+        this.party.currentlyPlaying =
+          currentSong.data.refreshCurrentSong.currentSong;
+        console.log(this.party);
+      }
+      done();
     }
   },
   async created() {

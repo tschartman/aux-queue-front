@@ -95,6 +95,28 @@ export const LEAVE_PARTY_MUTATION = gql`
   }
 `;
 
+export const SHUT_DOWN_PARTY_MUTATION = gql`
+  mutation shutDownParty {
+    shutDownParty {
+      ok
+    }
+  }
+`;
+
+export const REFRESH_CURRENT_SONG = gql`
+  mutation refreshCurrentSong {
+    refreshCurrentSong {
+      ok
+      currentSong {
+        title
+        artist
+        album
+        coverUri
+      }
+    }
+  }
+`;
+
 export const JOIN_PARTY_MUTATION = gql`
   mutation joinParty($userName: String!) {
     joinParty(input: { userName: $userName }) {
