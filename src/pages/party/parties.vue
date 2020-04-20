@@ -1,9 +1,6 @@
 <template>
   <div>
     <h4 class="title">Parties</h4>
-    <div class="q-pa-md">
-      <searchContainer @selectSong="suggestSong" />
-    </div>
     <div v-if="party" class="row justify-center" q-ma-md>
       <q-btn
         v-if="party.host.userName === $store.getters.user.userName"
@@ -19,8 +16,14 @@
     </div>
     <div v-if="party">
       <q-pull-to-refresh @refresh="pullRefresh">
-        <partyView
+        <partyHostView
+          v-if="$store.getters.user.userName === party.host.userName"
           :party="party"
+        />
+        <partyView
+          v-else
+          :party="party"
+          @suggestSong="suggestSong"
           @leaveParty="leaveParty"
           @updateQueue="updateQueue"
         />
@@ -46,9 +49,9 @@ import {
   SHUT_DOWN_PARTY_MUTATION,
   REFRESH_CURRENT_SONG
 } from "src/graphql/queries/partyQueries";
-import searchContainer from "components/searchContainer";
 import followingParties from "components/followingParties";
 import partyView from "components/partyView";
+import partyHostView from "components/partyHostView";
 import { QPullToRefresh } from "quasar";
 const alerts = [
   {
@@ -75,9 +78,9 @@ const alerts = [
 export default {
   name: "Queue",
   components: {
-    searchContainer,
     partyView,
     followingParties,
+    partyHostView,
     QPullToRefresh
   },
   data() {
@@ -110,6 +113,7 @@ export default {
       this.$set(this.party, "queue", queue);
     },
     async suggestSong(song) {
+      console.log(song);
       let queue = Array.from(this.party.queue);
       let newSong = {
         title: song.name,
@@ -184,16 +188,26 @@ export default {
       }
     },
     pullRefresh(done) {
-      this.refresh();
+      this.refresh(this.party.host.userName);
       done();
     },
-    async refresh() {
+    async refresh(userName) {
       const currentSong = await this.$apollo.mutate({
-        mutation: REFRESH_CURRENT_SONG
+        mutation: REFRESH_CURRENT_SONG,
+        variables: { userName: userName }
       });
       if (currentSong.data.refreshCurrentSong.ok) {
-        this.party.currentlyPlaying =
-          currentSong.data.refreshCurrentSong.currentSong;
+        if (this.party) {
+          this.party.currentlyPlaying =
+            currentSong.data.refreshCurrentSong.currentSong;
+        }
+        let parties = Array.from(this.parties);
+        let partyIndex = parties.findIndex(p => p.host.userName === userName);
+        if (partyIndex !== -1) {
+          parties[partyIndex].currentlyPlaying =
+            currentSong.data.refreshCurrentSong.currentSong;
+          this.parties = parties;
+        }
       }
     }
   },

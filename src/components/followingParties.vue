@@ -35,7 +35,10 @@
                 </div>
               </q-card-section>
               <q-card-section class="row justify-center">
-                <q-icon @click="$emit('refresh')" size="xl" name="loop"
+                <q-icon
+                  @click="$emit('refresh', party.host.userName)"
+                  size="xl"
+                  name="loop"
                   ><q-tooltip>
                     No Songs Playing
                   </q-tooltip>

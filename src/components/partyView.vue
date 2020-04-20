@@ -1,5 +1,8 @@
 <template>
   <div>
+    <div class="q-pa-md">
+      <searchContainer @selectSong="suggestSong" />
+    </div>
     <currentPlayback
       :currentlyPlaying="party.currentlyPlaying"
       :controller="false"
@@ -20,6 +23,7 @@
 import { QScrollArea } from "quasar";
 import suggestedSongs from "src/components/suggestedSongs";
 import currentPlayback from "components/currentPlayback";
+import searchContainer from "components/searchContainer";
 import {
   RATE_SONG_MUTATION,
   REMOVE_RATING_MUTATION
@@ -35,7 +39,8 @@ export default {
   components: {
     suggestedSongs,
     currentPlayback,
-    QScrollArea
+    QScrollArea,
+    searchContainer
   },
   props: {
     party: Object,
@@ -102,6 +107,9 @@ export default {
           this.$q.notify(alerts[0]);
         }
       }
+    },
+    suggestSong(song) {
+      this.$emit("suggestSong", song);
     }
   }
 };

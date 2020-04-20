@@ -104,8 +104,8 @@ export const SHUT_DOWN_PARTY_MUTATION = gql`
 `;
 
 export const REFRESH_CURRENT_SONG = gql`
-  mutation refreshCurrentSong {
-    refreshCurrentSong {
+  mutation refreshCurrentSong($userName: String!) {
+    refreshCurrentSong(input: { userName: $userName }) {
       ok
       currentSong {
         title
