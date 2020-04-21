@@ -25,45 +25,59 @@
           >{{ suggested.song.title }} -
           {{ suggested.song.artist }}</q-item-section
         >
-        <q-item-section avatar>
+        <q-item-section v-if="!host" avatar>
           <q-icon
-            :color="
-              suggested.rating.find(
-                r => r.user.userName === $store.getters.user.userName && r.like
-              )
-                ? 'blue'
-                : ''
-            "
+            :color="liked(suggested) ? 'blue' : ''"
             @click="$emit('likeAction', suggested)"
             name="arrow_upward"
-          />
+          >
+            <q-tooltip>like</q-tooltip>
+          </q-icon>
         </q-item-section>
         <q-item-section avatar>
-          {{ score(suggested) }}
+          <div class="text-subtitle2">
+            {{ score(suggested) }}
+            <q-tooltip>rating</q-tooltip>
+          </div>
         </q-item-section>
-        <q-item-section avatar>
+        <q-item-section v-if="host" avatar>
+          <q-icon name="delete" color="red">
+            <q-tooltip>Remove</q-tooltip>
+          </q-icon>
+        </q-item-section>
+        <q-item-section v-if="host" avatar>
+          <q-icon name="playlist_add" color="blue">
+            <q-tooltip>Add To Plalist</q-tooltip>
+          </q-icon>
+        </q-item-section>
+        <q-item-section v-if="!host" avatar>
           <q-icon
-            :color="
-              suggested.rating.find(
-                r => r.user.userName === $store.getters.user.userName && !r.like
-              )
-                ? 'red'
-                : ''
-            "
+            :color="disliked(suggested) ? 'red' : ''"
             @click="$emit('dislikeAction', suggested)"
             name="arrow_downward"
-          />
+          >
+            <q-tooltip>dislike</q-tooltip>
+          </q-icon>
         </q-item-section>
       </q-item>
     </q-intersection>
   </div>
 </template>
 <script>
-import { QIntersection, QItem, QImg, QItemSection, QBtn, QIcon } from "quasar";
+import {
+  QIntersection,
+  QItem,
+  QImg,
+  QItemSection,
+  QBtn,
+  QIcon,
+  QTooltip
+} from "quasar";
 
 export default {
   name: "suggestedSongs",
   props: {
+    host: Boolean,
     songs: Array,
     method: { type: Function }
   },
@@ -73,7 +87,8 @@ export default {
     QItemSection,
     QBtn,
     QIcon,
-    QIntersection
+    QIntersection,
+    QTooltip
   },
 
   data() {
@@ -105,6 +120,16 @@ export default {
       return (
         song.rating.filter(r => r.like).length -
         song.rating.filter(r => !r.like).length
+      );
+    },
+    liked(suggested) {
+      return suggested.rating.find(
+        r => r.user.userName === this.$store.getters.user.userName && r.like
+      );
+    },
+    disliked(suggested) {
+      return suggested.rating.find(
+        r => r.user.userName === this.$store.getters.user.userName && !r.like
       );
     }
   },

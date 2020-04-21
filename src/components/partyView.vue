@@ -3,6 +3,9 @@
     <div class="q-pa-md">
       <searchContainer @selectSong="suggestSong" />
     </div>
+    <div class="row justify-center" q-ma-md>
+      <q-btn @click="$emit('leaveParty')" flat color="red">Leave</q-btn>
+    </div>
     <currentPlayback
       :currentlyPlaying="party.currentlyPlaying"
       :controller="false"
@@ -12,10 +15,15 @@
     </div>
     <q-scroll-area style="height: 200px;">
       <suggestedSongs
+        v-if="party.queue.length > 0"
+        :host="false"
         @likeAction="likeSong"
         @dislikeAction="dislikeSong"
         :songs="party.queue"
       />
+      <div v-else class="row justify-center text-body1">
+        No suggested Songs. Search for a song and suggest one!
+      </div>
     </q-scroll-area>
   </div>
 </template>

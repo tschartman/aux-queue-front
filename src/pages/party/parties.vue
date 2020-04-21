@@ -1,22 +1,10 @@
 <template>
   <div>
     <h4 class="title">Parties</h4>
-    <div v-if="party" class="row justify-center" q-ma-md>
-      <q-btn
-        v-if="party.host.userName === $store.getters.user.userName"
-        @click="shutDownParty"
-        flat
-        color="red"
-        >shut down party</q-btn
-      >
-      <q-btn v-else @click="leaveParty" flat color="red">Leave</q-btn>
-    </div>
-    <div v-else class="row justify-center" q-ma-md>
-      <q-btn @click="startParty" flat color="primary">Start One!</q-btn>
-    </div>
     <div v-if="party">
       <q-pull-to-refresh @refresh="pullRefresh">
         <partyHostView
+          @shutDownParty="shutDownParty"
           v-if="$store.getters.user.userName === party.host.userName"
           :party="party"
         />
@@ -30,6 +18,9 @@
       </q-pull-to-refresh>
     </div>
     <div v-else class="row justify-center" q-ma-md>
+      <div class="row justify-center" q-ma-md>
+        <q-btn @click="startParty" flat color="primary">Start One!</q-btn>
+      </div>
       <followingParties
         @refresh="refresh"
         @joinParty="joinParty"

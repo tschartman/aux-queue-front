@@ -1,5 +1,8 @@
 <template>
   <div>
+    <div v-if="party" class="row justify-center" q-ma-md>
+      <q-btn @click="confirmShutDown" flat color="red">shut down party</q-btn>
+    </div>
     <currentPlayback
       :currentlyPlaying="party.currentlyPlaying"
       :controller="true"
@@ -8,7 +11,15 @@
       <h6>Your party</h6>
     </div>
     <q-scroll-area style="height: 200px;">
-      <suggestedSongs :songs="party.queue" />
+      <suggestedSongs
+        v-if="party.queue.length > 0"
+        :host="true"
+        :songs="party.queue"
+      />
+      <div v-else class="row justify-center text-body1">
+        No suggested Songs. Invite more people to your party so that can suggest
+        some!
+      </div>
     </q-scroll-area>
   </div>
 </template>
@@ -16,13 +27,6 @@
 import { QScrollArea } from "quasar";
 import suggestedSongs from "src/components/suggestedSongs";
 import currentPlayback from "components/currentPlayback";
-// const alerts = [
-//   {
-//     color: "negative",
-//     message: "Error occured during rating",
-//     icon: "report_problem"
-//   }
-// ];
 export default {
   components: {
     suggestedSongs,
@@ -36,6 +40,22 @@ export default {
   data() {
     return {};
   },
-  methods: {}
+  methods: {
+    confirmShutDown() {
+      this.$q.notify({
+        message: "Are you sure you want to shut down the party?",
+        actions: [
+          { label: "Nevermind", color: "white", handler: () => {} },
+          {
+            label: "Shut Down",
+            color: "red",
+            handler: () => {
+              this.$emit("shutDownParty");
+            }
+          }
+        ]
+      });
+    }
+  }
 };
 </script>
