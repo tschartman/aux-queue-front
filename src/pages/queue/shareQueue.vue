@@ -30,9 +30,9 @@
   </div>
 </template>
 <script>
-import songList from "components/songList";
-import sharedSearchContainer from "components/sharedSearchContainer";
-import sharedPlaybackContainer from "components/sharedPlaybackContainer";
+import songList from "components/songs/songList";
+import sharedSearchContainer from "components/songs/sharedSearchContainer";
+import sharedPlaybackContainer from "components/playback/sharedPlaybackContainer";
 import { QIcon, QItemSection, QItemLabel } from "quasar";
 
 export default {

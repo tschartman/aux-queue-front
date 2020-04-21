@@ -40,10 +40,10 @@
 </template>
 <script>
 import shareQueue from "src/modals/shareQueue";
-import searchContainer from "components/searchContainer";
-import songList from "components/songList";
+import searchContainer from "components/songs/searchContainer";
+import songList from "components/songs/songList";
 import notLinked from "src/pages/auth/notLinked";
-import playbackContainer from "components/playbackContainer";
+import playbackContainer from "components/playback/playbackContainer";
 import { QBtn, QItemSection, QItemLabel } from "quasar";
 
 export default {

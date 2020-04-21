@@ -8,7 +8,7 @@
 </template>
 <script>
 import { spotify_api } from "src/utils/spotify-api";
-import songSearch from "components/songSearch";
+import songSearch from "components/songs/songSearch";
 export default {
   name: "searchContainer",
   props: {

@@ -15,7 +15,7 @@
 </template>
 <script>
 import { spotify_api } from "src/utils/spotify-api";
-import currentPlayback from "components/currentPlayback";
+import currentPlayback from "components/playback/currentPlayback";
 
 export default {
   name: "playbackContainer",

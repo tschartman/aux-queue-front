@@ -33,8 +33,8 @@ import {
   REMOVE_FOLLOWER_MUTATION
 } from "src/graphql/queries/followerQueries";
 import { QTabs, QTab, QTabPanel, QTabPanels, QSeparator } from "quasar";
-import followerList from "src/components/followerList";
-import followingList from "src/components/followingList";
+import followerList from "src/components/following/followerList";
+import followingList from "src/components/following/followingList";
 const statusList = ["pending", "accepted", "declined", "blocked"];
 export default {
   props: {

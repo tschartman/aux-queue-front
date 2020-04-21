@@ -83,12 +83,12 @@
   </div>
 </template>
 <script>
-import spotifyCarousel from "src/components/spotifyCarousel";
+import spotifyCarousel from "src/components/user/spotifyCarousel";
 import editUser from "src/modals/editUser";
 import editUserName from "src/modals/editUserName";
 import editPassword from "src/modals/editPassword";
 import Friends from "src/pages/user/Friends";
-import userView from "src/components/userView";
+import userView from "src/components/user/userView";
 import notLinked from "src/pages/auth/notLinked";
 import Following from "src/pages/user/Following";
 import {

@@ -15,7 +15,7 @@
 </template>
 <script>
 import axios from "axios";
-import currentPlayback from "components/currentPlayback";
+import currentPlayback from "components/playback/currentPlayback";
 
 export default {
   name: "playbackContainer",

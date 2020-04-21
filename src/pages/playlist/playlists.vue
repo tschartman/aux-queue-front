@@ -32,9 +32,9 @@
 </template>
 <script>
 import { spotify_api } from "src/utils/spotify-api";
-import searchContainer from "components/searchContainer";
-import songList from "components/songList";
-import playlistSelect from "components/playlistSelect";
+import searchContainer from "components/songs/searchContainer";
+import songList from "components/songs/songList";
+import playlistSelect from "components/playlist/playlistSelect";
 import { QItemLabel } from "quasar";
 
 export default {

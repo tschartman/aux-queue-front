@@ -27,8 +27,8 @@
 <script>
 import Vue from "vue";
 import axios from "axios";
-import sharedSearchContainer from "components/searchContainer";
-import songList from "components/songList";
+import sharedSearchContainer from "components/songs/searchContainer";
+import songList from "components/songs/songList";
 import { QBtn, QItemLabel } from "quasar";
 Vue.component("Share");
 

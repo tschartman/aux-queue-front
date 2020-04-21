@@ -151,7 +151,7 @@ import {
   REMOVE_FOLLOW_MUTATION,
   REMOVE_FOLLOWER_MUTATION
 } from "src/graphql/queries/followerQueries";
-import userView from "src/components/userView";
+import userView from "src/components/user/userView";
 const statusList = ["pending", "accepted", "declined", "blocked"];
 export default {
   props: {

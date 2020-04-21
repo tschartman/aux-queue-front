@@ -25,8 +25,8 @@
 </template>
 <script>
 import { QScrollArea } from "quasar";
-import suggestedSongs from "src/components/suggestedSongs";
-import currentPlayback from "components/currentPlayback";
+import suggestedSongs from "src/components/songs/suggestedSongs";
+import currentPlayback from "components/playback/currentPlayback";
 export default {
   components: {
     suggestedSongs,

@@ -40,9 +40,9 @@ import {
   SHUT_DOWN_PARTY_MUTATION,
   REFRESH_CURRENT_SONG
 } from "src/graphql/queries/partyQueries";
-import followingParties from "components/followingParties";
-import partyView from "components/partyView";
-import partyHostView from "components/partyHostView";
+import followingParties from "components/following/followingParties";
+import partyView from "components/party/partyView";
+import partyHostView from "components/party/partyHostView";
 import { QPullToRefresh } from "quasar";
 const alerts = [
   {

@@ -29,9 +29,9 @@
 </template>
 <script>
 import { QScrollArea } from "quasar";
-import suggestedSongs from "src/components/suggestedSongs";
-import currentPlayback from "components/currentPlayback";
-import searchContainer from "components/searchContainer";
+import suggestedSongs from "src/components/songs/suggestedSongs";
+import currentPlayback from "components/playback/currentPlayback";
+import searchContainer from "components/songs/searchContainer";
 import {
   RATE_SONG_MUTATION,
   REMOVE_RATING_MUTATION
