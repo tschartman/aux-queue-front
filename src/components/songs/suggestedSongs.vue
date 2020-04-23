@@ -41,12 +41,20 @@
           </div>
         </q-item-section>
         <q-item-section v-if="host" avatar>
-          <q-icon name="delete" color="red">
+          <q-icon
+            @click="$emit('removeAction', suggested)"
+            name="delete"
+            color="red"
+          >
             <q-tooltip>Remove</q-tooltip>
           </q-icon>
         </q-item-section>
         <q-item-section v-if="host" avatar>
-          <q-icon name="playlist_add" color="blue">
+          <q-icon
+            @click="$emit('playAction', suggested.song)"
+            name="playlist_add"
+            color="blue"
+          >
             <q-tooltip>Add To Plalist</q-tooltip>
           </q-icon>
         </q-item-section>

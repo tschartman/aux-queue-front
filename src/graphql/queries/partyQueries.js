@@ -55,6 +55,14 @@ export const RATE_SONG_MUTATION = gql`
   }
 `;
 
+export const REMOVE_SONG_MUTATION = gql`
+  mutation removeSong($id: ID!) {
+    removeSong(input: { id: $id }) {
+      ok
+    }
+  }
+`;
+
 export const REMOVE_RATING_MUTATION = gql`
   mutation removeRating($id: ID!) {
     removeRating(input: { id: $id }) {

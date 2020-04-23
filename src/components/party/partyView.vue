@@ -6,29 +6,33 @@
     <div class="row justify-center" q-ma-md>
       <q-btn @click="$emit('leaveParty')" flat color="red">Leave</q-btn>
     </div>
-    <currentPlayback
-      :currentlyPlaying="party.currentlyPlaying"
-      :controller="false"
-    />
+    <q-pull-to-refresh @refresh="pullRefreshSong">
+      <currentPlayback
+        :currentlyPlaying="party.currentlyPlaying"
+        :controller="false"
+      />
+    </q-pull-to-refresh>
     <div class="row justify-center">
       <h6>{{ party.host.userName }}'s party</h6>
     </div>
-    <q-scroll-area style="height: 200px;">
-      <suggestedSongs
-        v-if="party.queue.length > 0"
-        :host="false"
-        @likeAction="likeSong"
-        @dislikeAction="dislikeSong"
-        :songs="party.queue"
-      />
-      <div v-else class="row justify-center text-body1">
-        No suggested Songs. Search for a song and suggest one!
-      </div>
-    </q-scroll-area>
+    <q-pull-to-refresh @refresh="pullRefreshQueue">
+      <q-scroll-area style="height: 200px;">
+        <suggestedSongs
+          v-if="party.queue.length > 0"
+          :host="false"
+          @likeAction="likeSong"
+          @dislikeAction="dislikeSong"
+          :songs="party.queue"
+        />
+        <div v-else class="row justify-center text-body1">
+          No suggested Songs. Search for a song and suggest one!
+        </div>
+      </q-scroll-area>
+    </q-pull-to-refresh>
   </div>
 </template>
 <script>
-import { QScrollArea } from "quasar";
+import { QScrollArea, QPullToRefresh } from "quasar";
 import suggestedSongs from "src/components/songs/suggestedSongs";
 import currentPlayback from "components/playback/currentPlayback";
 import searchContainer from "components/songs/searchContainer";
@@ -48,7 +52,8 @@ export default {
     suggestedSongs,
     currentPlayback,
     QScrollArea,
-    searchContainer
+    searchContainer,
+    QPullToRefresh
   },
   props: {
     party: Object,
@@ -118,6 +123,13 @@ export default {
     },
     suggestSong(song) {
       this.$emit("suggestSong", song);
+    },
+    pullRefreshSong(done) {
+      this.$emit("refreshSong", this.party.host.userName, done);
+      done();
+    },
+    pullRefreshQueue(done) {
+      this.$emit("refreshQueue", done);
     }
   }
 };

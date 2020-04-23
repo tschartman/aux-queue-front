@@ -2,27 +2,31 @@
   <div>
     <h4 class="title">Parties</h4>
     <div v-if="party">
-      <q-pull-to-refresh @refresh="pullRefresh">
-        <partyHostView
-          @shutDownParty="shutDownParty"
-          v-if="$store.getters.user.userName === party.host.userName"
-          :party="party"
-        />
-        <partyView
-          v-else
-          :party="party"
-          @suggestSong="suggestSong"
-          @leaveParty="leaveParty"
-          @updateQueue="updateQueue"
-        />
-      </q-pull-to-refresh>
+      <partyHostView
+        @refreshQueue="refreshQueue"
+        @shutDownParty="shutDownParty"
+        @removeSong="removeSong"
+        @refreshSong="refreshSong"
+        v-if="$store.getters.user.userName === party.host.userName"
+        :party="party"
+      />
+      <partyView
+        v-else
+        :party="party"
+        @removeSong="removeSong"
+        @refreshSong="refreshSong"
+        @refreshQueue="refreshQueue"
+        @suggestSong="suggestSong"
+        @leaveParty="leaveParty"
+        @updateQueue="updateQueue"
+      />
     </div>
     <div v-else class="row justify-center" q-ma-md>
       <div class="row justify-center" q-ma-md>
         <q-btn @click="startParty" flat color="primary">Start One!</q-btn>
       </div>
       <followingParties
-        @refresh="refresh"
+        @refresh="refreshSong"
         @joinParty="joinParty"
         :parties="parties"
       />
@@ -43,7 +47,7 @@ import {
 import followingParties from "components/following/followingParties";
 import partyView from "components/party/partyView";
 import partyHostView from "components/party/partyHostView";
-import { QPullToRefresh } from "quasar";
+//import { QPullToRefresh } from "quasar";
 const alerts = [
   {
     color: "negative",
@@ -71,8 +75,7 @@ export default {
   components: {
     partyView,
     followingParties,
-    partyHostView,
-    QPullToRefresh
+    partyHostView
   },
   data() {
     return {
@@ -82,6 +85,16 @@ export default {
     };
   },
   methods: {
+    async refreshQueue(done) {
+      const party = await this.$apollo.query({
+        query: GET_PARTY_QUERY
+      });
+      if (party.data.party.queue) {
+        console.log(party.data.party.queue);
+        this.$set(this.party, "queue", party.data.party.queue);
+      }
+      done();
+    },
     updateQueue(action, song) {
       const user = this.$store.getters.user;
       let queue = Array.from(this.party.queue);
@@ -178,11 +191,7 @@ export default {
         this.$q.notify(alerts[1]);
       }
     },
-    pullRefresh(done) {
-      this.refresh(this.party.host.userName);
-      done();
-    },
-    async refresh(userName) {
+    async refreshSong(userName) {
       const currentSong = await this.$apollo.mutate({
         mutation: REFRESH_CURRENT_SONG,
         variables: { userName: userName }
@@ -200,6 +209,11 @@ export default {
           this.parties = parties;
         }
       }
+    },
+    removeSong(song) {
+      let songs = Array.from(this.party.queue);
+      songs = songs.filter(s => s.id !== song.id);
+      this.$set(this.party, "queue", songs);
     }
   },
   async created() {
