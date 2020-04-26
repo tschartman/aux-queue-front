@@ -42,7 +42,8 @@ import {
   JOIN_PARTY_MUTATION,
   CREATE_PARTY_MUTATION,
   SHUT_DOWN_PARTY_MUTATION,
-  REFRESH_CURRENT_SONG
+  REFRESH_CURRENT_SONG,
+  PARTY_SUBSCRIPTION
 } from "src/graphql/queries/partyQueries";
 import followingParties from "components/following/followingParties";
 import partyView from "components/party/partyView";
@@ -214,6 +215,23 @@ export default {
       let songs = Array.from(this.party.queue);
       songs = songs.filter(s => s.id !== song.id);
       this.$set(this.party, "queue", songs);
+    }
+  },
+  apollo: {
+    $subscribe: {
+      partyAdded: {
+        query: PARTY_SUBSCRIPTION,
+        result({ data }) {
+          let parties = Array.from(this.parties);
+          if (parties.findIndex(p => p.id === data.partyCreated.id) === -1) {
+            parties.push(data.partyCreated);
+          }
+          this.parties = parties;
+        }
+        // skip(){
+        //   return this.skipSubscription
+        // }
+      }
     }
   },
   async created() {

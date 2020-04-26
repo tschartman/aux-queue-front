@@ -3,6 +3,22 @@ import gql from "graphql-tag";
 export const GET_PARTIES_QUERY = gql`
   query getParties {
     parties {
+      id
+      name
+      currentlyPlaying {
+        coverUri
+      }
+      host {
+        userName
+      }
+    }
+  }
+`;
+
+export const PARTY_SUBSCRIPTION = gql`
+  subscription partyCreated {
+    partyCreated {
+      id
       name
       currentlyPlaying {
         coverUri
