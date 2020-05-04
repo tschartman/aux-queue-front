@@ -43,7 +43,9 @@ import {
   CREATE_PARTY_MUTATION,
   SHUT_DOWN_PARTY_MUTATION,
   REFRESH_CURRENT_SONG,
-  PARTY_SUBSCRIPTION
+  PARTY_CREATED_SUBSCRIPTION,
+  PARTY_DELETED_SUBSCRIPTION,
+  PARTY_UPDATED_SUBSCRIPTION
 } from "src/graphql/queries/partyQueries";
 import followingParties from "components/following/followingParties";
 import partyView from "components/party/partyView";
@@ -85,7 +87,44 @@ export default {
       party: null
     };
   },
+  apollo: {
+    party: GET_PARTY_QUERY,
+    parties: {
+      query: GET_PARTIES_QUERY,
+      subscribeToMore: [
+        {
+          document: PARTY_CREATED_SUBSCRIPTION,
+          updateQuery: function(previousResult, { subscriptionData }) {
+            let newParty = subscriptionData.data.partyCreated;
+            if (!this.parties.find(p => p.id === newParty.id)) {
+              return Array.from(this.parties.push(newParty));
+            }
+          }
+        },
+        {
+          document: PARTY_DELETED_SUBSCRIPTION,
+          updateQuery: function(previousResult, { subscriptionData }) {
+            let deletedParty = subscriptionData.data.partyDeleted;
+            this.parties = Array.from(
+              this.parties.filter(p => p.id !== deletedParty.id)
+            );
+          }
+        }
+      ]
+    }
+  },
   methods: {
+    subscribeToParty(id) {
+      this.$apollo.queries.party.subscribeToMore({
+        document: PARTY_UPDATED_SUBSCRIPTION,
+        variables: {
+          id: id
+        },
+        updateQuery: (previousResult, { subscriptionData }) => {
+          this.party = subscriptionData.data.partyUpdated;
+        }
+      });
+    },
     async refreshQueue(done) {
       const party = await this.$apollo.query({
         query: GET_PARTY_QUERY
@@ -118,7 +157,6 @@ export default {
       this.$set(this.party, "queue", queue);
     },
     async suggestSong(song) {
-      console.log(song);
       let queue = Array.from(this.party.queue);
       let newSong = {
         title: song.name,
@@ -136,7 +174,6 @@ export default {
         // if no errors occured then add then update ui to reflect changes
         if (suggestedSong.data.suggestSong.ok) {
           queue.push(suggestedSong.data.suggestSong.suggested);
-          this.remove(song);
           this.$set(this.party, "queue", queue);
         } else {
           // else an error has occured
@@ -153,7 +190,9 @@ export default {
         variables: { userName: userName }
       });
       if (joinParty.data.joinParty.ok) {
-        this.party = joinParty.data.joinParty.party;
+        let party = joinParty.data.joinParty.party;
+        this.party = party;
+        this.subscribeToParty(party.id);
       } else {
         this.$q.notify(alerts[3]);
       }
@@ -167,10 +206,6 @@ export default {
       } else {
         this.$q.notify(alerts[2]);
       }
-    },
-    remove(song) {
-      let index = this.queue.indexOf(song);
-      this.queue.splice(index, 1);
     },
     async leaveParty() {
       const leaveParty = await this.$apollo.mutate({
@@ -216,33 +251,6 @@ export default {
       songs = songs.filter(s => s.id !== song.id);
       this.$set(this.party, "queue", songs);
     }
-  },
-  apollo: {
-    $subscribe: {
-      partyAdded: {
-        query: PARTY_SUBSCRIPTION,
-        result({ data }) {
-          let parties = Array.from(this.parties);
-          if (parties.findIndex(p => p.id === data.partyCreated.id) === -1) {
-            parties.push(data.partyCreated);
-          }
-          this.parties = parties;
-        }
-        // skip(){
-        //   return this.skipSubscription
-        // }
-      }
-    }
-  },
-  async created() {
-    const party = await this.$apollo.query({
-      query: GET_PARTY_QUERY
-    });
-    const parties = await this.$apollo.query({
-      query: GET_PARTIES_QUERY
-    });
-    this.parties = parties.data.parties;
-    this.party = party.data.party;
   }
 };
 </script>

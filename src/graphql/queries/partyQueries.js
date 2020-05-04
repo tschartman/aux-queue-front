@@ -15,7 +15,7 @@ export const GET_PARTIES_QUERY = gql`
   }
 `;
 
-export const PARTY_SUBSCRIPTION = gql`
+export const PARTY_CREATED_SUBSCRIPTION = gql`
   subscription partyCreated {
     partyCreated {
       id
@@ -25,6 +25,47 @@ export const PARTY_SUBSCRIPTION = gql`
       }
       host {
         userName
+      }
+    }
+  }
+`;
+
+export const PARTY_DELETED_SUBSCRIPTION = gql`
+  subscription partyDeleted {
+    partyDeleted {
+      id
+    }
+  }
+`;
+
+export const PARTY_UPDATED_SUBSCRIPTION = gql`
+  subscription partyUpdated($id: ID!) {
+    partyUpdated(id: $id) {
+      name
+      host {
+        userName
+      }
+      currentlyPlaying {
+        title
+        artist
+        album
+        coverUri
+      }
+      queue {
+        id
+        song {
+          title
+          album
+          artist
+          coverUri
+          songUri
+        }
+        rating {
+          user {
+            userName
+          }
+          like
+        }
       }
     }
   }
@@ -146,6 +187,7 @@ export const JOIN_PARTY_MUTATION = gql`
     joinParty(input: { userName: $userName }) {
       ok
       party {
+        id
         name
         host {
           userName
