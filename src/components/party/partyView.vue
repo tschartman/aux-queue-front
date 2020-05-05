@@ -12,23 +12,18 @@
         :controller="false"
       />
     </q-pull-to-refresh>
-    <div class="row justify-center">
-      <h6>{{ party.host.userName }}'s party</h6>
-    </div>
-    <q-pull-to-refresh @refresh="pullRefreshQueue">
-      <q-scroll-area style="height: 200px;">
-        <suggestedSongs
-          v-if="party.queue.length > 0"
-          :host="false"
-          @likeAction="likeSong"
-          @dislikeAction="dislikeSong"
-          :songs="party.queue"
-        />
-        <div v-else class="row justify-center text-body1">
-          No suggested Songs. Search for a song and suggest one!
-        </div>
-      </q-scroll-area>
-    </q-pull-to-refresh>
+    <q-scroll-area style="height: 200px;">
+      <suggestedSongs
+        v-if="party.queue.length > 0"
+        :host="false"
+        @likeAction="likeSong"
+        @dislikeAction="dislikeSong"
+        :songs="party.queue"
+      />
+      <div v-else class="row justify-center text-body1">
+        No suggested Songs. Search for a song and suggest one!
+      </div>
+    </q-scroll-area>
   </div>
 </template>
 <script>
@@ -127,9 +122,6 @@ export default {
     pullRefreshSong(done) {
       this.$emit("refreshSong", this.party.host.userName, done);
       done();
-    },
-    pullRefreshQueue(done) {
-      this.$emit("refreshQueue", done);
     }
   }
 };

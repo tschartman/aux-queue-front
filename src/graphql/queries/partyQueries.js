@@ -41,6 +41,7 @@ export const PARTY_DELETED_SUBSCRIPTION = gql`
 export const PARTY_UPDATED_SUBSCRIPTION = gql`
   subscription partyUpdated($id: ID!) {
     partyUpdated(id: $id) {
+      id
       name
       host {
         userName
@@ -74,6 +75,7 @@ export const PARTY_UPDATED_SUBSCRIPTION = gql`
 export const GET_PARTY_QUERY = gql`
   query getParty {
     party {
+      id
       name
       host {
         userName
@@ -186,36 +188,6 @@ export const JOIN_PARTY_MUTATION = gql`
   mutation joinParty($userName: String!) {
     joinParty(input: { userName: $userName }) {
       ok
-      party {
-        id
-        name
-        host {
-          userName
-          userImage
-        }
-        currentlyPlaying {
-          title
-          artist
-          album
-          coverUri
-        }
-        queue {
-          id
-          song {
-            title
-            album
-            artist
-            coverUri
-            songUri
-          }
-          rating {
-            user {
-              userName
-            }
-            like
-          }
-        }
-      }
     }
   }
 `;
@@ -224,18 +196,6 @@ export const CREATE_PARTY_MUTATION = gql`
   mutation createParty {
     createParty {
       ok
-      party {
-        name
-        queue {
-          id
-          song {
-            title
-          }
-        }
-        host {
-          userName
-        }
-      }
     }
   }
 `;

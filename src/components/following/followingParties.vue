@@ -34,16 +34,7 @@
                   {{ party.host.userName }}
                 </div>
               </q-card-section>
-              <q-card-section class="row justify-center">
-                <q-icon
-                  @click="$emit('refresh', party.host.userName)"
-                  size="xl"
-                  name="loop"
-                  ><q-tooltip>
-                    No Songs Playing
-                  </q-tooltip>
-                </q-icon>
-              </q-card-section>
+              <q-card-section class="row justify-center"> </q-card-section>
               <q-card-actions class="row justify-center">
                 <q-btn
                   flat
@@ -60,15 +51,7 @@
   </div>
 </template>
 <script>
-import {
-  QScrollArea,
-  QCard,
-  QImg,
-  QCardActions,
-  QCardSection,
-  QIcon,
-  QTooltip
-} from "quasar";
+import { QScrollArea, QCard, QImg, QCardActions, QCardSection } from "quasar";
 
 export default {
   components: {
@@ -76,9 +59,7 @@ export default {
     QCard,
     QImg,
     QCardActions,
-    QCardSection,
-    QIcon,
-    QTooltip
+    QCardSection
   },
   props: {
     parties: { type: Array },
