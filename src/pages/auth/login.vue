@@ -130,7 +130,6 @@ export default {
           });
           await this.$store.dispatch("login", loggedInUser);
         } catch (err) {
-          console.log(err);
           this.loading = false;
           this.authError = "Username or password incorrect";
         }
