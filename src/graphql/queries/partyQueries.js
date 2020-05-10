@@ -67,6 +67,12 @@ export const GET_PARTY_QUERY = gql`
       host {
         userName
       }
+      guests {
+        userName
+        firstName
+        lastName
+        userImage
+      }
       currentlyPlaying {
         title
         artist

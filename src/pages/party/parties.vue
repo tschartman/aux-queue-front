@@ -13,7 +13,11 @@
       transition-next="jump-up"
     >
       <q-tab-panel name="parties">
-        <followingParties @joinParty="joinParty" :parties="parties" />
+        <followingParties
+          @joinParty="joinParty"
+          :current="currentParty"
+          :parties="parties"
+        />
       </q-tab-panel>
       <q-tab-panel name="party">
         <party

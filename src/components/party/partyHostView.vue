@@ -6,29 +6,66 @@
     <q-pull-to-refresh @refresh="pullRefreshSong">
       <currentPlayback
         :currentlyPlaying="party.currentlyPlaying"
-        :controller="true"
+        :controller="false"
       />
     </q-pull-to-refresh>
-    <q-scroll-area style="height: 200px;">
-      <suggestedSongs
-        v-if="party.queue.length > 0"
-        :host="true"
-        :songs="party.queue"
-        @removeAction="removeSong"
-        @playAction="playSong"
+    <q-tabs v-model="tab" narrow-indicator dense align="justify">
+      <q-tab
+        class="text-purple"
+        name="queue"
+        icon="format_list_bulleted"
+        label="Queue"
       />
-      <div v-else class="row justify-center text-body1">
-        No suggested Songs. Invite more people to your party so that can suggest
-        some!
-      </div>
-    </q-scroll-area>
+      <q-tab class="text-orange" name="guests" icon="people" label="Guests" />
+    </q-tabs>
+    <q-separator />
+    <q-tab-panels
+      v-model="tab"
+      animated
+      swipeable
+      transition-prev="jump-up"
+      transition-next="jump-up"
+    >
+      <q-tab-panel name="queue">
+        <q-scroll-area style="height: 350px;">
+          <suggestedSongs
+            v-if="party.queue.length > 0"
+            :host="true"
+            :songs="party.queue"
+            @removeAction="removeSong"
+            @playAction="playSong"
+          />
+          <div v-else class="row justify-center text-body1">
+            No suggested Songs. Invite more people to your party so that can
+            suggest some!
+          </div>
+        </q-scroll-area>
+      </q-tab-panel>
+      <q-tab-panel name="guests">
+        <q-scroll-area style="height: 400px;">
+          <userList v-if="party.guests.length > 0" :users="party.guests" />
+          <div v-else class="row justify-center text-body1">
+            No one is in your party. Invite more people to your pary!
+          </div>
+        </q-scroll-area>
+      </q-tab-panel>
+    </q-tab-panels>
   </div>
 </template>
 <script>
 import { spotify_api } from "src/utils/spotify-api";
-import { QScrollArea, QPullToRefresh } from "quasar";
+import {
+  QScrollArea,
+  QPullToRefresh,
+  QTabs,
+  QTab,
+  QTabPanel,
+  QTabPanels,
+  QSeparator
+} from "quasar";
 import suggestedSongs from "src/components/songs/suggestedSongs";
 import currentPlayback from "components/playback/currentPlayback";
+import userList from "src/components/user/userList";
 import { REMOVE_SONG_MUTATION } from "src/graphql/queries/partyQueries";
 const alerts = [
   {
@@ -41,15 +78,23 @@ export default {
   components: {
     suggestedSongs,
     currentPlayback,
+    userList,
     QScrollArea,
-    QPullToRefresh
+    QPullToRefresh,
+    QTabs,
+    QTab,
+    QTabPanel,
+    QTabPanels,
+    QSeparator
   },
   props: {
     party: Object,
     method: { type: Function }
   },
   data() {
-    return {};
+    return {
+      tab: "queue"
+    };
   },
   methods: {
     async removeSong(song) {

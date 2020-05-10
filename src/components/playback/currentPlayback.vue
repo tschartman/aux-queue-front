@@ -18,14 +18,14 @@
         {{ currentlyPlaying.title }} - {{ currentlyPlaying.artist }}
       </div>
     </div>
-    <div class="row justify-center items-center">
+    <div v-if="controller" class="row justify-center items-center">
       <q-linear-progress
         class="progress q-ma-lg"
         :value="progress / duration"
         color="black"
       />
     </div>
-    <div class="row justify-center text-center">
+    <div v-if="controller" class="row justify-center text-center">
       <div class="col-xs-6 q-mb-md">
         {{ moment(progress).format("mm:ss") }}
       </div>

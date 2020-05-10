@@ -36,7 +36,11 @@
               </q-card-section>
               <q-card-section class="row justify-center"> </q-card-section>
               <q-card-actions class="row justify-center">
+                <div v-if="current">
+                  You are in this party
+                </div>
                 <q-btn
+                  v-else
                   flat
                   @click="$emit('joinParty', party.host.userName)"
                   color="primary"
@@ -63,6 +67,7 @@ export default {
   },
   props: {
     parties: { type: Array },
+    current: { type: Object },
     method: { type: Function }
   },
   data() {
