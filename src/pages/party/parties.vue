@@ -1,21 +1,37 @@
 <template>
   <div>
-    <div v-if="view === 'parties'">
-      <h4 class="title">Parties</h4>
-      <div class="row justify-center" q-ma-md>
-        <div class="row justify-center" q-ma-md>
-          <q-btn @click="startParty" flat color="primary">Start One!</q-btn>
-        </div>
+    <q-tabs v-model="tab" class="text-teal">
+      <q-tab name="parties" label="All Parties"></q-tab>
+      <q-tab name="party" label="Current Party"></q-tab>
+    </q-tabs>
+    <q-separator />
+    <q-tab-panels
+      v-model="tab"
+      animated
+      swipeable
+      transition-prev="jump-up"
+      transition-next="jump-up"
+    >
+      <q-tab-panel name="parties">
         <followingParties @joinParty="joinParty" :parties="parties" />
-      </div>
-    </div>
-    <div v-else class="row justify-center" q-ma-md>
-      <party
-        @refreshParty="refreshParty"
-        @changeView="view = 'parties'"
-        :parties="parties"
-      />
-    </div>
+      </q-tab-panel>
+      <q-tab-panel name="party">
+        <party
+          v-if="currentParty || joinedParty"
+          @refreshParty="refreshParty"
+          @leaveParty="leaveParty"
+        />
+        <div v-else>
+          <div class="row justify-center">
+            <q-btn @click="startParty" flat color="primary">Start One!</q-btn>
+          </div>
+          <div class="row justify-center text-body1">
+            You are currently not in any parties. Join one from one of your
+            friends or start your own!
+          </div>
+        </div>
+      </q-tab-panel>
+    </q-tab-panels>
   </div>
 </template>
 <script>
@@ -26,6 +42,7 @@ import {
   PARTY_CREATED_SUBSCRIPTION,
   PARTY_DELETED_SUBSCRIPTION
 } from "src/graphql/queries/partyQueries";
+import { QTabs, QTab, QTabPanel, QTabPanels, QSeparator } from "quasar";
 import followingParties from "components/following/followingParties";
 import party from "src/pages/party/party";
 const alerts = [
@@ -44,12 +61,18 @@ export default {
   name: "Parties",
   components: {
     followingParties,
-    party
+    party,
+    QTabs,
+    QTab,
+    QTabPanel,
+    QTabPanels,
+    QSeparator
   },
   data() {
     return {
       parties: [],
-      view: "parties"
+      tab: "parties",
+      joinedParty: false
     };
   },
   apollo: {
@@ -77,6 +100,21 @@ export default {
       ]
     }
   },
+  computed: {
+    currentParty: function() {
+      return (
+        this.parties.find(
+          p => p.host.userName === this.$store.getters.user.userName
+        ) ||
+        this.parties.find(
+          p =>
+            p.guests.findIndex(
+              user => user.userName == this.$store.getters.user.userName
+            ) !== -1
+        )
+      );
+    }
+  },
   methods: {
     async joinParty(userName) {
       const joinParty = await this.$apollo.mutate({
@@ -84,7 +122,8 @@ export default {
         variables: { userName: userName }
       });
       if (joinParty.data.joinParty.ok) {
-        this.view = "party";
+        this.joinedParty = true;
+        this.tab = "party";
       } else {
         this.$q.notify(alerts[1]);
       }
@@ -94,7 +133,7 @@ export default {
         mutation: CREATE_PARTY_MUTATION
       });
       if (createParty.data.createParty.ok) {
-        this.view = "party";
+        this.tab = "party";
       } else {
         this.$q.notify(alerts[0]);
       }
@@ -106,6 +145,10 @@ export default {
         parties[partyIndex].currentlyPlaying = currentlyPlaying;
         this.parties = parties;
       }
+    },
+    leaveParty() {
+      this.joinedParty = false;
+      this.tab = "parties";
     }
   }
 };

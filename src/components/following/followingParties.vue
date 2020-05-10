@@ -72,6 +72,9 @@ export default {
 };
 </script>
 <style scoped>
+h6 {
+  margin: 0;
+}
 .page {
   width: 100%;
   overflow: hidden;

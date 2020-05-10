@@ -11,6 +11,9 @@ export const GET_PARTIES_QUERY = gql`
       host {
         userName
       }
+      guests {
+        userName
+      }
     }
   }
 `;
@@ -43,30 +46,14 @@ export const PARTY_UPDATED_SUBSCRIPTION = gql`
     partyUpdated(id: $id) {
       id
       name
+      currentlyPlaying {
+        coverUri
+      }
       host {
         userName
       }
-      currentlyPlaying {
-        title
-        artist
-        album
-        coverUri
-      }
-      queue {
-        id
-        song {
-          title
-          album
-          artist
-          coverUri
-          songUri
-        }
-        rating {
-          user {
-            userName
-          }
-          like
-        }
+      guests {
+        userName
       }
     }
   }

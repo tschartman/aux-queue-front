@@ -1,24 +1,22 @@
 <template>
   <div>
-    <h4 class="title">{{ party.host.userName }}'s Party</h4>
-    <div v-if="party" class="row justify-center" q-ma-md>
-      <partyHostView
-        v-if="$store.getters.user.userName === party.host.userName"
-        :party="party"
-        @shutDownParty="shutDownParty"
-        @removeSong="removeSong"
-        @refreshSong="refreshSong"
-      />
-      <partyView
-        v-else
-        :party="party"
-        @removeSong="removeSong"
-        @refreshSong="refreshSong"
-        @suggestSong="suggestSong"
-        @leaveParty="leaveParty"
-        @updateQueue="updateQueue"
-      />
-    </div>
+    <h5 class="title">{{ party.host.userName }}'s Party</h5>
+    <partyHostView
+      v-if="$store.getters.user.userName === party.host.userName"
+      :party="party"
+      @shutDownParty="shutDownParty"
+      @removeSong="removeSong"
+      @refreshSong="refreshSong"
+    />
+    <partyView
+      v-else
+      :party="party"
+      @removeSong="removeSong"
+      @refreshSong="refreshSong"
+      @suggestSong="suggestSong"
+      @leaveParty="leaveParty"
+      @updateQueue="updateQueue"
+    />
   </div>
 </template>
 <script>
@@ -164,11 +162,14 @@ export default {
         mutation: LEAVE_PARTY_MUTATION
       });
       if (leaveParty.data.leaveParty.ok) {
-        this.$emit("changeView");
+        this.$emit("leaveParty");
       } else {
         this.$q.notify(alerts[1]);
       }
     }
+  },
+  created() {
+    console.log(this.$store.getters);
   }
 };
 </script>
