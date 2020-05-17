@@ -39,12 +39,27 @@
           />
         </q-popup-edit>
       </q-item-section>
+      <q-item-section avatar>
+        <q-icon
+          size="sm"
+          name="pan_tool"
+          @click="kickUser(guest.user.userName, guest.id)"
+          color="red"
+        >
+          <q-tooltip>
+            Kick from party
+          </q-tooltip>
+        </q-icon>
+      </q-item-section>
     </q-item>
   </div>
 </template>
 <script>
 import { QImg, QAvatar, QTooltip, QPopupEdit, QInput } from "quasar";
-import { UPDATE_ALLOWED_REQUEST } from "src/graphql/queries/partyQueries";
+import {
+  UPDATE_ALLOWED_REQUEST,
+  REMOVE_FROM_PARTY_MUTATION
+} from "src/graphql/queries/partyQueries";
 export default {
   components: {
     QImg,
@@ -72,6 +87,37 @@ export default {
         this.$q.notify({
           color: "negative",
           message: "Error updating requests amount",
+          icon: "report_problem"
+        });
+      }
+    },
+    kickUser(username, id) {
+      this.$q.notify({
+        message:
+          "Are you sure you want to kick " + username + " from your party?",
+        actions: [
+          { label: "Nevermind", color: "white", handler: () => {} },
+          {
+            label: "Kick them out!",
+            color: "red",
+            handler: () => {
+              this.sendRemoveRequest(id);
+            }
+          }
+        ]
+      });
+    },
+    async sendRemoveRequest(id) {
+      const removeFromParty = await this.$apollo.mutate({
+        mutation: REMOVE_FROM_PARTY_MUTATION,
+        variables: { id: id }
+      });
+      if (removeFromParty.data.removeFromParty.ok) {
+        this.guests = Array.from(this.guests).filter(g => g.id === id);
+      } else {
+        this.$q.notify({
+          color: "negative",
+          message: "Error removing user from party",
           icon: "report_problem"
         });
       }

@@ -59,7 +59,6 @@ export const PARTY_UPDATED_SUBSCRIPTION = gql`
         id
         allowedRequests
         amountRequested
-        blocked
         user {
           userName
           firstName
@@ -83,7 +82,6 @@ export const GET_PARTY_QUERY = gql`
         id
         allowedRequests
         amountRequested
-        blocked
         user {
           userName
           firstName
@@ -179,6 +177,14 @@ export const UPDATE_ALLOWED_REQUEST = gql`
 export const LEAVE_PARTY_MUTATION = gql`
   mutation leaveParty {
     leaveParty {
+      ok
+    }
+  }
+`;
+
+export const REMOVE_FROM_PARTY_MUTATION = gql`
+  mutation RemoveFromParty($id: ID!) {
+    removeFromParty(input: { id: $id }) {
       ok
     }
   }
