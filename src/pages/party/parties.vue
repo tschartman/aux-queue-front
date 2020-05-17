@@ -113,7 +113,7 @@ export default {
         this.parties.find(
           p =>
             p.guests.findIndex(
-              user => user.userName == this.$store.getters.user.userName
+              g => g.user.userName == this.$store.getters.user.userName
             ) !== -1
         )
       );

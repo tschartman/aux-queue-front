@@ -12,7 +12,10 @@ export const GET_PARTIES_QUERY = gql`
         userName
       }
       guests {
-        userName
+        id
+        user {
+          userName
+        }
       }
     }
   }
@@ -53,7 +56,16 @@ export const PARTY_UPDATED_SUBSCRIPTION = gql`
         userName
       }
       guests {
-        userName
+        id
+        allowedRequests
+        amountRequested
+        blocked
+        user {
+          userName
+          firstName
+          lastName
+          userImage
+        }
       }
     }
   }
@@ -68,10 +80,16 @@ export const GET_PARTY_QUERY = gql`
         userName
       }
       guests {
-        userName
-        firstName
-        lastName
-        userImage
+        id
+        allowedRequests
+        amountRequested
+        blocked
+        user {
+          userName
+          firstName
+          lastName
+          userImage
+        }
       }
       currentlyPlaying {
         title
@@ -142,6 +160,17 @@ export const SUGGEST_SONG_MUTATION = gql`
           }
           like
         }
+      }
+    }
+  }
+`;
+
+export const UPDATE_ALLOWED_REQUEST = gql`
+  mutation updateAllowedRequests($id: ID!, $amount: Int!) {
+    updateAllowedRequests(input: { amount: $amount, id: $id }) {
+      ok
+      guest {
+        allowedRequests
       }
     }
   }

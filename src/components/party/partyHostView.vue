@@ -43,7 +43,10 @@
       </q-tab-panel>
       <q-tab-panel name="guests">
         <q-scroll-area style="height: 400px;">
-          <userList v-if="party.guests.length > 0" :users="party.guests" />
+          <partyUsersList
+            v-if="party.guests.length > 0"
+            :users="party.guests"
+          />
           <div v-else class="row justify-center text-body1">
             No one is in your party. Invite more people to your pary!
           </div>
@@ -65,7 +68,7 @@ import {
 } from "quasar";
 import suggestedSongs from "src/components/songs/suggestedSongs";
 import currentPlayback from "components/playback/currentPlayback";
-import userList from "src/components/user/userList";
+import partyUsersList from "src/components/party/partyUsersList";
 import { REMOVE_SONG_MUTATION } from "src/graphql/queries/partyQueries";
 const alerts = [
   {
@@ -78,7 +81,7 @@ export default {
   components: {
     suggestedSongs,
     currentPlayback,
-    userList,
+    partyUsersList,
     QScrollArea,
     QPullToRefresh,
     QTabs,
