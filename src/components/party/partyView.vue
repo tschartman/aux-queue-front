@@ -1,5 +1,6 @@
 <template>
   <div>
+    <p class="text-overline title">Requests Remaining: {{ songRequests }}</p>
     <div class="q-pa-md">
       <searchContainer @selectSong="suggestSong" />
     </div>
@@ -40,6 +41,11 @@ const alerts = [
     color: "negative",
     message: "Error occured during rating",
     icon: "report_problem"
+  },
+  {
+    color: "negative",
+    message: "You are out out song requests",
+    icon: "report_problem"
   }
 ];
 export default {
@@ -56,6 +62,14 @@ export default {
   },
   data() {
     return {};
+  },
+  computed: {
+    songRequests() {
+      const guest = this.party.guests.find(
+        g => g.user.userName === this.$store.getters.user.userName
+      );
+      return guest.allowedRequests - guest.amountRequested;
+    }
   },
   methods: {
     async likeSong(song) {
@@ -117,7 +131,11 @@ export default {
       }
     },
     suggestSong(song) {
-      this.$emit("suggestSong", song);
+      if (this.songRequests > 0) {
+        this.$emit("suggestSong", song);
+      } else {
+        this.$q.notify(alerts[1]);
+      }
     },
     pullRefreshSong(done) {
       this.$emit("refreshSong", this.party.host.userName, done);
@@ -126,3 +144,9 @@ export default {
   }
 };
 </script>
+<style scoped>
+.title {
+  margin: auto;
+  text-align: center;
+}
+</style>

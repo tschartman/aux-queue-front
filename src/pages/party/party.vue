@@ -115,6 +115,11 @@ export default {
         // if no errors occured then add then update ui to reflect changes
         if (suggestedSong.data.suggestSong.ok) {
           queue.push(suggestedSong.data.suggestSong.suggested);
+          this.$set(
+            this.party,
+            "guests",
+            this.updateRequests(Array.from(this.party.guests))
+          );
           this.$set(this.party, "queue", queue);
         } else {
           // else an error has occured
@@ -124,6 +129,16 @@ export default {
         // if song is already in queue simple remove it from my list
         this.remove(song);
       }
+    },
+    updateRequests(guests) {
+      const guestIndex = guests.findIndex(
+        g => g.user.userName === this.$store.getters.user.userName
+      );
+      if (guestIndex !== -1) {
+        guests[guestIndex].allowedRequests -= 1;
+        return guests;
+      }
+      return guests;
     },
     async refreshSong(userName) {
       const currentSong = await this.$apollo.mutate({
@@ -167,9 +182,6 @@ export default {
         this.$q.notify(alerts[1]);
       }
     }
-  },
-  created() {
-    console.log(this.$store.getters);
   }
 };
 </script>
