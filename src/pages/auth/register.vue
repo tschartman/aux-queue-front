@@ -105,6 +105,7 @@
 </template>
 <script>
 import { validationMixin } from "vuelidate";
+import { app_api } from "src/utils/app-api";
 import {
   required,
   sameAs,
@@ -113,10 +114,6 @@ import {
   helpers
 } from "vuelidate/lib/validators";
 import { TOKEN_AUTH_MUTATION } from "src/graphql/queries/authQueries";
-import {
-  USER_CREATION_MUTATON,
-  CHECK_USER_MUTATION
-} from "src/graphql/queries/userQueries";
 const alpha = helpers.regex("alpha", /^(?=.*\d)(?=.*[a-zA-Z]).{8,25}$/);
 const alerts = [
   {
@@ -185,11 +182,10 @@ export default {
   },
   watch: {
     userName: async function(val) {
-      const userNameStatus = await this.$apollo.mutate({
-        mutation: CHECK_USER_MUTATION,
-        variables: { userName: val }
+      const valid = await app_api.get("/username/", {
+        params: { username: val }
       });
-      this.unique = userNameStatus.data.checkUserName.ok;
+      this.unique = valid.data.valid;
     }
   },
   computed: {
@@ -248,19 +244,15 @@ export default {
       this.loading = true;
       this.$v.$touch();
       if (!this.$v.$invalid) {
-        let data = {
-          firstName: this.firstName,
-          lastName: this.lastName,
-          userName: this.userName,
+        const data = {
+          first_name: this.firstName,
+          last_name: this.lastName,
+          user_name: this.userName,
           email: this.email.toLowerCase(),
           password: this.password
         };
-        console.log(data);
-        const createdUser = await this.$apollo.mutate({
-          mutation: USER_CREATION_MUTATON,
-          variables: data
-        });
-        if (createdUser.data.createUser.ok) {
+        const newUser = await app_api.post("/users/", data);
+        if (newUser.status === 201) {
           const loggedInUser = await this.$apollo.mutate({
             mutation: TOKEN_AUTH_MUTATION,
             variables: {
@@ -269,6 +261,7 @@ export default {
             }
           });
           if (loggedInUser.data) {
+            await this.$apollo.getClient().resetStore();
             await this.$store.dispatch("login", loggedInUser);
             this.$router.push("/user");
           } else {

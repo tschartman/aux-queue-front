@@ -14,8 +14,8 @@
   />
 </template>
 <script>
-import { spotify_api } from "src/utils/spotify-api";
-import currentPlayback from "components/currentPlayback";
+import axios from "axios";
+import currentPlayback from "components/playback/currentPlayback";
 
 export default {
   name: "playbackContainer",
@@ -28,11 +28,11 @@ export default {
   data() {
     return {
       currentlyPlaying: null,
-      id: "",
       paused: false,
       progress: 0,
       duration: 0,
-      interval: 0
+      interval: 0,
+      baseUrl: "https://api.spotify.com/v1"
     };
   },
   methods: {
@@ -41,8 +41,8 @@ export default {
         return song.uri;
       });
 
-      spotify_api
-        .put("/me/player/play", { uris: uris })
+      axios
+        .put(this.baseUrl + "/me/player/play", { uris: uris }, this.config)
         .then(res => {
           //  if (res.status == 204) {
           console.log(res);
@@ -57,8 +57,8 @@ export default {
     },
     playNow(song) {
       let uris = [song.uri];
-      spotify_api
-        .put("/me/player/play", { uris: uris })
+      axios
+        .put(this.baseUrl + "/me/player/play", { uris: uris }, this.config)
         .then(res => {
           //  if (res.status == 204) {
           console.log(res);
@@ -72,7 +72,7 @@ export default {
         });
     },
     playCurrentSong() {
-      spotify_api.put("/me/player/play").then(res => {
+      axios.put(this.baseUrl + "/me/player/play", {}, this.config).then(res => {
         //  if (res.status === 204) {
         console.log(res);
         this.paused = false;
@@ -80,40 +80,54 @@ export default {
       });
     },
     pauseCurrentSong() {
-      spotify_api.put("/me/player/pause").then(res => {
-        if (res.status === 204) {
-          this.paused = true;
-        }
-      });
+      axios
+        .put(this.baseUrl + "/me/player/pause", {}, this.config)
+        .then(res => {
+          if (res.status === 204) {
+            this.paused = true;
+          }
+        });
     },
     skipNext() {
-      spotify_api.post("/me/player/next").then(res => {
-        //  if (res.status == 204) {
-        console.log(res);
-        this.init();
-        //  }
-      });
+      axios
+        .post(this.baseUrl + "/me/player/next", {}, this.config)
+        .then(res => {
+          //  if (res.status == 204) {
+          console.log(res);
+          this.init();
+          //  }
+        });
     },
     skipPrevious() {
-      spotify_api.post("/me/player/previous").then(res => {
-        //  if (res.status == 204) {
-        console.log(res);
-        this.init();
-        // }
-      });
+      axios
+        .post(this.baseUrl + "/me/player/previous", {}, this.config)
+        .then(res => {
+          //  if (res.status == 204) {
+          console.log(res);
+          this.init();
+          // }
+        });
     },
     resetView() {
       this.currentlyPlaying = null;
       this.duration = 0;
       this.progress = 0;
     },
+    mapCurrentlyPlaying(data) {
+      return {
+        name: data.name,
+        artist: data.artists[0].name,
+        coverUri: data.album.images[0].url
+      };
+    },
     init() {
       clearInterval(this.interval);
-      spotify_api.get("/me/player/currently-playing").then(res => {
-        if (res.data !== "" && res.data.item) {
-          if (res.data.is_playing && res.data.item.id != this.id) {
-            this.currentlyPlaying = res.data.item;
-            this.id = res.data.item.id;
+      axios
+        .get(this.baseUrl + "/me/player/currently-playing", this.config)
+        .then(res => {
+          console.log(res);
+          if (res.data !== "" && res.data.is_playing) {
+            this.currentlyPlaying = this.mapCurrentlyPlaying(res.data.item);
             this.duration = res.data.item.duration_ms;
             this.progress = res.data.progress_ms;
             this.interval = setInterval(() => {
@@ -124,9 +138,9 @@ export default {
                 this.progress = this.progress + 10;
               }
             }, 10);
-          } else if (!res.data.is_playing && res.data.item.id != this.id) {
+          } else if (!res.data.is_playing) {
+            console.log("here");
             this.currentlyPlaying = res.data.item;
-            this.id = res.data.id;
             this.duration = res.data.item.duration_ms;
             this.progress = res.data.progress_ms;
             this.paused = true;
@@ -134,12 +148,23 @@ export default {
             this.duration = res.data.item.duration_ms;
             this.progress = res.data.progress_ms;
           }
-        }
-      });
+        });
     }
   },
   created() {
-    this.init();
+    if (this.$route.query.code) {
+      this.config = {
+        headers: {
+          Authorization: "Bearer " + this.$route.query.code
+        }
+      };
+      axios.get(this.baseUrl + "/me", this.config).then(res => {
+        this.$emit("setParent", res.data.display_name, this.config);
+        this.init();
+      });
+    } else {
+      this.$router.push("/login");
+    }
   }
 };
 </script>

@@ -47,11 +47,23 @@
                 <q-item-label>AuxQueue</q-item-label>
               </q-item-section>
             </q-item>
+            <q-item
+              :active="link === 'party'"
+              clickable
+              v-on:click="$router.push('/party'), (link = 'party')"
+            >
+              <q-item-section avatar>
+                <q-icon name="wc" />
+              </q-item-section>
+              <q-item-section>
+                <q-item-label>Party</q-item-label>
+              </q-item-section>
+            </q-item>
             <q-expansion-item
               :content-inset-level="1"
               expand-separator
               icon="view_list"
-              label="Playlists"
+              label="Playlist"
             >
               <q-item
                 :active="link === 'playlists'"

@@ -30,7 +30,7 @@
 </template>
 <script>
 import { spotify_api } from "src/utils/spotify-api";
-import playlistSelect from "components/playlistSelect";
+import playlistSelect from "components/playlist/playlistSelect";
 import { QImg, QBtn, QSeparator } from "quasar";
 import Store from "src/store/index";
 const alerts = [

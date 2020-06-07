@@ -96,8 +96,8 @@ import Vue from "vue";
 import { spotify_api } from "src/utils/spotify-api";
 import { validationMixin } from "vuelidate";
 import { required } from "vuelidate/lib/validators";
-import songList from "components/songList";
-import playlistSelect from "components/playlistSelect";
+import songList from "components/songs/songList";
+import playlistSelect from "components/playlist/playlistSelect";
 import { QBtn, QItemLabel, QInput, QCheckbox, QImg } from "quasar";
 
 Vue.component("Queue");

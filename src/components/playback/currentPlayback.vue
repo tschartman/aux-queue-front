@@ -3,7 +3,7 @@
     <h6 class="title">Now Playing</h6>
     <div class="row justify-center items-center q-pt-lg">
       <q-img
-        :src="currentlyPlaying.album.images[0].url"
+        :src="currentlyPlaying.coverUri"
         style="width: 150px"
         :ratio="1"
         basic
@@ -15,17 +15,17 @@
 
     <div class="row justify-center items-center  q-pt-lg">
       <div class="text-subtitle1">
-        {{ currentlyPlaying.name }} - {{ currentlyPlaying.artists[0].name }}
+        {{ currentlyPlaying.title }} - {{ currentlyPlaying.artist }}
       </div>
     </div>
-    <div class="row justify-center items-center">
+    <div v-if="controller" class="row justify-center items-center">
       <q-linear-progress
         class="progress q-ma-lg"
         :value="progress / duration"
         color="black"
       />
     </div>
-    <div class="row justify-center text-center">
+    <div v-if="controller" class="row justify-center text-center">
       <div class="col-xs-6 q-mb-md">
         {{ moment(progress).format("mm:ss") }}
       </div>
@@ -33,7 +33,7 @@
         {{ moment(duration - progress).format("mm:ss") }}
       </div>
     </div>
-    <div class="row justify-center items-center">
+    <div v-if="controller" class="row justify-center items-center">
       <q-btn v-on:click="$emit('skipPrevious')" flat icon="skip_previous" />
       <div class="q-mx-md">
         <q-btn
@@ -62,6 +62,7 @@ export default {
   name: "currentPlayback",
   props: {
     currentlyPlaying: Object,
+    controller: Boolean,
     paused: Boolean,
     progress: Number,
     duration: Number,

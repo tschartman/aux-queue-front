@@ -62,6 +62,7 @@
 <script>
 import { validationMixin } from "vuelidate";
 import { required } from "vuelidate/lib/validators";
+import { USER_DATA_QUERY } from "src/graphql/queries/userQueries";
 import {
   TOKEN_AUTH_MUTATION,
   SPOTIFY_REFRESH_MUTATION
@@ -129,12 +130,15 @@ export default {
           });
           await this.$store.dispatch("login", loggedInUser);
         } catch (err) {
-          console.log(err);
           this.loading = false;
           this.authError = "Username or password incorrect";
         }
         if (loggedInUser.data) {
-          this.$apollo.getClient().resetStore();
+          await this.$apollo.getClient().resetStore();
+          const userData = await this.$apollo.query({
+            query: USER_DATA_QUERY
+          });
+          this.$store.dispatch("linkUser", userData.data.user);
           const refreshed = await this.$apollo.mutate({
             mutation: SPOTIFY_REFRESH_MUTATION
           });

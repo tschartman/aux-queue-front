@@ -8,7 +8,7 @@
 </template>
 <script>
 import axios from "axios";
-import songSearch from "components/songSearch";
+import songSearch from "components/songs/songSearch";
 export default {
   name: "searchContainer",
   props: {
