@@ -16,7 +16,10 @@
               v-if="party.currentlyPlaying"
               :src="party.currentlyPlaying.coverUri"
             >
-              <div class="absolute-bottom">
+              <div
+                v-if="party.host.userName !== $store.getters.user.userName"
+                class="absolute-bottom"
+              >
                 <div class="text-subtitle2">
                   {{ party.host.userName }}'s party
                   <q-btn
@@ -25,6 +28,11 @@
                     color="primary"
                     >Join</q-btn
                   >
+                </div>
+              </div>
+              <div v-else class="absolute-bottom">
+                <div class="text-subtitle2">
+                  Your party
                 </div>
               </div>
             </q-img>
