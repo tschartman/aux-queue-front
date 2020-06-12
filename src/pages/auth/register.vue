@@ -217,7 +217,7 @@ export default {
     userNameErrors() {
       const errors = [];
       if (!this.$v.userName.$dirty) return errors;
-      !this.$v.userName.required && errors.push("First Name is required.");
+      !this.$v.userName.required && errors.push("Username is required.");
       !this.unique && errors.push("Username already taken");
       return errors;
     },

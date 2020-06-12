@@ -4,42 +4,36 @@
   </div>
 </template>
 <script>
-import Vue from "vue";
 import { SPOTIFY_AUTH_MUTATION } from "src/graphql/queries/authQueries";
-Vue.component("Link");
-
 export default {
   name: "Link",
   components: {},
   data() {
     return {};
   },
-
   computed: {},
-  methods: {},
-
-  async created() {
-    if (this.$route.query.token && this.$route.query.refresh) {
-      const data = {
-        access_token: this.$route.query.token,
-        refresh_token: this.$route.query.refresh
-      };
-      const response = await this.$apollo.mutate({
+  methods: {
+    async linkSpotify(token, refresh) {
+      const linkSpotify = await this.$apollo.mutate({
         mutation: SPOTIFY_AUTH_MUTATION,
         variables: {
-          accessToken: data.access_token,
-          refreshToken: data.refresh_token
+          accessToken: token,
+          refreshToken: refresh
         }
       });
-      console.log(response);
-      if (response.data) {
+      if (linkSpotify.data) {
         let data = {
-          access_token: data.data.user.access_token,
-          refresh_token: data.data.user.refresh_token
+          access_token: token,
+          refresh_token: refresh
         };
-        await this.$store.dispatch("linkSpotify", data);
+        this.$store.dispatch("linkSpotify", data);
         this.$router.push("/");
       }
+    }
+  },
+  async created() {
+    if (this.$route.query.token && this.$route.query.refresh) {
+      this.linkSpotify(this.$route.query.token, this.$route.query.refresh);
     }
   }
 };

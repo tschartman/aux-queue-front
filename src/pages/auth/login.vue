@@ -142,6 +142,7 @@ export default {
           const refreshed = await this.$apollo.mutate({
             mutation: SPOTIFY_REFRESH_MUTATION
           });
+          console.log(refreshed);
           if (refreshed.data.refreshTokens.user.refreshToken) {
             let data = {
               access_token: refreshed.data.refreshTokens.user.accessToken,

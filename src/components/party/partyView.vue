@@ -13,7 +13,7 @@
         :controller="false"
       />
     </q-pull-to-refresh>
-    <q-scroll-area style="height: 200px;">
+    <q-scroll-area style="height: 300px;">
       <suggestedSongs
         v-if="party.queue.length > 0"
         :host="false"

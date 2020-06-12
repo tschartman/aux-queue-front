@@ -238,7 +238,6 @@ export default {
     spotify_api
       .get("/users/" + this.$store.getters.sUser.id + "/playlists")
       .then(res => {
-        console.log(res);
         this.playlists = res.data.items;
         this.playlist1 = res.data.items[0];
         this.playlist2 = res.data.items[1];
